@@ -9,5 +9,19 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
+{
+//    UILabel *lblInput;
+    
+    UIButton *btnInput;
+}
+
+@property (retain, nonatomic) NSArray *data;
+@property (nonatomic, assign) UIActivityIndicatorViewStyle indicatorStyle;
+
+@end
+
+@protocol MainDelegate <NSObject>
+
+-(void)addDataFrom:(NSArray *)array;
 
 @end

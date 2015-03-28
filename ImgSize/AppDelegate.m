@@ -8,10 +8,23 @@
 
 #import "AppDelegate.h"
 
+@interface AppDelegate ()
+{
+    int count;
+}
+
+@end
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    NSArray *listWindow = [[UIApplication sharedApplication] windows];
+    if ([listWindow containsObject:self.window]) {
+        NSLog(@"OK");
+    }else{
+        NSLog(@"Fail");
+    }
     // Override point for customization after application launch.
     return YES;
 }
@@ -36,11 +49,24 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    
+    NSString *Path = @"~/Documents";
+    NSString *FilePath = [Path stringByExpandingTildeInPath];
+    NSLog(@"Path : %@",FilePath);
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    count = 0;
+    [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(print) userInfo:nil repeats:YES];
+    NSLog(@"程序终止");
+}
+
+-(void)print
+{
+    count ++ ;
+    NSLog(@"count = %d",count);
 }
 
 @end
