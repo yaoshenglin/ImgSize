@@ -7,112 +7,169 @@
 //
 
 #import "AsyncSocket.h"
-#import <TargetConditionals.h>
-#import <sys/socket.h>
-#import <netinet/in.h>
-#import <arpa/inet.h>
-#import <sys/ioctl.h>
-#import <net/if.h>
-#import <netdb.h>
+#import "Tools.h"
+#import "CTB.h"
+
+@interface AsyncSocket ()
+{
+    BOOL isOn;
+}
+
+@end
 
 @implementation AsyncSocket
 
-- (int)Server
+@synthesize udpSocket;
+
+- (instancetype)init
 {
-    struct sockaddr_in server_addr;
-    server_addr.sin_len = sizeof(struct sockaddr_in);
-    server_addr.sin_family = AF_INET;//Address families AF_INET互联网地址簇
-    server_addr.sin_port = htons(11332);
-    server_addr.sin_addr.s_addr = inet_addr("192.168.11.160");
-    bzero(&(server_addr.sin_zero),8);
-    
-    //创建socket
-    int server_socket = socket(AF_INET, SOCK_STREAM, 0);//SOCK_STREAM 有连接
-    if (server_socket == -1) {
-        perror("socket error");
-        return 1;
+    if (self = [super init]) {
+        udpSocket = [[AsyncUdpSocket alloc] initWithDelegate:self];
+        [self enableBroadcast:YES port:8001];
     }
     
-    //绑定socket：将创建的socket绑定到本地的IP地址和端口，此socket是半相关的，只是负责侦听客户端的连接请求，并不能用于和客户端通信
-    int bind_result = bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    if (bind_result == -1) {
-        perror("bind error");
-        return 1;
-    }
-    
-    //listen侦听 第一个参数是套接字，第二个参数为等待接受的连接的队列的大小，在connect请求过来的时候,完成三次握手后先将连接放到这个队列中，直到被accept处理。如果这个队列满了，且有新的连接的时候，对方可能会收到出错信息。
-    if (listen(server_socket, 5) == -1) {
-        perror("listen error");
-        return 1;
-    }
-    
-    struct sockaddr_in client_address;
-    socklen_t address_len;
-    int client_socket = accept(server_socket, (struct sockaddr *)&client_address, &address_len);
-    //返回的client_socket为一个全相关的socket，其中包含client的地址和端口信息，通过client_socket可以和客户端进行通信。
-    if (client_socket == -1) {
-        perror("accept error");
-        return -1;
-    }
-    
-    char recv_msg[1024];
-    char reply_msg[1024];
-    
-    while (1) {
-        bzero(recv_msg, 1024);
-        bzero(reply_msg, 1024);
-        
-        printf("reply:");
-        scanf("%s",reply_msg);
-        send(client_socket, reply_msg, 1024, 0);
-        
-        long byte_num = recv(client_socket,recv_msg,1024,0);
-        recv_msg[byte_num] = '\0';
-        printf("client said:%s\n",recv_msg);
-        
-    }
-    
-    return 0;
+    return self;
 }
 
-- (int)Client
+- (void)enableBroadcast:(BOOL)flag port:(UInt16)port
 {
-    struct sockaddr_in server_addr;
-    server_addr.sin_len = sizeof(struct sockaddr_in);
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(11332);
-    server_addr.sin_addr.s_addr = inet_addr("192.168.11.160");
-    bzero(&(server_addr.sin_zero),8);
-    
-    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket == -1) {
-        perror("socket error");
-        return 1;
+    NSError *error = nil;
+    [udpSocket enableBroadcast:flag error:&error];
+    if (error) {
+        NSLog(@"Broadcast : %@",error.localizedDescription);
     }
-    char recv_msg[1024];
-    char reply_msg[1024];
+    [udpSocket bindToPort:port error:&error];
+    if (error) {
+        NSLog(@"Port : %@",error.localizedDescription);
+    }
     
-    if (connect(server_socket, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_in))==0)     {
-        //connect 成功之后，其实系统将你创建的socket绑定到一个系统分配的端口上，且其为全相关，包含服务器端的信息，可以用来和服务器端进行通信。
-        while (1) {
-            bzero(recv_msg, 1024);
-            bzero(reply_msg, 1024);
-            long byte_num = recv(server_socket,recv_msg,1024,0);
-            recv_msg[byte_num] = '\0';
-            printf("server said:%s\n",recv_msg);
+    [udpSocket receiveWithTimeout:-1 tag:0];
+}
+
+- (void)sendData
+{
+    NSData *data = [Tools getHost1:!isOn];
+    
+    NSString *host = @"112.125.95.30";//@"255.255.255.255",@"192.168.11.28"
+    [udpSocket sendData:data toHost:host port:8001 withTimeout:-1 tag:0];
+}
+
+#pragma mark - --------AsyncUdpSocket-------------------------
+- (void)onUdpSocket:(AsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
+{
+    NSLog(@"没有发送数据:%@",error.localizedDescription);
+}
+
+- (void)onUdpSocket:(AsyncUdpSocket *)sock didSendDataWithTag:(long)tag
+{
+    NSLog(@"已经发送数据");
+}
+
+- (BOOL)onUdpSocket:(AsyncUdpSocket *)sock didReceiveData:(NSData *)data withTag:(long)tag fromHost:(NSString *)host port:(UInt16)port
+{
+    NSString *localIP = [CTB getLocalIPAddress][@"en0"];
+    if (![host hasSuffix:localIP]) {
+        NSLog(@"已经接收数据");
+        NSLog(@"data : %@",data);
+        NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        if (str) {
+            NSLog(@"str : %@",str);
+        }else{
+            [self pasreData:data];
+        }
+    }
+    [sock receiveWithTimeout:-1 tag:0];
+    return YES;
+}
+
+- (void)onUdpSocket:(AsyncUdpSocket *)sock didNotReceiveDataWithTag:(long)tag dueToError:(NSError *)error
+{
+    NSLog(@"没有接收数据:%@",error.localizedDescription);
+}
+
+- (void)closeSocket
+{
+    //[udpSocket close];
+}
+
+- (void)pasreData:(NSData *)data
+{
+    NSString *hexStr = [data dataBytes2HexStr];
+    
+    Byte *data_bytes = (Byte*)[data bytes];
+    Byte data_byte = data_bytes[0];
+    
+    switch (data_byte) {
+        case (Byte) 0xE6 : // 读取主机ID返回
+        {
+            NSLog(@"UdpSocket 读取主机ID返回");
             
-            printf("reply:");
-            scanf("%s",reply_msg);
-            if (send(server_socket, reply_msg, 1024, 0) == -1) {
-                perror("send error");
+            NSString *host_mac = [hexStr substringWithRange:NSMakeRange(2, 12)];
+            if ([host_mac isEqualToString:@"FFFFFFFFFFFF"]) {
+                NSLog(@"UdpSocket 主机不在线!");
+            }else{
+                NSLog(@"UdpSocket 主机在线!  当前主机ID -> %@",host_mac);
             }
         }
-        
+            break;
+        case (Byte) 0XE0 : // 关闭从机返回
+        {
+            isOn = NO;
+            NSLog(@"UdpSocket 关闭从机返回");
+        }
+            break;
+        case (Byte) 0XE1 : // 开启从机返回
+        {
+            isOn = YES;
+            NSLog(@"UdpSocket 开启从机返回");
+        }
+            break;
+        case (Byte) 0XD4 : // 读状态为关机返回
+        {
+            isOn = NO;
+            NSLog(@"UdpSocket 读状态为关机返回");
+        }
+            break;
+        case (Byte) 0xE4 : // 读状态为开机返回
+        {
+            isOn = YES;
+            NSLog(@"UdpSocket 读状态为开机返回");
+        }
+            break;
+        case (Byte) 0xAA : // 主机心跳包
+        {
+            NSLog(@"UdpSocket 主机心跳包返回");
+            NSString *host_mac = [hexStr substringWithRange:NSMakeRange(2, 12)];
+            if ([host_mac isEqualToString:@"FFFFFFFFFFFF"]) {
+                NSLog(@"UdpSocket 主机不在线!");
+            }else{
+                NSLog(@"UdpSocket 主机在线!  当前主机ID -> %@",host_mac);
+                //setUserData(host_mac, @"host_mac");
+            }
+        }
+            break;
+        case (Byte) 0xD8 : // 下发学习指令成功
+        {
+            //dialog.show();
+            NSLog(@"UdpSocket 下发学习指令成功");
+        }
+            break;
+        case (Byte) 0xE8 : // 接收到遥控编码返回
+        {
+            NSLog(@"UdpSocket 接收到遥控编码返回");
+        }
+            break;
+        case (Byte) 0xD9: // 执行摇控指令成功
+        {
+            NSLog(@"UdpSocket 执行摇控指令成功");
+        }
+            break;
+        case (Byte)0xE7:// 接收到上传配置成功返回
+        {
+            NSLog(@"UdpSocket 上传配置成功！正在切换WIFI...");
+        }
+            break;
     }
-    
-    // insert code here...
-    printf("Hello, World!\n");
-    return 0;
 }
 
 @end

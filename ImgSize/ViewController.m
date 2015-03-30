@@ -10,7 +10,9 @@
 #import "MBProgressHUD.h"
 #import "JDStatusBarNotification.h"
 #import "CTB.h"
+#import "Tools.h"
 #import "AddressBook.h"
+#import "AsyncSocket.h"
 
 static NSString *const JDButtonName = @"JDButtonName";
 static NSString *const JDButtonInfo = @"JDButtonInfo";
@@ -26,6 +28,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     UIActivityIndicatorView *activity;
     NSTimer *timer;
     bool isShow;
+    BOOL isOn;
     
     int count;
     NSString *status;
@@ -40,6 +43,8 @@ static NSString *const SBStyle2 = @"SBStyle2";
     NSDate *date;
     UILabel *lblInstantSpeed;
     UILabel *lblPeakSpeed;
+    
+    AsyncSocket *sock;
 }
 
 @end
@@ -68,6 +73,8 @@ static NSString *const SBStyle2 = @"SBStyle2";
     [super viewDidLoad];
     [self initCapacity];
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    sock = [[AsyncSocket alloc] init];
 }
 
 -(void)initCapacity
@@ -77,11 +84,13 @@ static NSString *const SBStyle2 = @"SBStyle2";
     
     btnTest = [CTB buttonType:UIButtonTypeCustom delegate:self to:self.view tag:3 title:@"" img:@""];
     btnTest.frame = GetRect(0, 0, 22.5, 22.5);
-    [btnTest setImage:[UIImage imageNamed:@"底部表情"] forState:UIControlStateNormal];
+    //[btnTest setImage:[UIImage imageNamed:@"底部表情"] forState:UIControlStateNormal];
+    [btnTest setBackgroundImage:[UIImage imageNamed:@"底部表情"] forState:UIControlStateNormal];
     btnTest.center = CGPointMake(Screen_Width/2, 200);
     [self.view addSubview:btnTest];
     
     self.title = @"哈哈";
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:select(closeSocket) name:@"closeSocket" object:nil];
 }
 
 -(void)PrintWord
@@ -129,6 +138,14 @@ static NSString *const SBStyle2 = @"SBStyle2";
         
         //[self PasswordButton];
         //return;
+        NSString *SSID = [Tools getCurrentWifiSSID];
+        if (![SSID isEqualToString:@"CaidanTechnology"]) {
+            NSString *msg = [NSString stringWithFormat:@"当前连接的是 %@",SSID];
+            hudView = hudView ?: [MBProgressHUD showRuningView:self.view];
+            [hudView showDetailMsg:msg delay:2.0f];
+        }
+        
+        [sock sendData];
     }
 }
 
@@ -174,6 +191,11 @@ static NSString *const SBStyle2 = @"SBStyle2";
     if (addressBook) {
         CFRelease(addressBook);
     }
+}
+
+- (void)closeSocket
+{
+    [sock closeSocket];
 }
 
 - (void)didReceiveMemoryWarning

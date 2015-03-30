@@ -67,6 +67,8 @@
 typedef enum {
 	/** default */
 	MBProgressHUDModeIndeterminate,
+    /** Shows only UIActivityIndicatorView */
+    MBProgressHUDModeActivity,
 	/** Progress is shown using a round, pie-chart like, progress view. */
 	MBProgressHUDModeDeterminate,
 	/** Progress is shown using a ring-shaped progress view. */
@@ -188,6 +190,7 @@ typedef enum {
  * @return first found HUD view.
  */
 +(MBProgressHUD *)showRuningView:(UIView *)View;
++(MBProgressHUD *)showRuningView:(UIView *)View activity:(UIActivityIndicatorViewStyle)style;
 
 /**
  * Finds HUD customView and returns them.
@@ -230,6 +233,21 @@ typedef enum {
  * @see animationType
  */
 - (void)hide:(BOOL)animated afterDelay:(NSTimeInterval)delay;
+
+/**
+ * Hide the HUD after a delay. This still calls the hudWasHidden: delegate. This is the counterpart of the show: method. Use it to
+ * hide the HUD when your task completes.
+ *
+ * @param animated If set to YES the HUD will disappear using the current animationType. If set to NO the HUD will not use
+ * animations while disappearing.
+ * @param delay Delay in secons until the HUD is hidden.
+ *
+ * @see animationType
+ */
+- (void)showDetailMsg:(NSString *)msg delay:(NSTimeInterval)delay;
+- (void)showDetailMsg:(NSString *)msg delay:(NSTimeInterval)delay yOffset:(CGFloat)y;
+
+- (void)showImgWith:(NSString *)imgName text:(NSString *)text delay:(NSTimeInterval)delay;
 
 /** 
  * Shows the HUD while a background task is executing in a new thread, then hides the HUD.
@@ -319,7 +337,7 @@ typedef enum {
 //活动指示器类型
 @property (assign, nonatomic) UIActivityIndicatorViewStyle activityStyle;//活动指示器类型
 
-@property (nonatomic) CGSize frameSize;
+//@property (nonatomic) CGFloat Point_Y;
 
 /** 
  * The x-axis offset of the HUD relative to the centre of the superview. 

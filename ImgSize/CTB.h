@@ -358,7 +358,7 @@ BOOL containString(NSString *string,NSString *aString);
 +(BOOL)isExistSelf:(UIViewController *)VC;
 
 //获取本机IP地址
-+ (NSString *)getLocalIPAddress;
++ (NSDictionary *)getLocalIPAddress;
 + (void)getLocalIPAddress:(void (^)(NSDictionary *dicIP))completion;
 //获取外网IP
 + (void)getWANIPAddressWithCompletion:(void(^)(NSString *IPAddress))completion;
@@ -369,5 +369,11 @@ BOOL containString(NSString *string,NSString *aString);
 
 #pragma mark - ----------过滤HTML------------------------
 + (NSString *)removeHTML:(NSString *)html;
+
+@end
+
+@interface NSData (NSObject)
+
+- (NSString *)dataBytes2HexStr;
 
 @end

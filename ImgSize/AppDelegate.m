@@ -59,6 +59,7 @@
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     count = 0;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"closeSocket" object:nil];
     [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(print) userInfo:nil repeats:YES];
     NSLog(@"程序终止");
 }

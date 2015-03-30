@@ -20,4 +20,11 @@
 #pragma mark 设置备份模式
 + (BOOL)addSkipBackupAttributeToItemAtFilePath:(NSString *)filePath;
 
+#pragma mark 获取当前WIFI SSID信息
++(NSString*)getCurrentWifiSSID;
++ (NSData *)getHost;
++ (NSData *)getHost1:(BOOL)isOn;
++ (NSData *)getHost2:(BOOL)isOn;
++ (NSData *)getHostConfig;
+
 @end

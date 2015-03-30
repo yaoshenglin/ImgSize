@@ -98,6 +98,7 @@
 		E25B076A19A491B1001EA090 /* JDStatusBarNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076519A491B1001EA090 /* JDStatusBarNotification.m */; };
 		E25B076B19A491B1001EA090 /* JDStatusBarStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076719A491B1001EA090 /* JDStatusBarStyle.m */; };
 		E25B076C19A491B1001EA090 /* JDStatusBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076919A491B1001EA090 /* JDStatusBarView.m */; };
+		E263E34F1AC92F3800785EE4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E263E34E1AC92F3800785EE4 /* SystemConfiguration.framework */; };
 		E264915C1A651ED8009910C5 /* Color_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E264915B1A651ED8009910C5 /* Color_ViewController.m */; };
 		E270DD2419ADE367009543CE /* myKeyboardType.m in Sources */ = {isa = PBXBuildFile; fileRef = E270DD2319ADE367009543CE /* myKeyboardType.m */; };
 		E2727A6A1A6A59C000CC57D6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2E7E5EC1A27008200E6A108 /* Security.framework */; };
@@ -109,6 +110,8 @@
 		E275EE7E1A08CF4C00483DE5 /* Swift_ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E275EE7D1A08CF4C00483DE5 /* Swift_ViewController.swift */; };
 		E2866C971AAEE5B400D8B6D3 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E2866C961AAEE5B400D8B6D3 /* AsyncSocket.m */; };
 		E28EBFA319FA00ED007753E5 /* MyDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = E28EBFA219FA00ED007753E5 /* MyDrawView.m */; };
+		E2A455B01AC8E9B200AC7293 /* AsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E2A455AF1AC8E9B200AC7293 /* AsyncUdpSocket.m */; };
+		E2A455B21AC8E9EF00AC7293 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2A455B11AC8E9EF00AC7293 /* CFNetwork.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -233,6 +236,7 @@
 		E25B076719A491B1001EA090 /* JDStatusBarStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JDStatusBarStyle.m; sourceTree = "<group>"; };
 		E25B076819A491B1001EA090 /* JDStatusBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JDStatusBarView.h; sourceTree = "<group>"; };
 		E25B076919A491B1001EA090 /* JDStatusBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JDStatusBarView.m; sourceTree = "<group>"; };
+		E263E34E1AC92F3800785EE4 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E264915A1A651ED8009910C5 /* Color_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color_ViewController.h; sourceTree = "<group>"; };
 		E264915B1A651ED8009910C5 /* Color_ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Color_ViewController.m; sourceTree = "<group>"; };
 		E270DD2219ADE367009543CE /* myKeyboardType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myKeyboardType.h; sourceTree = "<group>"; };
@@ -253,6 +257,9 @@
 		E2866C961AAEE5B400D8B6D3 /* AsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncSocket.m; sourceTree = "<group>"; };
 		E28EBFA119FA00ED007753E5 /* MyDrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyDrawView.h; sourceTree = "<group>"; };
 		E28EBFA219FA00ED007753E5 /* MyDrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyDrawView.m; sourceTree = "<group>"; };
+		E2A455AE1AC8E9B200AC7293 /* AsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncUdpSocket.h; sourceTree = "<group>"; };
+		E2A455AF1AC8E9B200AC7293 /* AsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncUdpSocket.m; sourceTree = "<group>"; };
+		E2A455B11AC8E9EF00AC7293 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		E2E7E5EC1A27008200E6A108 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -261,6 +268,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E263E34F1AC92F3800785EE4 /* SystemConfiguration.framework in Frameworks */,
+				E2A455B21AC8E9EF00AC7293 /* CFNetwork.framework in Frameworks */,
 				E2727A6A1A6A59C000CC57D6 /* Security.framework in Frameworks */,
 				E22C944719CC35ED00D9EAC1 /* libsqlite3.dylib in Frameworks */,
 				E218EBC519480F80002160DC /* AudioToolbox.framework in Frameworks */,
@@ -350,6 +359,8 @@
 		E21EE5E619270DBF0051408C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E263E34E1AC92F3800785EE4 /* SystemConfiguration.framework */,
+				E2A455B11AC8E9EF00AC7293 /* CFNetwork.framework */,
 				E2E7E5EC1A27008200E6A108 /* Security.framework */,
 				E22C944619CC35ED00D9EAC1 /* libsqlite3.dylib */,
 				E218EBC419480F80002160DC /* AudioToolbox.framework */,
@@ -443,6 +454,8 @@
 				E25103721A09B12C00E6923C /* Person.swift */,
 				E2866C951AAEE5B400D8B6D3 /* AsyncSocket.h */,
 				E2866C961AAEE5B400D8B6D3 /* AsyncSocket.m */,
+				E2A455AE1AC8E9B200AC7293 /* AsyncUdpSocket.h */,
+				E2A455AF1AC8E9B200AC7293 /* AsyncUdpSocket.m */,
 			);
 			name = Tool;
 			sourceTree = "<group>";
@@ -713,6 +726,7 @@
 				E2727A7A1A6A59EA00CC57D6 /* KeychainItemWrapper.m in Sources */,
 				E23410A4195BAA560086AE54 /* PhotoPreView.m in Sources */,
 				E22C944519CC354B00D9EAC1 /* DB.m in Sources */,
+				E2A455B01AC8E9B200AC7293 /* AsyncUdpSocket.m in Sources */,
 				E2727A7B1A6A59EA00CC57D6 /* TentacleView.m in Sources */,
 				E228DFD9196F7FF200C882E0 /* Test_ViewController.m in Sources */,
 				E22C944219CC351F00D9EAC1 /* AddressBook.m in Sources */,
@@ -802,7 +816,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -834,7 +848,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -846,8 +860,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: yong yin (PCML72KPNS)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
@@ -855,7 +868,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "235ff3f3-5410-4d85-9d5c-729b254ea94d";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -870,15 +883,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: yong yin (PCML72KPNS)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "235ff3f3-5410-4d85-9d5c-729b254ea94d";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				VALID_ARCHS = "armv7 armv7s";

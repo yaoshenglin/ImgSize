@@ -2415,9 +2415,9 @@ BOOL containString(NSString *string,NSString *aString)
     return NO;
 }
 
-+ (NSString *)getLocalIPAddress
++ (NSDictionary *)getLocalIPAddress
 {
-    NSString *localIP = nil;
+    NSMutableDictionary *localIP = [NSMutableDictionary dictionary];
     struct ifaddrs *addrs;
     if (getifaddrs(&addrs)==0) {
         const struct ifaddrs *cursor = addrs;
@@ -2427,15 +2427,7 @@ BOOL containString(NSString *string,NSString *aString)
                 NSString *IP = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)cursor->ifa_addr)->sin_addr)];
                 
                 NSString *name = [NSString stringWithUTF8String:cursor->ifa_name];
-                NSLog(@"%@ : %@",name,IP);
-                if ([name isEqualToString:@"en0"]) {
-                    // Wi-Fi adapter
-                    localIP = IP;
-                }
-                if ([name isEqualToString:@"en1"]) {
-                    // Wi-Fi adapter
-                    localIP = IP;
-                }
+                [localIP setObject:IP forKey:name];
             }
             cursor = cursor->ifa_next;
         }
@@ -2457,7 +2449,7 @@ BOOL containString(NSString *string,NSString *aString)
                     NSString *IP = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)cursor->ifa_addr)->sin_addr)];
                     
                     NSString *name = [NSString stringWithUTF8String:cursor->ifa_name];
-                    NSLog(@"%@ : %@",name,IP);
+                    //NSLog(@"%@ : %@",name,IP);
                     
                     name = name ? name : @"en";
                     IP = IP ? IP : @"0.0.0.0";
@@ -2547,6 +2539,29 @@ BOOL containString(NSString *string,NSString *aString)
     html = [html stringByReplacingOccurrencesOfString:@"\r\n" withString:@""];
     return html;
     
+}
+
+@end
+
+@implementation NSData (NSObject)
+
+- (NSString *)dataBytes2HexStr
+{
+    if (!self) {
+        return nil;
+    }
+    Byte *bytes = (Byte*)[self bytes];
+    NSString *hexStr = @"";
+    for(int i=0;i<[self length];i++)
+    {
+        NSString *newHexStr = [NSString stringWithFormat:@"%X",bytes[i]&0xff];///16进制数
+        if([newHexStr length] == 1)
+            hexStr=[NSString stringWithFormat:@"%@0%@",hexStr,newHexStr];
+        else
+            hexStr=[NSString stringWithFormat:@"%@%@",hexStr,newHexStr];
+    }
+    
+    return hexStr;
 }
 
 @end
