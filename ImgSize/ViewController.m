@@ -75,6 +75,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
 	// Do any additional setup after loading the view, typically from a nib.
     
     sock = [[AsyncSocket alloc] init];
+    [sock enableBroadcast:YES port:8001];
 }
 
 -(void)initCapacity

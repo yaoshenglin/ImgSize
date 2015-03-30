@@ -25,7 +25,6 @@
 {
     if (self = [super init]) {
         udpSocket = [[AsyncUdpSocket alloc] initWithDelegate:self];
-        [self enableBroadcast:YES port:8001];
     }
     
     return self;
