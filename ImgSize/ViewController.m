@@ -75,7 +75,8 @@ static NSString *const SBStyle2 = @"SBStyle2";
 	// Do any additional setup after loading the view, typically from a nib.
     
     sock = [[AsyncSocket alloc] init];
-    [sock enableBroadcast:YES port:8001];
+    //sock.host = @"192.168.11.250";
+    [sock enableBroadcast:YES port:8101];
 }
 
 -(void)initCapacity
@@ -140,7 +141,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
         //[self PasswordButton];
         //return;
         NSString *SSID = [Tools getCurrentWifiSSID];
-        if (![SSID isEqualToString:@"CaidanTechnology"]) {
+        if (SSID && ![SSID isEqualToString:@"CaidanTechnology"]) {
             NSString *msg = [NSString stringWithFormat:@"当前连接的是 %@",SSID];
             hudView = hudView ?: [MBProgressHUD showRuningView:self.view];
             [hudView showDetailMsg:msg delay:2.0f];

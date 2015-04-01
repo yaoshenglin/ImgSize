@@ -24,6 +24,8 @@
 - (instancetype)init
 {
     if (self = [super init]) {
+        _port = 8001;
+        _host = @"255.255.255.255";
         udpSocket = [[AsyncUdpSocket alloc] initWithDelegate:self];
     }
     
@@ -42,15 +44,15 @@
         NSLog(@"Port : %@",error.localizedDescription);
     }
     
+    _port = port;
     [udpSocket receiveWithTimeout:-1 tag:0];
 }
 
 - (void)sendData
 {
-    NSData *data = [Tools getHost1:!isOn];
+    NSData *data = [Tools getHost];
     
-    NSString *host = @"112.125.95.30";//@"255.255.255.255",@"192.168.11.28"
-    [udpSocket sendData:data toHost:host port:8001 withTimeout:-1 tag:0];
+    [udpSocket sendData:data toHost:_host port:_port withTimeout:-1 tag:0];
 }
 
 #pragma mark - --------AsyncUdpSocket-------------------------
@@ -68,7 +70,7 @@
 {
     NSString *localIP = [CTB getLocalIPAddress][@"en0"];
     if (![host hasSuffix:localIP]) {
-        NSLog(@"已经接收数据");
+        NSLog(@"已经接收来自%@数据,端口:%d",host,port);
         NSLog(@"data : %@",data);
         NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if (str) {

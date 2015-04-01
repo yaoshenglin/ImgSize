@@ -12,6 +12,8 @@
 
 @interface AsyncSocket : NSObject
 
+@property (assign, nonatomic) UInt16 port;
+@property (retain, nonatomic) NSString *host;
 @property (retain, nonatomic) AsyncUdpSocket *udpSocket;
 
 - (void)enableBroadcast:(BOOL)flag port:(UInt16)port;
