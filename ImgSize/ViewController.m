@@ -12,7 +12,6 @@
 #import "CTB.h"
 #import "Tools.h"
 #import "AddressBook.h"
-#import "AsyncSocket.h"
 
 static NSString *const JDButtonName = @"JDButtonName";
 static NSString *const JDButtonInfo = @"JDButtonInfo";
@@ -21,7 +20,7 @@ static NSString *const JDNotificationText = @"JDNotificationText";
 static NSString *const SBStyle1 = @"SBStyle1";
 static NSString *const SBStyle2 = @"SBStyle2";
 
-@interface ViewController ()<CTBDelegate,UITextViewDelegate,UITextFieldDelegate>
+@interface ViewController ()<UITextViewDelegate,UITextFieldDelegate>
 {
     UILabel *lblPlaceholder;
     UIView *BGView;
@@ -29,9 +28,11 @@ static NSString *const SBStyle2 = @"SBStyle2";
     NSTimer *timer;
     bool isShow;
     BOOL isOn;
+    BOOL isConnect;
     
     int count;
     NSString *status;
+    NSMutableDictionary *dicAccess;
     
     CGFloat progress;
     
@@ -43,8 +44,6 @@ static NSString *const SBStyle2 = @"SBStyle2";
     NSDate *date;
     UILabel *lblInstantSpeed;
     UILabel *lblPeakSpeed;
-    
-    AsyncSocket *sock;
 }
 
 @end
@@ -73,16 +72,13 @@ static NSString *const SBStyle2 = @"SBStyle2";
     [super viewDidLoad];
     [self initCapacity];
 	// Do any additional setup after loading the view, typically from a nib.
-    
-    sock = [[AsyncSocket alloc] init];
-    //sock.host = @"192.168.11.250";
-    [sock enableBroadcast:YES port:8101];
 }
 
 -(void)initCapacity
 {
     self.navigationItem.leftBarButtonItem = [CTB BarButtonWithTitle:@"退出" target:self tag:1];
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"更多" target:self tag:2];
+    dicAccess = [NSMutableDictionary dictionary];
     
     btnTest = [CTB buttonType:UIButtonTypeCustom delegate:self to:self.view tag:3 title:@"" img:@""];
     btnTest.frame = GetRect(0, 0, 22.5, 22.5);
@@ -92,7 +88,6 @@ static NSString *const SBStyle2 = @"SBStyle2";
     [self.view addSubview:btnTest];
     
     self.title = @"哈哈";
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:select(closeSocket) name:@"closeSocket" object:nil];
 }
 
 -(void)PrintWord
@@ -115,47 +110,25 @@ static NSString *const SBStyle2 = @"SBStyle2";
         
         //[self.view bringSubviewToFront:ViewBlue];
         
-        UIViewController *Second = [CTB getControllerWithIdentity:@"Second" storyboard:nil];
-        self.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:Second animated:YES];
-        //[self presentViewController:Second animated:YES completion:nil];
-        self.hidesBottomBarWhenPushed = NO;
-        
-        [CTB getLocalIPAddress:^(NSDictionary *dicIP){
-            NSArray *list = dicIP.allKeys;
-            
-            NSMutableArray *listResult = [NSMutableArray array];
-            
-            for (NSString *key in list) {
-                NSString *result = [NSString stringWithFormat:@"%@ : %@",key,dicIP[key]];
-                [listResult addObject:result];
-            }
-            
-            if ([Second respondsToSelector:select(addDataFrom:)]) {
-                [(id)Second addDataFrom:listResult];
-            }
-        }];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择设备" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"门禁", @"主机", nil];
+        alert.tag = 2;
+        [alert show];
     }
     if (button.tag == 3) {
         
-        //[self PasswordButton];
-        //return;
-        NSString *SSID = [Tools getCurrentWifiSSID];
-        if (SSID && ![SSID isEqualToString:@"CaidanTechnology"]) {
-            NSString *msg = [NSString stringWithFormat:@"当前连接的是 %@",SSID];
-            hudView = hudView ?: [MBProgressHUD showRuningView:self.view];
-            [hudView showDetailMsg:msg delay:2.0f];
-        }
-        
-        [sock sendData];
+        self.hidesBottomBarWhenPushed = YES;
+        UIViewController *Test = getController(@"Test", nil);
+        [Test setValue:dicAccess forKey:@"dicAccess"];
+        [self.navigationController pushViewController:Test animated:YES];
+        self.hidesBottomBarWhenPushed = NO;
     }
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSString *btnTitle = [alertView buttonTitleAtIndex:buttonIndex];
-    if ([alertView.title isEqualToString:@"提示"]) {
-        if ([btnTitle isEqualToString:@"OK"]) {
+    if (alertView.tag == 1) {
+        if ([btnTitle isEqualToString:@"确定"]) {
             exit(1);
         }else{
             //[imgView startAnimating];
@@ -172,6 +145,21 @@ static NSString *const SBStyle2 = @"SBStyle2";
 //            }else{
 //                [self addContacts];
 //            }
+        }
+    }
+    else if (alertView.tag == 2) {
+        UIViewController *Second = [CTB getControllerWithIdentity:@"Second" storyboard:nil];
+        self.hidesBottomBarWhenPushed = YES;
+        [Second setValue:dicAccess forKey:@"dicAccess"];
+        if ([btnTitle isEqualToString:@"门禁"]) {
+            [Second setValue:@(1) forKey:@"tag"];
+            [self.navigationController pushViewController:Second animated:YES];
+            self.hidesBottomBarWhenPushed = NO;
+        }
+        else if ([btnTitle isEqualToString:@"主机"]) {
+            [Second setValue:@(2) forKey:@"tag"];
+            [self.navigationController pushViewController:Second animated:YES];
+            self.hidesBottomBarWhenPushed = NO;
         }
     }
 }
@@ -195,15 +183,15 @@ static NSString *const SBStyle2 = @"SBStyle2";
     }
 }
 
-- (void)closeSocket
-{
-    [sock closeSocket];
-}
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
 }
 
 @end

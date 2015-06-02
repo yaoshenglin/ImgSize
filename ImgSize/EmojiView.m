@@ -9,7 +9,7 @@
 #import "EmojiView.h"
 #import "CTB.h"
 
-@interface EmojiView ()<UIScrollViewDelegate,CTBDelegate>
+@interface EmojiView ()<UIScrollViewDelegate>
 {
     UIScrollView *iScrollView;
 }

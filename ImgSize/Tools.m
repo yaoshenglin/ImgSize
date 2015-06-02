@@ -7,6 +7,7 @@
 //
 
 #import "Tools.h"
+#import "CTB.h"
 #include <sys/xattr.h>
 //#import <SystemConfiguration/SystemConfiguration.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
@@ -98,6 +99,34 @@
     }
 }
 
+#pragma mark 获取crc校验码
++(NSData*)getCRC:(NSMutableData*)dataBytes
+{
+    Byte sum = 0x00;
+    Byte *bytes = (Byte *)[dataBytes bytes];
+    NSUInteger length = dataBytes.length;
+    for (int i = 0; i < length; i++) {
+        sum += bytes[i];
+    }
+    
+    return [NSData dataWithBytes:&sum length:1];
+}
+
++ (NSData *)getCRCWith:(NSArray *)listData
+{
+    NSMutableData *result = [NSMutableData data];
+    for (NSData *data in listData) {
+        [result appendData:data];
+    }
+    
+    if (result.length > 0) {
+        NSData *data = [self getCRC:result];
+        return data;
+    }
+    
+    return nil;
+}
+
 #pragma mark 获取当前WIFI SSID信息
 +(NSString*)getCurrentWifiSSID
 {
@@ -157,6 +186,114 @@
 {
     NSData *buffer = [Tools makeUploadConfig:@"iFace" password:@"iFace2015" serverip:@"112.125.95.30" serverport:8001];
     return buffer;
+}
+
+#pragma mark - -------开关的CRC校验----------------
++(NSData*)replaceCRCForSwitch:(NSData *)buffer
+{
+    if (!buffer) {
+        return nil;
+    }
+    NSMutableData *result = [[NSMutableData alloc] init];
+    [result appendData:buffer];
+    
+    Byte crc1 = 0x00;
+    Byte crc2 = 0x00;
+    Byte *value = (Byte *)[buffer bytes];
+    
+    for (int i=0; i<buffer.length; i++) {
+        crc1 += value[i];
+        crc2 ^= value[i];
+    }
+    
+    Byte crc[] = {crc1, crc2};
+    [result appendBytes:crc length:sizeof(crc)];
+    
+    return result;
+    
+}
+
+#pragma mark 构造开门动作
++ (NSData*)makeOpenDoorActionWithSN:(NSString*)SN parmsDoor:(NSString*)parmsDoor
+{
+    Byte byte[] = {0x7E};
+    NSData *dataSign = [NSData dataWithBytes:byte length:1];
+    NSData *dataSN = [SN dataUsingEncoding:NSASCIIStringEncoding];
+    NSData *dataContent = [parmsDoor dataByHexString];
+    
+    // 检验码：除标志码和检验码，命令中所有字节都相加然后取尾子节。
+    NSData *dataCRC = [Tools getCRCWith:@[dataSN,dataContent]];//检验码
+    
+    //输出拼接格式 SIGN, content, CRC, SIGN
+    NSMutableData *result =[[NSMutableData alloc] init];
+    [result appendData:dataSign];//标志码
+    [result appendData:dataSN];//门系列号
+    [result appendData:dataContent];//控制命令
+    [result appendData:dataCRC];//检验码
+    [result appendData:dataSign];//标志码
+    
+    return result;
+}
+
+#pragma mark - -------组合门禁控制命令----------------
++ (NSString *)makeControl:(NSString *)control value:(NSString *)value
+{
+    NSString *result = [self makeControl:control dataLen:4 value:value];
+    
+    return result;
+}
+
++ (NSString *)makeControl:(NSString *)control dataLen:(int)len value:(NSString *)value
+{
+    if (len != value.length/2) {
+        [CTB showMsg:@"创建指令有误"];
+        return nil;
+    }
+    NSString *result = [control stringByAppendingFormat:@"%08x%@",len,value];
+    if (len == 0) {
+        result = [control stringByAppendingFormat:@"%08x",len];
+    }
+    
+    return result;
+}
+
++ (NSData *)makeDoorCommandWith:(NSString *)SN pwd:(NSString *)pwd msg:(NSString *)msg control:(NSString *)control
+{
+    NSData *dataSign = [@"\x7e" dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *dataSN = [SN dataUsingEncoding:NSASCIIStringEncoding];
+    
+    if (SN.length <= 0) {
+        SN = @"FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF";
+        dataSN = [SN dataUsingEncoding:NSASCIIStringEncoding];
+    }
+    
+    if (pwd.length < 8) {
+        pwd = @"FFFFFFFF";
+    }
+    
+    if (msg.length < 8) {
+        msg = @"00000000";
+    }
+    
+    if (control.length <= 0) {
+        return nil;
+    }
+    
+    NSString *parmsDoor = [NSString stringWithFormat:@"%@%@%@",pwd,msg,control];
+    NSData *dataContent = [parmsDoor dataByHexString];
+    
+    // 检验码：除标志码和检验码，命令中所有字节都相加然后取尾子节。
+    NSData *dataCRC = [Tools getCRCWith:@[dataSN,dataContent]];//检验码
+    
+    //输出拼接格式 SIGN, content, CRC, SIGN
+    NSMutableData *result =[[NSMutableData alloc] init];
+    [result appendData:dataSign];   //标志码
+    [result appendData:dataSN];     //门系列号
+    [result appendData:dataContent];//控制命令
+    [result appendData:dataCRC];    //检验码
+    [result appendData:dataSign];   //标志码
+    
+    return result;
 }
 
 @end

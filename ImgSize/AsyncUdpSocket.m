@@ -1757,6 +1757,11 @@ static void MyCFSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, con
 	
 	fd_set fds;
 	FD_ZERO(&fds);
+    
+    if (theNativeSocket < 0) {
+        return NO;
+    }
+    
 	FD_SET(theNativeSocket, &fds);
 	
 	struct timeval timeout;
@@ -1980,6 +1985,11 @@ static void MyCFSocketCallback(CFSocketRef, CFSocketCallBackType, CFDataRef, con
 	
 	fd_set fds;
 	FD_ZERO(&fds);
+    
+    if (theNativeSocket < 0) {
+        return NO;
+    }
+    
 	FD_SET(theNativeSocket, &fds);
 	
 	struct timeval timeout;

@@ -9,7 +9,7 @@
 #import "Third_ViewController.h"
 #import "CTB.h"
 
-@interface Third_ViewController ()<CTBDelegate,UIScrollViewDelegate,UIWebViewDelegate,UIActionSheetDelegate>
+@interface Third_ViewController ()<UIScrollViewDelegate,UIWebViewDelegate,UIActionSheetDelegate>
 {
     UIScrollView *scrollview;
     UIPageControl *pageControl;

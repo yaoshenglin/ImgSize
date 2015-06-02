@@ -10,15 +10,26 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <ifaddrs.h>
+#include <CommonCrypto/CommonDigest.h>
+#import <SystemConfiguration/CaptiveNetwork.h>//获取WiFi信息
 
-@interface CTB () <UIAlertViewDelegate>
+@interface CTB () <UIAlertViewDelegate,UITableViewDelegate>
 
 @end
 
-const CTB *Ctb;
-
 @implementation CTB
-+(id)getControllerWithIdentity:(NSString *)identifier storyboard:(NSString *)title
+
++ (CTB *)getInstance
+{
+    static dispatch_once_t once;
+    static CTB *sharedInstance;
+    dispatch_once(&once, ^ {
+        sharedInstance = [[CTB alloc] init];
+    });
+    return sharedInstance;
+}
+
++ (id)getControllerWithIdentity:(NSString *)identifier storyboard:(NSString *)title
 {
     UIStoryboard *storyBoard = nil;
     if (title==NULL) {
@@ -41,15 +52,14 @@ const CTB *Ctb;
 id getController(NSString *identifier,NSString *title)
 {
     UIStoryboard *storyBoard = nil;
-    if (title==NULL) {
+    if (!title || title.length <= 0) {
         //应用程序的名称和版本号等信息都保存在mainBundle的一个字典中，用下面代码可以取出来。
         NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
-        
         title = [infoDict objectForKey:@"UIMainStoryboardFile"];
-        storyBoard = [UIStoryboard storyboardWithName:title bundle:nil];
-    }else{
-        storyBoard = [UIStoryboard storyboardWithName:title bundle:nil];
     }
+    
+    storyBoard = [UIStoryboard storyboardWithName:title bundle:nil];
+    
     if (storyBoard == NULL) {
         return NULL;
     }
@@ -58,27 +68,36 @@ id getController(NSString *identifier,NSString *title)
     return viewController;
 }
 
-+(UIWindow *)getWindow
++ (UIWindow *)getWindow
 {
     //活跃的window
     NSArray *listWindow = [[UIApplication sharedApplication] windows];
     return [listWindow firstObject];
 }
 
-+(void)ButtonEvents:(UIButton *)button
++ (void)ButtonEvents:(UIButton *)button
 {
 //    NSLog(@"请注意此方法");
 }
 
--(void)ButtonEvents:(UIButton *)button
+- (void)ButtonEvents:(UIButton *)button
 {
     if (button.tag==1) {
         [CTB alertWithMessage:@"你确定要退出吗" Delegate:self tag:1];
     }
 }
 
+#pragma mark UIView
++ (UIView *)viewWithColor:(UIColor *)color
+{
+    color = color ? color : [UIColor clearColor];
+    UIView *View = [[UIView alloc] initWithFrame:CGRectZero];
+    View.backgroundColor = color;
+    return View;
+}
+
 #pragma mark - ========按钮=UIButton=============================
-+(UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName
++ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName
 {
     type = type ?: UIButtonTypeCustom;
     UIButton *button = [UIButton buttonWithType:type];
@@ -119,7 +138,7 @@ id getController(NSString *identifier,NSString *title)
     return button;
 }
 
-+(UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName action:(SEL)action
++ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName action:(SEL)action
 {
     UIButton *button = [[self class] buttonType:type delegate:nil to:View tag:tag title:title img:imgName];
     if ([delegate respondsToSelector:action]) {
@@ -135,7 +154,7 @@ typedef NS_ENUM(NSInteger, ImgType)
     Img_Background = 2
 };
 
-+(void)setImg:(NSDictionary *)dicData button:(UIButton *)button, ...
++ (void)setImg:(NSDictionary *)dicData button:(UIButton *)button, ...
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -165,7 +184,7 @@ typedef NS_ENUM(NSInteger, ImgType)
     va_end(args);
 }
 
-+(void)settitleColor:(NSDictionary *)dicData button:(UIButton *)button, ...
++ (void)settitleColor:(NSDictionary *)dicData button:(UIButton *)button, ...
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -181,7 +200,7 @@ typedef NS_ENUM(NSInteger, ImgType)
     va_end(args);
 }
 
-+(NSMutableDictionary *)dicWith:(NSDictionary *)dic
++ (NSMutableDictionary *)dicWith:(NSDictionary *)dic
 {
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
     if (dic) {
@@ -194,14 +213,14 @@ typedef NS_ENUM(NSInteger, ImgType)
 NSMutableDictionary *DicWith(NSDictionary *dic)
 {
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
-    if (dic) {
-        [result setDictionary:dic];
+    if (dic && [dic isKindOfClass:[NSDictionary class]]) {
+        result.dictionary = dic;
     }
     
     return result;
 }
 
-+(void)addTarget:(id)delegate action:(SEL)action button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION
++ (void)addTarget:(id)delegate action:(SEL)action button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -215,7 +234,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     va_end(args);
 }
 
-+(void)addDownTarget:(id)delegate action:(SEL)action button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION
++ (void)addDownTarget:(id)delegate action:(SEL)action button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -229,7 +248,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     va_end(args);
 }
 
-+(void)setRadius:(CGFloat)radius View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
++ (void)setTextColor:(UIColor *)color View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -237,13 +256,35 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     
     // get rest of the objects until nil is found
     for (UIView *v = View; v != nil; v = va_arg(args,UIView *)) {
+        if ([v isKindOfClass:[UIButton class]]) {
+            UIButton *btn = (UIButton *)v;
+            [btn setTitleColor:color forState:UIControlStateNormal];
+        }
+        else if ([v isKindOfClass:[UILabel class]]) {
+            UILabel *lbl = (UILabel *)v;
+            lbl.textColor = color;
+        }
+    }
+    
+    va_end(args);
+}
+
++ (void)setRadius:(CGFloat)radius View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
+{
+    va_list args;
+    // scan for arguments after firstObject.
+    va_start(args, View);
+    
+    // get rest of the objects until nil is found
+    for (UIView *v = View; v != nil; v = va_arg(args,UIView *)) {
+        v.clipsToBounds ? (void)v : (void)(v.clipsToBounds = YES);
         v.layer.cornerRadius = radius;
     }
     
     va_end(args);
 }
 
-+(void)setBorderWidth:(CGFloat)width View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
++ (void)setBorderWidth:(CGFloat)width View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -252,13 +293,13 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     // get rest of the objects until nil is found
     for (UIView *v = View; v != nil; v = va_arg(args,UIView *)) {
         v.layer.borderWidth = width;
-        v.layer.borderColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5].CGColor;
+        v.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.5].CGColor;
     }
     
     va_end(args);
 }
 
-+(void)setBorderWidth:(CGFloat)width Color:(UIColor *)color View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
++ (void)setBorderWidth:(CGFloat)width Color:(UIColor *)color View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -273,8 +314,57 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     va_end(args);
 }
 
+//按钮底部添加线条
++ (void)setBottomLineToBtn:(id)button, ...
+{
+    va_list args;
+    // scan for arguments after firstObject.
+    va_start(args, button);
+    
+    // get rest of the objects until nil is found
+    for (UIButton *btn = button; btn != nil; btn = va_arg(args,UIButton *)) {
+        if ([btn isKindOfClass:[UIButton class]]) {
+            UIView *lineView = getSubViewBy([UIView class], btn, 99);
+            if (!lineView) {
+                lineView = [[UIView alloc] initWithFrame:GetRect(0, GetVHeight(btn)-1, GetVWidth(btn), 1)];
+                lineView.tag = 99;
+                lineView.backgroundColor = [UIColor grayColor];
+                [btn addSubview:lineView];
+            }
+            
+            lineView.hidden = NO;
+        }
+    }
+    
+    va_end(args);
+}
+
++ (void)setBottomLineHigh:(CGFloat)high Color:(UIColor *)color toV:(id)button, ...
+{
+    va_list args;
+    // scan for arguments after firstObject.
+    va_start(args, button);
+    
+    // get rest of the objects until nil is found
+    for (UIButton *btn = button; btn != nil; btn = va_arg(args,UIButton *)) {
+        if ([btn isKindOfClass:[UIButton class]]) {
+            UIView *lineView = getSubViewBy([UIView class], btn, 99);
+            if (!lineView) {
+                lineView = [[UIView alloc] initWithFrame:GetRect(0, GetVHeight(btn)-high, GetVWidth(btn), high)];
+                lineView.tag = 99;
+                lineView.backgroundColor = color;
+                [btn addSubview:lineView];
+            }
+            
+            lineView.hidden = NO;
+        }
+    }
+    
+    va_end(args);
+}
+
 //设置左边text间距
-+(void)setLeftViewWithWidth:(CGFloat)w textField:(UITextField *)textField, ... NS_REQUIRES_NIL_TERMINATION
++ (void)setLeftViewWithWidth:(CGFloat)w textField:(UITextField *)textField, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -290,7 +380,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 }
 
 #pragma mark 添加圆角
-+(void)drawBorder:(UIView *)view radius:(float)radius borderWidth:(float)borderWidth borderColor:(UIColor *)borderColor
++ (void)drawBorder:(UIView *)view radius:(float)radius borderWidth:(float)borderWidth borderColor:(UIColor *)borderColor
 {
     CALayer *layer = [view layer];
     [layer setMasksToBounds:YES];
@@ -299,7 +389,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     [layer setBorderColor:[borderColor CGColor]];
 }
 
-+(void)setHidden:(BOOL)hidden View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
++ (void)setHidden:(BOOL)hidden View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -313,34 +403,35 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     va_end(args);
 }
 
-+(UIBarButtonItem *)BarButtonWithTitle:(NSString *)title target:(id)target tag:(NSUInteger)tag
+#pragma mark - ==========UIBarButtonItem===================
++ (UIBarButtonItem *)BarButtonWithTitle:(NSString *)title target:(id)target tag:(NSUInteger)tag
 {
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:target action:select(ButtonEvents:)];
     BtnItem.tag = tag;
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BackBarButtonWithTitle:(NSString *)title
++ (UIBarButtonItem *)BackBarButtonWithTitle:(NSString *)title
 {
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:nil action:nil];
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarButtonWithStyle:(UIBarButtonSystemItem)style target:(id)target tag:(NSUInteger)tag
++ (UIBarButtonItem *)BarButtonWithStyle:(UIBarButtonSystemItem)style target:(id)target tag:(NSUInteger)tag
 {
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:style target:target action:select(ButtonEvents:)];
     BtnItem.tag = tag;
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarButtonWithImg:(UIImage *)image target:(id)target tag:(NSUInteger)tag
++ (UIBarButtonItem *)BarButtonWithImg:(UIImage *)image target:(id)target tag:(NSUInteger)tag
 {
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:target action:select(ButtonEvents:)];
     BtnItem.tag = tag;
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarButtonWithImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag
++ (UIBarButtonItem *)BarButtonWithImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag
 {
     UIImage *image = [UIImage imageNamed:imgName];
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:target action:select(ButtonEvents:)];
@@ -348,7 +439,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarButtonWithBtnImg:(UIImage *)image target:(id)target tag:(NSUInteger)tag
++ (UIBarButtonItem *)BarButtonWithBtnImg:(UIImage *)image target:(id)target tag:(NSUInteger)tag
 {
     UIButton *btnBar = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnBar setImage:image forState:UIControlStateNormal];
@@ -359,7 +450,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarButtonWithBtnImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag
++ (UIBarButtonItem *)BarButtonWithBtnImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag
 {
     UIImage *image = [UIImage imageNamed:imgName];
     UIButton *btnBar = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -371,7 +462,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarWithBtnImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag rect:(CGRect)rect
++ (UIBarButtonItem *)BarWithBtnImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag rect:(CGRect)rect
 {
     UIImage *image = [UIImage imageNamed:imgName];
     UIButton *btnBar = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -383,13 +474,13 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarButtonWithCustomView:(UIView *)View
++ (UIBarButtonItem *)BarButtonWithCustomView:(UIView *)View
 {
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithCustomView:View];
     return BtnItem;
 }
 
-+(UIBarButtonItem *)BarWithWidth:(CGFloat)w title:(NSString *)title
++ (UIBarButtonItem *)BarWithWidth:(CGFloat)w title:(NSString *)title
 {
     UILabel *lblNavTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, w, 44)];
     lblNavTitle.text = title;
@@ -399,7 +490,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return barItem;
 }
 
-+(UIBarButtonItem *)BarWithTitle:(NSString *)title delegate:(id)delegate action:(SEL)action
++ (UIBarButtonItem *)BarWithTitle:(NSString *)title delegate:(id)delegate action:(SEL)action
 {
     UIButton *btnBack = [UIButton buttonWithType:UIButtonTypeCustom];
     UIImageView *imgBack = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"顶部左上角返回按钮"]];
@@ -422,7 +513,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return barItem;
 }
 
-+(NSArray *)BarButtonWithTitle:(NSArray *)array delegate:(id)delegate
++ (NSArray *)BarButtonWithTitle:(NSArray *)array delegate:(id)delegate
 {
     NSMutableArray *result = [NSMutableArray array];
     if (array.count>1) {
@@ -446,7 +537,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return result;
 }
 
-+(NSArray *)BarButtonWithImg:(NSArray *)array delegate:(id)delegate
++ (NSArray *)BarButtonWithImg:(NSArray *)array delegate:(id)delegate
 {
     NSMutableArray *result = [NSMutableArray array];
     if (array.count>1) {
@@ -470,8 +561,21 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return result;
 }
 
++ (void)tabBarTextColor:(UIColor *)aColor selected:(UIColor *)bColor
+{
+    //UIFont *font = [UIFont fontWithName:@"AmericanTypewriter" size:13.0f];
+    //NSValue *TextShadowOffset = [NSValue valueWithUIOffset:UIOffsetMake(0.0f,1.0f)];
+    NSDictionary *dic = @{UITextAttributeTextColor:aColor};
+    //设置tabbar字体颜色(未选中)
+    [[UITabBarItem appearance] setTitleTextAttributes:dic forState:UIControlStateNormal];
+    
+    dic = @{UITextAttributeTextColor:bColor};
+    //设置tabbar字体颜色(选中)
+    [[UITabBarItem appearance] setTitleTextAttributes:dic forState:UIControlStateSelected];
+}
+
 #pragma mark - ==============创建导航栏退出按钮===========================
-+(void)createQuitBarButtonItem:(UIViewController *)VC delegate:(id)delegate location:(int)location
++ (void)createQuitBarButtonItem:(UIViewController *)VC delegate:(id)delegate location:(int)location
 {
     UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"X" style:UIBarButtonItemStylePlain target:delegate action:select(ButtonEvents:)];
     button.tag = 1;
@@ -484,7 +588,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 }
 
 #pragma mark - ========实用TextField==============================
-+(UITextField *)createTextField:(int)tag hintTxt:(NSString *)placeholder V:(UIView *)View
++ (UITextField *)createTextField:(int)tag hintTxt:(NSString *)placeholder V:(UIView *)View
 {
     CGFloat h=tag*80-20;
     CGRect rect=CGRectMake(10, h, 300, 40);
@@ -508,7 +612,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 }
 
 #pragma mark - =========Label=============================
-+(UILabel *)labelTag:(int)tag toView:(UIView *)View text:(NSString *)text wordSize:(CGFloat)size
++ (UILabel *)labelTag:(int)tag toView:(UIView *)View text:(NSString *)text wordSize:(CGFloat)size
 {
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.tag = tag;
@@ -526,7 +630,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return label;
 }
 
-+(UILabel *)labelTag:(int)tag toView:(UIView *)View text:(NSString *)text wordSize:(CGFloat)size alignment:(NSTextAlignment)textAlignment
++ (UILabel *)labelTag:(int)tag toView:(UIView *)View text:(NSString *)text wordSize:(CGFloat)size alignment:(NSTextAlignment)textAlignment
 {
     UILabel *label = [[self class] labelTag:tag toView:View text:text wordSize:size];
     label.textAlignment = textAlignment;
@@ -534,7 +638,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 }
 
 #pragma mark - ========TextField==============================
-+(UITextField *)textFieldTag:(int)tag holderTxt:(NSString *)placeholder V:(UIView *)View delegate:(id)delegate
++ (UITextField *)textFieldTag:(int)tag holderTxt:(NSString *)placeholder V:(UIView *)View delegate:(id)delegate
 {
     UITextField *textField = [[UITextField alloc] initWithFrame:CGRectZero];
     textField.tag = tag;
@@ -557,7 +661,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 }
 
 #pragma mark - ========分段控件==============================
-+(UISegmentedControl *)segmentedTag:(int)tag Itmes:(NSArray *)items toView:(UIView *)View
++ (UISegmentedControl *)segmentedTag:(int)tag Itmes:(NSArray *)items toView:(UIView *)View
 {
     UISegmentedControl *segControl = [[UISegmentedControl alloc] initWithItems:items];
     //segControl.segmentedControlStyle = UISegmentedControlStyleBar;//UISegmentedControlStyleBar
@@ -567,7 +671,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return segControl;
 }
 
-+(UITableView *)tableViewStyle:(UITableViewStyle)style delegate:(id)delegate toV:(UIView *)View
++ (UITableView *)tableViewStyle:(UITableViewStyle)style delegate:(id)delegate toV:(UIView *)View
 {
     UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectZero style:style];
     tableView.dataSource = delegate;
@@ -583,7 +687,36 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return tableView;
 }
 
-+(id)cellWithRow:(NSInteger)row inTable:(UITableView *)tableView
++ (id)tableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath
+{
+    NSString *identifier = [NSString stringWithFormat:@"Cell"];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+    }
+    
+    cell.textLabel.text = @"参数错误";
+    
+    return cell;
+}
+
++ (void)showFinishView:(UITableView *)tableView
+{
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    UIView *finishView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, 49)];
+    //finishView.backgroundColor = [CTB colorWithHexString:@"#E7E7E7"];
+    
+    UILabel *lblStatus = [[UILabel alloc] initWithFrame:CGRectMake(20, 15, size.width-40, 20)];
+    lblStatus.text = @"已加载全部数据";
+    lblStatus.font = [UIFont systemFontOfSize:15];
+    lblStatus.textColor = [UIColor grayColor];
+    lblStatus.textAlignment = NSTextAlignmentCenter;
+    [finishView addSubview:lblStatus];
+    
+    tableView.tableFooterView = finishView;
+}
+
++ (id)cellWithRow:(NSInteger)row inTable:(UITableView *)tableView
 {
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
@@ -591,7 +724,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return cell;
 }
 
-+(UIWebView *)gifViewInitWithFile:(NSString *)Path
++ (UIWebView *)gifViewInitWithFile:(NSString *)Path
 {
     NSData *gifData = [NSData dataWithContentsOfFile:Path];
     UIWebView *webView = [[UIWebView alloc] init];
@@ -604,15 +737,16 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return webView;
 }
 
-+(void)showMsgWithTitle:(NSString *)title msg:(NSString *)msg
++ (UIAlertView *)showMsgWithTitle:(NSString *)title msg:(NSString *)msg
 {
     title = title.length>0 ? title : @"确定";
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
     alert.tag=0;
     [alert show];
+    return alert;
 }
 
-+(void)showMsg:(NSString *)msg
++ (UIAlertView *)showMsg:(NSString *)msg
 {
     if (!msg || [msg isKindOfClass:[NSNull class]]) {
         msg = @"";
@@ -620,9 +754,10 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
     alert.tag = 0;
     [alert show];
+    return alert;
 }
 
-+(void)showMsg:(NSString *)msg tag:(int)tag delegate:(id)delegate
++ (UIAlertView *)showMsg:(NSString *)msg tag:(int)tag delegate:(id)delegate
 {
     if (!msg || [msg isKindOfClass:[NSNull class]]) {
         msg = @"";
@@ -630,9 +765,10 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:msg delegate:delegate cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
     alert.tag = tag;
     [alert show];
+    return alert;
 }
 
-+(UIAlertView *)alertWithMessage:(NSString *)message Delegate:(id)delegate tag:(int)tag
++ (UIAlertView *)alertWithMessage:(NSString *)message Delegate:(id)delegate tag:(int)tag
 {
     UIAlertView *alert = nil;
     if (delegate) {
@@ -645,7 +781,20 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return alert;
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
++ (UIAlertView *)alertWithTitle:(NSString *)title msg:(NSString *)message Delegate:(id)delegate tag:(int)tag
+{
+    UIAlertView *alert = nil;
+    if (delegate) {
+        alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:delegate cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    }else{
+        alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+    }
+    alert.tag = tag;
+    [alert show];
+    return alert;
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex==0) {
         exit(0);
@@ -719,7 +868,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 }
 
 #pragma mark 设置透明背景色
-+(void)setClearColor:(UITableView *)tableView
++ (void)setClearColor:(UITableView *)tableView
 {
     tableView.backgroundColor = [UIColor clearColor];
     tableView.backgroundView = nil;
@@ -727,7 +876,28 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 
 #pragma mark - =============从指定的视图上获取想要的视图类============================
 //从View上获取父级视图
-+(id)getObjType:(Class)aClass toView:(UIView *)View
++ (id)getObjType:(Class)aClass toView:(UIView *)View
+{
+    return getSuperView(aClass, View);
+}
+
++ (id)getObjType:(Class)aClass tag:(int)tag toView:(UIView *)View
+{
+    return getSuperViewBy(aClass, View, tag);
+}
+
+//从View上获取子视图
++ (id)getObjType:(Class)aClass fromView:(UIView *)View
+{
+    return getSubView(aClass, View);
+}
+
++ (id)getObjType:(Class)aClass tag:(int)tag fromView:(UIView *)View
+{
+    return getSubViewBy(aClass, View, tag);
+}
+
+id getSuperView(Class aClass,UIView *View)
 {
     id obj = nil;
     for (UIView* next = [View superview]; next; next = next.superview) {
@@ -748,7 +918,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return obj;
 }
 
-+(id)getObjType:(Class)aClass tag:(int)tag toView:(UIView *)View
+id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 {
     id obj = nil;
     for (UIView* next = [View superview]; next; next = next.superview) {
@@ -769,8 +939,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return obj;
 }
 
-//从View上获取子视图
-+(id)getObjType:(Class)aClass fromView:(UIView *)View
+id getSubView(Class aClass,UIView *View)
 {
     id obj = nil;
     NSArray *listView = View.subviews;
@@ -784,7 +953,20 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return obj;
 }
 
-+(id)getObjType:(Class)aClass tag:(int)tag fromView:(UIView *)View
+NSArray *getSubViewList(Class aClass,UIView *View)
+{
+    NSMutableArray *list = [NSMutableArray array];
+    NSArray *listView = View.subviews;
+    for (UIView *v in listView) {
+        if ([v isKindOfClass:[aClass class]]) {
+            [list addObject:v];
+        }
+    }
+    
+    return list;
+}
+
+id getSubViewBy(Class aClass,UIView *View,NSInteger tag)
 {
     id obj = nil;
     NSArray *listView = View.subviews;
@@ -798,7 +980,17 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return obj;
 }
 
-+(UIView *)showMessageWithString:(NSString *)msg to:(UIViewController *)viewController
+NSString *getBtnTitleBy(UIButton *button)
+{
+    if ([button isKindOfClass:[UIButton class]]) {
+        return button.currentTitle;
+    }
+    
+    return @"";
+}
+
+#pragma mark -
++ (UIView *)showMessageWithString:(NSString *)msg to:(UIViewController *)viewController
 {
     CGSize locatiion = [UIScreen mainScreen].bounds.size;
     CGFloat w=msg.length*17;
@@ -852,7 +1044,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return View;
 }
 
-+(UIViewController *)getControllerFrom:(UINavigationController *)Nav className:(NSString *)className
++ (UIViewController *)getControllerFrom:(UINavigationController *)Nav className:(NSString *)className
 {
     if (![Nav isKindOfClass:[UINavigationController class]]) {
         return NULL;
@@ -893,15 +1085,36 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     
     NSArray *listNav = Nav.viewControllers;
     for (UIViewController *V in listNav) {
-        if ([NSStringFromClass(V.class) isEqualToString:className]) {
-            return V;
+        if ([NSStringFromClass(V.class) hasPrefix:className]) {
+            //类名相同
+            if (V != VC) {
+                //排除自己
+                return V;
+            }
         }
     }
     
     return NULL;
 }
 
-+(void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav
+UIViewController *getParentController(UIViewController *VC,NSString *className)
+{
+    if (![VC isKindOfClass:[UIViewController class]]) {
+        return NULL;
+    }
+    
+    UIViewController *result = nil;
+    for (UIViewController *V = VC.parentViewController; V; V = V.parentViewController) {
+        if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            result = V;
+            break;
+        }
+    }
+    
+    return result;
+}
+
++ (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav
 {
     if (![Nav isKindOfClass:[UINavigationController class]]) {
         return;
@@ -918,13 +1131,20 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     Nav.viewControllers = listResult;
 }
 
+void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
+{
+    if (iPhone >= 7) {
+        VC.navigationController.interactivePopGestureRecognizer.enabled = !isForbid;
+    }
+}
+
 #pragma mark - ============活动指示器============================
-+(void)showActivityInView:(UIView *)View
++ (void)showActivityInView:(UIView *)View
 {
     [self showActivityInView:View style:UIActivityIndicatorViewStyleWhite];
 }
 
-+(void)showActivityInView:(UIView *)View style:(UIActivityIndicatorViewStyle)style
++ (void)showActivityInView:(UIView *)View style:(UIActivityIndicatorViewStyle)style
 {
     UIActivityIndicatorView *activity = nil;
     for (UIActivityIndicatorView *act in View.subviews) {
@@ -943,7 +1163,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [activity startAnimating];
 }
 
-+(void)hiddenActivityInView:(UIView *)View
++ (void)hiddenActivityInView:(UIView *)View
 {
     for (UIActivityIndicatorView *activity in View.subviews) {
         if ([activity isKindOfClass:[UIActivityIndicatorView class]]) {
@@ -953,7 +1173,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
 }
 
 //普通
-+(void)showSignView:(UIView *)View
++ (void)showSignView:(UIView *)View
 {
     UIActivityIndicatorView *Design = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     Design.frame = CGRectMake(0, 0, 20, 20);
@@ -963,7 +1183,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [Design startAnimating];
 }
 //大
-+(void)showBigSignView:(UIView *)View
++ (void)showBigSignView:(UIView *)View
 {
     UIActivityIndicatorView *Design = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     Design.frame = CGRectMake(0, 0, 20, 20);
@@ -972,7 +1192,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [View addSubview:Design];
     [Design startAnimating];
 }
-+(void)hiddenSignView:(UIView *)View
++ (void)hiddenSignView:(UIView *)View
 {
     if (View==nil) {
         return;
@@ -984,7 +1204,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     }
 }
 
-+(int)setFontSize:(NSString *)text
++ (int)setFontSize:(NSString *)text
 {
     CGFloat result = 17;
     if (text.length>17) {
@@ -995,7 +1215,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     return result;
 }
 
-+(void)printfView:(UIView *)View
++ (void)printfView:(UIView *)View
 {
     if (View.subviews.count>0) {
         for (UIView *v in View.subviews) {
@@ -1011,12 +1231,12 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
 
 
 #pragma mark - ===========状态栏字体颜色============================
-//+(UIStatusBarStyle)setStatusBarStyle
+//+ (UIStatusBarStyle)setStatusBarStyle
 //{
 //    return UIStatusBarStyleBlackOpaque;
 //}
 //
-//+(void)setFrame:(UIViewController *)viewController
+//+ (void)setFrame:(UIViewController *)viewController
 //{
 //    if (iPhone>=7) {
 //        if (viewController.view.frame.size.height==Screen_Height&&[Tool getData].isSetView) {
@@ -1027,7 +1247,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
 //}
 
 //隐藏键盘
-+(void)HiddenKeyboard:(id)txtField, ...
++ (void)HiddenKeyboard:(id)txtField, ...
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -1048,7 +1268,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     va_end(args);
 }
 
-+(void)PrintString:(id)obj headName:(NSString *)name
++ (void)PrintString:(id)obj headName:(NSString *)name
 {
     if (!obj && !name) {
         return;
@@ -1064,7 +1284,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     NSLog(@"%@%@",name,obj);
 }
 
-+(void)printNum:(CGFloat)result headName:(NSString *)name
++ (void)printNum:(CGFloat)result headName:(NSString *)name
 {
     if (!name) {
         NSLog(@"%f",result);
@@ -1073,7 +1293,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     NSLog(@"%@%f",name,result);
 }
 
-+(NSString *)printDic:(NSDictionary *)dic
++ (NSString *)printDic:(NSDictionary *)dic
 {
     if (dic) {
         NSMutableString *value = [NSMutableString string];
@@ -1096,7 +1316,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     return NULL;
 }
 
-+(void)setViewBounds:(UIViewController *)viewController
++ (void)setViewBounds:(UIViewController *)viewController
 {
     BOOL navigationHidden = viewController.navigationController.navigationBarHidden;
     if (viewController.navigationController==NULL) {
@@ -1116,7 +1336,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     }
 }
 
-+(void)addStatusBarToView:(UIView *)view
++ (void)addStatusBarToView:(UIView *)view
 {
     if (iPhone>=7) {
         UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0, -20, Screen_Width, 20)];
@@ -1125,7 +1345,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     }
 }
 
-+(void)HiddenView:(BOOL)hidden with:(UIView *)View, ...
++ (void)HiddenView:(BOOL)hidden with:(UIView *)View, ...
 {
     va_list args;
     // scan for arguments after firstObject.
@@ -1140,7 +1360,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
 }
 
 #pragma mark - ============设置Navigation Bar背景图片==========================
-+(void)setNavigationBarBackground:(NSString *)imgName to:(UIViewController *)viewController
++ (void)setNavigationBarBackground:(NSString *)imgName to:(UIViewController *)viewController
 {
     UIImage *title_bg = [UIImage imageNamed:imgName];  //获取图片
     CGSize titleSize = viewController.navigationController.navigationBar.bounds.size;  //获取Navigation Bar的位置和大小
@@ -1151,20 +1371,47 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [viewController.navigationController.navigationBar setBackgroundImage:title_bg forBarMetrics:UIBarMetricsDefault];
 }
 
-+(void)setNavBackImg:(NSString *)imgName to:(UIViewController *)viewController
++ (void)setNavBackImg:(NSString *)imgName to:(UIViewController *)viewController
 {
-    viewController.navigationController.navigationBarHidden = NO;
+    //[viewController.navigationController setNavigationBarHidden:NO animated:YES];
     UIImage *title_bg = [UIImage imageNamed:imgName];  //获取图片
     CGRect navRect = viewController.navigationController.navigationBar.frame;
     CGSize size = GetSize(navRect.size.width, navRect.size.height);
     
     if (iPhone >= 7) {
+        navRect.origin.y = 20.0f;
         size = GetSize(navRect.size.width, navRect.origin.y+navRect.size.height);
     }
     
     title_bg = [[self class] scaleImg:title_bg size:size];
     
     [viewController.navigationController.navigationBar setBackgroundImage:title_bg forBarMetrics:UIBarMetricsDefault];
+}
+
+//颜色转换成图片
++(void)imgColor:(UIColor *)color to:(UIViewController *)viewController
+{
+    CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    
+    CGRect navRect = viewController.navigationController.navigationBar.frame;
+    CGSize size = GetSize(navRect.size.width, navRect.size.height);
+    
+    if (iPhone >= 7) {
+        navRect.origin.y = 20.0f;
+        size = GetSize(navRect.size.width, navRect.origin.y+navRect.size.height);
+    }
+    
+    theImage = [[self class] scaleImg:theImage size:size];
+    
+    [viewController.navigationController.navigationBar setBackgroundImage:theImage forBarMetrics:UIBarMetricsDefault];
+    
 }
 
 //调整图片大小
@@ -1209,7 +1456,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
 }
 
 #pragma mark - ---------------设置动画---------------------------------
-+(void)setAnimationWith:(UIView *)View rect:(CGRect)rect
++ (void)setAnimationWith:(UIView *)View rect:(CGRect)rect
 {
     [UIView animateWithDuration:0.3
                      animations:^{
@@ -1220,8 +1467,45 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
                      }];
 }
 
++ (NSArray *)getAnimationData:(BOOL)isBig
+{
+    NSMutableArray *values = [NSMutableArray array];
+    
+    GetPoint(1, 0);
+    
+    NSArray *list = @[valueWithTran3DScale(0.1, 0.1, 1.0),
+                      [NSValue valueWithCATransform3D:Trans3DScale(0.5, 0.5, 1.0)],
+                      [NSValue valueWithCATransform3D:Trans3DScale(0.9, 0.9, 0.9)],
+                      [NSValue valueWithCATransform3D:Trans3DScale(1.0, 1.0, 1.0)]];
+    
+    if (isBig) {
+        for (NSValue *value in list) {
+            [values addObject:value];
+        }
+    }else{
+        for (NSInteger i=list.count; i>0; i--) {
+            NSValue *value = list[i-1];
+            [values addObject:value];
+        }
+    }
+    
+    return values;
+}
+
 // 特殊动画效果
-+(void)exChangeOut:(UIView *)changeOutView dur:(CFTimeInterval)dur
++ (void)exChangeOut:(UIView *)changeOutView dur:(CFTimeInterval)dur
+{
+    NSMutableArray *values = [NSMutableArray array];
+    
+    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.1, 0.1, 1.0)]];
+//    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(1.2, 1.2, 1.0)]];
+//    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.9, 0.9, 0.9)]];
+    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(1.0, 1.0, 1.0)]];
+    
+    [[self class] exChangeOut:changeOutView dur:dur values:values];
+}
+
++ (void)exChangeOut:(UIView *)changeOutView dur:(CFTimeInterval)dur values:(NSArray *)listValue
 {
     CAKeyframeAnimation * animation;
     animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
@@ -1234,21 +1518,20 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     
     animation.fillMode = kCAFillModeForwards;
     
-    NSMutableArray *values = [NSMutableArray array];
+    NSArray *values = [[self class] getAnimationData:true];//变大
     
-    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.1, 0.1, 1.0)]];
-    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(1.2, 1.2, 1.0)]];
-    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.9, 0.9, 0.9)]];
-    [values addObject:[NSValue valueWithCATransform3D:CATransform3DMakeScale(1.0, 1.0, 1.0)]];
-    
-    animation.values = values;
+    if (listValue.count > 0) {
+        animation.values = listValue;
+    }else{
+        animation.values = values;
+    }
     
     animation.timingFunction = [CAMediaTimingFunction functionWithName: @"easeInEaseOut"];
     
     [changeOutView.layer addAnimation:animation forKey:nil];
 }
 
-+(void)setAnimationWith:(UIView *)View rect:(CGRect)rect complete:(SEL)action delegate:(id)delegate
++ (void)setAnimationWith:(UIView *)View rect:(CGRect)rect complete:(SEL)action delegate:(id)delegate
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1259,7 +1542,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIView *)View rect:(CGRect)rect complete:(SEL)action delegate:(id)delegate duration:(NSTimeInterval)duration
++ (void)setAnimationWith:(UIView *)View rect:(CGRect)rect complete:(SEL)action delegate:(id)delegate duration:(NSTimeInterval)duration
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1270,7 +1553,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIView *)View point:(CGPoint)point duration:(NSTimeInterval)duration
++ (void)setAnimationWith:(UIView *)View point:(CGPoint)point duration:(NSTimeInterval)duration
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1279,7 +1562,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIView *)View toX:(CGFloat)x duration:(NSTimeInterval)duration
++ (void)setAnimationWith:(UIView *)View toX:(CGFloat)x duration:(NSTimeInterval)duration
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1288,7 +1571,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIView *)View toY:(CGFloat)y duration:(NSTimeInterval)duration
++ (void)setAnimationWith:(UIView *)View toY:(CGFloat)y duration:(NSTimeInterval)duration
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1297,7 +1580,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIView *)View point:(CGPoint)point complete:(SEL)action delegate:(id)delegate
++ (void)setAnimationWith:(UIView *)View point:(CGPoint)point complete:(SEL)action delegate:(id)delegate
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1308,7 +1591,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIView *)View size:(CGSize)size
++ (void)setAnimationWith:(UIView *)View size:(CGSize)size
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1317,7 +1600,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIView *)View size:(CGSize)size complete:(SEL)action delegate:(id)delegate
++ (void)setAnimationWith:(UIView *)View size:(CGSize)size complete:(SEL)action delegate:(id)delegate
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1328,7 +1611,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIScrollView *)tableView Offset:(CGPoint)point
++ (void)setAnimationWith:(UIScrollView *)tableView Offset:(CGPoint)point
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1339,7 +1622,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(UIScrollView *)tableView Offset:(CGPoint)point duration:(NSTimeInterval)duration
++ (void)setAnimationWith:(UIScrollView *)tableView Offset:(CGPoint)point duration:(NSTimeInterval)duration
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1350,7 +1633,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView commitAnimations];
 }
 
-+(void)setAnimationWith:(NSTimeInterval)duration delegate:(id)delegate complete:(SEL)action
++ (void)setAnimationWith:(NSTimeInterval)duration delegate:(id)delegate complete:(SEL)action
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     [UIView beginAnimations:nil context:context];
@@ -1359,7 +1642,7 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
     [UIView setAnimationDidStopSelector:action];
 }
 
-+(void)commitAnimations
++ (void)commitAnimations
 {
     [UIView commitAnimations];
 }
@@ -1386,13 +1669,13 @@ UIViewController *getControllerFor(UIViewController *VC,NSString *className)
 }
 
 #pragma mark 获取底部坐标
-+(CGFloat)getBottomPositionBy:(UIView *)View
++ (CGFloat)getBottomPositionBy:(UIView *)View
 {
     return View.frame.origin.y + View.frame.size.height;
 }
 
 #pragma mark 获取右边尾端坐标
-+(CGFloat)getRightPositionBy:(UIView *)View
++ (CGFloat)getRightPositionBy:(UIView *)View
 {
     return View.frame.origin.x + View.frame.size.width;
 }
@@ -1404,25 +1687,25 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 #pragma mark - ===========重新设置视图的位置和尺寸=========================
-+(CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width
++ (CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width
 {
     View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, width, View.frame.size.height);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toHeight:(CGFloat)high
++ (CGRect)setRectWith:(UIView *)View toHeight:(CGFloat)high
 {
     View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, View.frame.size.width, high);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toX:(CGFloat)x
++ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x
 {
     View.frame = CGRectMake(x, View.frame.origin.y, View.frame.size.width, View.frame.size.height);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toY:(CGFloat)y
++ (CGRect)setRectWith:(UIView *)View toY:(CGFloat)y
 {
     if (View.frame.origin.y == y) {
         return View.frame;
@@ -1432,73 +1715,73 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toWidth:(CGFloat)width
++ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toWidth:(CGFloat)width
 {
     View.frame = CGRectMake(x, View.frame.origin.y, width, View.frame.size.height);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toY:(CGFloat)y
++ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toY:(CGFloat)y
 {
     View.frame = CGRectMake(x, y, View.frame.size.width, View.frame.size.height);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toOrigin:(CGPoint)origin
++ (CGRect)setRectWith:(UIView *)View toOrigin:(CGPoint)origin
 {
     View.frame = CGRectMake(origin.x, origin.y, View.frame.size.width, View.frame.size.height);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toY:(CGFloat)y toHeight:(CGFloat)high
++ (CGRect)setRectWith:(UIView *)View toY:(CGFloat)y toHeight:(CGFloat)high
 {
     View.frame = CGRectMake(View.frame.origin.x, y, View.frame.size.width, high);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width toHeight:(CGFloat)high
++ (CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width toHeight:(CGFloat)high
 {
     View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, width, high);
     return View.frame;
 }
 
-+(CGRect)setRectWith:(UIView *)View toSize:(CGSize)size
++ (CGRect)setRectWith:(UIView *)View toSize:(CGSize)size
 {
     View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, size.width, size.height);
     return View.frame;
 }
 
-+(CGRect)setRectByX:(CGFloat)x Y:(CGFloat)y W:(CGFloat)w H:(CGFloat)h scale:(CGFloat)scale
++ (CGRect)setRectByX:(CGFloat)x Y:(CGFloat)y W:(CGFloat)w H:(CGFloat)h scale:(CGFloat)scale
 {
     CGRect rect = CGRectMake(x*scale, y*scale, w*scale, h*scale);
     return rect;
 }
 
-+(CGRect)setRect:(CGRect)rect scale:(CGFloat)scale
++ (CGRect)setRect:(CGRect)rect scale:(CGFloat)scale
 {
     rect = CGRectMake(rect.origin.x*scale, rect.origin.y*scale, rect.size.width*scale, rect.size.height*scale);
     return rect;
 }
 
-+(CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x Y:(CGFloat)y
++ (CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x Y:(CGFloat)y
 {
     View.center = CGPointMake(x, y);
     return View.center;
 }
 
-+(CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x
++ (CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x
 {
     View.center = CGPointMake(x, View.center.y);
     return View.center;
 }
 
-+(CGPoint)setCenterWith:(UIView *)View Y:(CGFloat)y
++ (CGPoint)setCenterWith:(UIView *)View Y:(CGFloat)y
 {
     View.center = CGPointMake(View.center.x, y);
     return View.center;
 }
 
-+(void)setCenterWith:(UIView *)View
++ (void)setCenterWith:(UIView *)View
 {
     UIView *parentView = View.superview;
     if (parentView) {
@@ -1506,7 +1789,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     }
 }
 
-+(BOOL)containsPoint:(CGPoint)point inRect:(CGRect)rect
++ (BOOL)containsPoint:(CGPoint)point inRect:(CGRect)rect
 {
     BOOL result = CGRectContainsPoint(rect, point);
     return result;
@@ -1602,14 +1885,14 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 //获取图片尺寸
-+(CGSize)getImgSizeBy:(UIImage *)img
++ (CGSize)getImgSizeBy:(UIImage *)img
 {
     CGSize size = CGSizeMake(img.size.width, img.size.height);
     return size;
 }
 
 //设置图片并调整尺寸到图片大小
-+(void)setSizeWithView:(UIImageView *)imgView withImg:(UIImage *)img
++ (void)setSizeWithView:(UIImageView *)imgView withImg:(UIImage *)img
 {
     CGSize size = CGSizeMake(img.size.width, img.size.height);
     imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, size.width, size.height);
@@ -1634,17 +1917,84 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 #pragma mark 截取部分图像
-+(UIImage*)getSubImage:(UIImage *)image rect:(CGRect)rect
++ (UIImage*)getSubImage:(UIImage *)image rect:(CGRect)rect
 {
-    CGImageRef imageRef = CGImageCreateWithImageInRect(image.CGImage, rect);
-    UIImage *newImage = [UIImage imageWithCGImage:imageRef];
+    UIImage *newImage = [UIImage imageWithCGImage:CGImageCreateWithImageInRect(image.CGImage, rect)];
     return newImage;
+}
+
+// 从view上截图
+- (UIImage *)getImageBy:(UIView *)View
+{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(150, 150), NO, 1.0);  //NO，YES 控制是否透明
+    [View.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    // 生成后的image
+    
+    return image;
+}
+
+#pragma mark 将图片分解成图片数组
++ (NSArray *)getImagesWithPath:(NSString *)path count:(int)count
+{
+    if (!path || path.length <= 0) {
+        return nil;
+    }
+    
+    CGFloat scale = 1.0f;
+    NSString *imgName = [path lastPathComponent];
+    if (imgName.length > 7) {
+        NSString *suffix = [imgName substringFromIndex:imgName.length-7];
+        
+        if ([suffix hasPrefix:@"@"] && [suffix hasSuffix:@"x.png"]) {
+            suffix = replaceString(suffix, @"@", @"");
+            suffix = replaceString(suffix, @"x.png", @"");
+            
+            scale = MAX(scale, [suffix floatValue]);
+        }
+    }
+    UIImage *image = [UIImage imageWithContentsOfFile:path];
+    CGFloat w = image.size.width/count;
+    CGFloat h = image.size.height;
+    NSMutableArray *listImg = [NSMutableArray array];
+    for (int i=0; i<count; i++) {
+        CGRect rect = GetRect(w*i*scale, 0, w*scale, h*scale);
+        UIImage *img = [CTB getSubImage:image rect:rect];
+        if (img) {
+            [listImg addObject:img];
+        }
+    }
+    
+    return listImg;
+}
+
++ (void)getSubImgView:(UIImageView *)imgView
+{
+    UIImage *image = imgView.image;
+    if (!image) {
+        return;
+    }
+    
+    CGSize imgSize = image.size;
+    CGSize viewSize = imgView.frame.size;
+    CGFloat scale = viewSize.width/viewSize.height;
+    if (imgSize.width/imgSize.height > scale) {
+        CGFloat w = imgSize.height * scale;
+        image = [[self class] getSubImage:image rect:GetRect((imgSize.width-w)/2, 0, w, imgSize.height)];
+    }
+    else if (imgSize.width/imgSize.height < scale) {
+        CGFloat h = imgSize.width / scale;
+        image = [[self class] getSubImage:image rect:GetRect(0, (imgSize.height-h)/2, imgSize.width, h)];
+    }
+    
+    imgView.image = image;
 }
 
 + (UIImage *)resizeImage:(UIImage *)image size:(CGSize)size
 {
     //UIGraphicsBeginImageContext(size);
-    if (UIGraphicsBeginImageContextWithOptions != NULL) {
+    if (&UIGraphicsBeginImageContextWithOptions != NULL) {
         UIGraphicsBeginImageContextWithOptions(size, NO, 0);
     }
     
@@ -1655,7 +2005,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 //设置图片并调整中心位置到原先设定状态
-+(void)setImgView:(UIImageView *)imgView withImgName:(NSString *)imgName
++ (void)setImgView:(UIImageView *)imgView withImgName:(NSString *)imgName
 {
     UIImage *image = [UIImage imageNamed:imgName];
     CGSize size = CGSizeMake(image.size.width, image.size.height);
@@ -1665,12 +2015,12 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     imgView.image = image;
 }
 
-+(void)setView:(UIView *)View toCentre_X:(CGFloat)x Y:(CGFloat)y
++ (void)setView:(UIView *)View toCentre_X:(CGFloat)x Y:(CGFloat)y
 {
     View.center = CGPointMake(x, y);
 }
 
-+(void)setImgView:(UIImageView *)imgView image:(UIImage *)image masksToSize:(CGSize)size
++ (void)setImgView:(UIImageView *)imgView image:(UIImage *)image masksToSize:(CGSize)size
 {
     CGSize imgSize = image.size;
     CGFloat scale_W = imgSize.width/size.width;
@@ -1694,7 +2044,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     imgView.image = image;
 }
 
-+(UIImage *)setImgWithName:(NSString *)imgName Capinsets:(UIEdgeInsets)capInsets
++ (UIImage *)setImgWithName:(NSString *)imgName Capinsets:(UIEdgeInsets)capInsets
 {
     UIImage *image = [UIImage imageNamed:imgName];
     image = [image resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];
@@ -1713,12 +2063,32 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     return image;
 }
 
+#pragma mark 根据颜色、大小生成一张图片
++ (UIImage *)imageWithColor:(UIColor *)color size:(CGSize)size
+{
+    CGRect rect = CGRectMake(0, 0, size.width, size.height);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
 #pragma mark - ==============根据字体参数计算label的高度==============================
 + (float)heightOfContent:(NSString *)content width:(CGFloat)width fontSize:(CGFloat)size
 {
     UIFont *contentFont = [UIFont systemFontOfSize:size];
     NSDictionary * tdic = [NSDictionary dictionaryWithObjectsAndKeys:contentFont, NSFontAttributeName,nil];
-    CGSize dateSize = [content boundingRectWithSize:CGSizeMake(width, 2000) options:NSStringDrawingUsesLineFragmentOrigin |NSStringDrawingUsesFontLeading attributes:tdic context:nil].size;
+    CGSize dateSize = CGSizeZero;
+    if (iPhone > 7) {
+        dateSize = [content boundingRectWithSize:CGSizeMake(width, 2000) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tdic context:nil].size;
+    }else{
+        dateSize = [content sizeWithFont:contentFont constrainedToSize:CGSizeMake(width, 2000) lineBreakMode:NSLineBreakByTruncatingTail];
+    }
     float heightOfContent = MAX(25, dateSize.height);
     return heightOfContent;
 }
@@ -1726,14 +2096,35 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 + (CGSize)getSizeWith:(NSString *)content wordSize:(CGFloat)big size:(CGSize)size
 {
     UIFont *font = [UIFont systemFontOfSize:big];
-    CGSize labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    CGSize labelsize = CGSizeZero;
+    if (iPhone > 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    }
+    return labelsize;
+}
+
++ (CGSize)getSizeWith:(NSString *)content font:(UIFont *)font size:(CGSize)size
+{
+    CGSize labelsize = CGSizeZero;
+    if (iPhone > 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    }
     return labelsize;
 }
 
 + (void)setWidthWith:(UILabel *)label content:(NSString *)content size:(CGSize)size
 {
     UIFont *font = [UIFont systemFontOfSize:label.font.pointSize];
-    CGSize labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    CGSize labelsize = CGSizeZero;
+    if (iPhone > 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    }
     label.text = content;
     [CTB setRectWith:label toWidth:labelsize.width];
 }
@@ -1742,7 +2133,12 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 {
     CGSize size = CGSizeMake(width, 2000);
     UIFont *font = [UIFont systemFontOfSize:big];
-    CGSize labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    CGSize labelsize = CGSizeZero;
+    if (iPhone > 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    }
     return labelsize.height;
 }
 
@@ -1750,14 +2146,195 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 {
     CGSize size = CGSizeMake(2000, high);
     UIFont *font = [UIFont systemFontOfSize:big];
-    CGSize labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    CGSize labelsize = CGSizeZero;
+    if (iPhone > 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    }
     return labelsize.width;
 }
 
-+(NSStringEncoding)getGBKEncoding
++ (NSStringEncoding)getGBKEncoding
 {
     NSStringEncoding GBK = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
     return GBK;
+}
+
+#pragma mark - ========处理字典中的NSNull类数据=====================
++ (NSString *)stringWith:(NSDictionary *)dic key:(NSString *)key
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        return NULL;
+    }
+    
+    NSString *result = [dic objectForKey:key];
+    if (!result || ![result isKindOfClass:[NSString class]]) {
+        return @"";
+    }
+    
+    result = [NSString stringWithFormat:@"%@",result];
+    
+    return result;
+}
+
+int getIntFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return 0;
+    }
+    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
+    int result = [content intValue];
+    return result;
+}
+
+long getLongFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return 0;
+    }
+    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
+    long result = (long)[content doubleValue];
+    return result;
+}
+
+float getFloatFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return 0;
+    }
+    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
+    float result = [content floatValue];
+    return result;
+}
+
+double getDoubleFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return 0;
+    }
+    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
+    double result = [content doubleValue];
+    return result;
+}
+
+bool getBoolFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return NO;
+    }
+    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
+    BOOL result = [content boolValue];
+    return result;
+}
+
+NSString *getStringFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return nil;
+    }
+    
+    NSString *result = [dic objectForKey:key];
+    if (!result || ![result isKindOfClass:[NSString class]]) {
+        return @"";
+    }
+    
+    result = [NSString stringWithFormat:@"%@",result];
+    
+    return result;
+}
+
+NSArray *getArrayFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return nil;
+    }
+    
+    NSArray *result = [dic objectForKey:key];
+    if (!result || ![result isKindOfClass:[NSArray class]]) {
+        return nil;
+    }
+    
+    return result;
+}
+
+NSDictionary *getDicFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return nil;
+    }
+    
+    NSDictionary *result = [dic objectForKey:key];
+    if (!result || ![result isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    
+    return result;
+}
+
+id getDataFrom(NSDictionary *dic,id key)
+{
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return nil;
+    }
+    
+    id result = [dic objectForKey:key];
+    
+    return result;
+}
+
+#pragma mark 合并字符串
+NSString *mergedString(NSString *aString,NSString *bString)
+{
+    NSString *result = pooledString(aString, bString, nil);
+    return result;
+}
+
+NSString *pooledString(NSString *aString,NSString *bString,NSString *midString)
+{
+    if (!aString && !bString) {
+        return nil;
+    }
+    
+    aString = aString ?: @"";
+    bString = bString ?: @"";
+    midString = midString ?: @"";
+    
+    NSString *result = [NSString stringWithFormat:@"%@%@%@",aString,midString,bString];
+    return result;
+}
+
++ (NSString *)getSameString:(NSString *)string length:(NSInteger)length
+{
+    NSString *result = @"";
+    if (length > 0 && string.length > 0) {
+        for (int i=0; i<length; i++) {
+            result = [result stringByAppendingString:string];
+        }
+    }
+    
+    return result;
+}
+
++ (CGSize)getWidthBy:(NSString *)string font:(UIFont *)font
+{
+    if (string.length <= 0) {
+        return CGSizeZero;
+    }
+    
+    NSString *temp = [self getSameString:string length:1000];
+    CGFloat h = font.pointSize * 1.2;//1.1930001
+    CGSize sizeTest = [CTB getSizeWith:temp font:font size:GetSize(50000, h)];
+    return sizeTest;
 }
 
 #pragma mark - =========颜色转换=============================
@@ -1790,10 +2367,21 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     [[NSScanner scannerWithString:gString] scanHexInt:&g];
     [[NSScanner scannerWithString:bString] scanHexInt:&b];
     
-    return [UIColor colorWithRed:((float) r / 255.0f)
-                           green:((float) g / 255.0f)
-                            blue:((float) b / 255.0f)
-                           alpha:1.0f];
+    CGFloat t = 255.0f;
+    UIColor *color = colorWithRGB(r/t,g/t,b/t,1.0f);
+    return color;
+}
+
+UIColor *colorWithHex(NSString *stringToConvert)
+{
+    UIColor *color = [CTB colorWithHexString:stringToConvert];
+    return color;
+}
+
+UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
+{
+    UIColor *color = [UIColor colorWithRed:r green:g blue:b alpha:alpha];
+    return color;
 }
 
 + (UIColor *)colorWithImgName:(NSString *)imgName
@@ -1809,7 +2397,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     return color;
 }
 
-+(UIColor *)setColor:(UIColor *)color opacity:(CGFloat)alpha
++ (UIColor *)setColor:(UIColor *)color opacity:(CGFloat)alpha
 {
     UIColor *result = nil;
     CGFloat opacity = 1;
@@ -1849,7 +2437,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 #pragma mark - ========设置背景色===================
-+(UIColor *)setBackgroundColor:(UIColor *)color opacity:(CGFloat)alpha
++ (UIColor *)setBackgroundColor:(UIColor *)color opacity:(CGFloat)alpha
 {
     CGFloat opacity = 0;
     UIColor *result = nil;
@@ -1872,8 +2460,21 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     return result;
 }
 
+#pragma mark - =============颜色转图片=========================
++ (UIImage *)imgColor:(UIColor *)color
+{
+    CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return theImage;
+}
+
 #pragma mark - =============保存图片到文件=========================
-+(void)saveImgToFile:(NSString *)FilePath withImg:(UIImage *)image
++ (void)saveImgToFile:(NSString *)FilePath withImg:(UIImage *)image
 {
     NSData *data=nil;
     if (UIImagePNGRepresentation(image) == nil) {
@@ -1889,7 +2490,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 //调整图片到指定尺寸(可能改变图片的宽高比)
-+(UIImage*)imageWithImageSimple:(UIImage*)image scaledToSize:(CGSize)newSize
++ (UIImage*)imageWithImageSimple:(UIImage*)image scaledToSize:(CGSize)newSize
 {
     if (!image) {
         return NULL;
@@ -1908,7 +2509,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 //按照图片比例压缩图片
-+(UIImage *)imageWithImg:(UIImage *)img scaledToSize:(CGSize)newSize
++ (UIImage *)imageWithImg:(UIImage *)img scaledToSize:(CGSize)newSize
 {
     if (!img) {
         return NULL;
@@ -1918,14 +2519,10 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     if (w<=newSize.width && h<=newSize.width) {
         return img;
     }else{
-        CGFloat scale = 1;
-        if (w/h > newSize.width/newSize.height) {
-            //over widtht
-            scale = w/newSize.width;
-        }else{
-            //over height
-            scale = h/newSize.height;
-        }
+        CGFloat scale = 0;
+        scale = MAX(w/newSize.width, scale);
+        scale = MAX(h/newSize.height, scale);
+        
         //new image size
         newSize = CGSizeMake(w/scale, h/scale);
         // Create a graphics image context
@@ -1991,9 +2588,33 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     return newImage;
 }
 
++ (NSData *)getImgDataBy:(UIImage *)image
+{
+    NSData *data;
+    if (UIImagePNGRepresentation(image) == nil) {
+        data = UIImageJPEGRepresentation(image, 1);
+    } else {
+        data = UIImagePNGRepresentation(image);
+    }
+    
+    return data;
+}
+
++ (void)deleteFileFor:(NSString *)path
+{
+    NSFileManager *manager = [NSFileManager defaultManager];
+    if ([manager fileExistsAtPath:path]) {
+        NSError *error = nil;
+        [manager removeItemAtPath:path error:&error];
+        if (error) {
+            NSLog(@"remove File : %@",error.localizedDescription);
+        }
+    }
+}
+
 #pragma mark - ==========文件,路径======================
 //判断路径或者文件是否存在
-+(BOOL)isExistWithPath:(NSString *)path
++ (BOOL)isExistWithPath:(NSString *)path
 {
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         return YES;
@@ -2002,7 +2623,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     }
 }
 
-+(NSString *)getSandboxPath
++ (NSString *)getSandboxPath
 {
     NSString *Path = @"~";
     Path = [Path stringByExpandingTildeInPath];
@@ -2010,14 +2631,14 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     return Path;
 }
 
-+(NSString *)getPath:(NSString *)path name:(NSString *)name
++ (NSString *)getPath:(NSString *)path name:(NSString *)name
 {
     path = [path stringByExpandingTildeInPath];//扩展成路径
     NSString *FilePath = [path stringByAppendingPathComponent:name];
     return FilePath;
 }
 
-+(void)saveFileWithPath:(NSString *)path FileName:(NSString *)name content:(id)content
++ (void)saveFileWithPath:(NSString *)path FileName:(NSString *)name content:(id)content
 {
     NSString *FilePath = nil;
     NSString *file = [path lastPathComponent];
@@ -2056,8 +2677,11 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     }
 }
 
-+(NSData *)readFileWithPath:(NSString *)path FileName:(NSString *)name
++ (NSData *)readFileWithPath:(NSString *)path FileName:(NSString *)name
 {
+    if (!path || path.length <= 0) {
+        return nil;
+    }
     NSString *lastPart = [path lastPathComponent];
     if (![lastPart hasSuffix:@".xml"]) {
         path = [path stringByExpandingTildeInPath];//扩展成路径
@@ -2074,7 +2698,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     return data;
 }
 
-+(id)readWithPath:(NSString *)path FileName:(NSString *)name
++ (id)readWithPath:(NSString *)path FileName:(NSString *)name
 {
     NSError *error = nil;
     name = [name stringByAppendingString:@".xml"];
@@ -2139,7 +2763,7 @@ NSArray *getDBPath()
     return result;
 }
 
-+(NSArray *)getDBPath
++ (NSArray *)getDBPath
 {
     return getDBPath();
 }
@@ -2163,6 +2787,12 @@ NSString *replaceString(NSString *string,NSString *oldString,NSString *newString
     return result;
 }
 
+NSString *StringFromCGRect(UIView *View)
+{
+    NSString *result = NSStringFromCGRect(View.frame);
+    return result;
+}
+
 #pragma mark - =============从字符串中获取指定某字符到某字符之间的字符串======================
 + (NSString *)scanString:(NSString *)aString Start:(NSString *)a End:(NSString *)b
 {
@@ -2177,7 +2807,7 @@ NSString *replaceString(NSString *string,NSString *oldString,NSString *newString
 }
 
 #pragma mark - =============判断是否包含======================
-+(BOOL)contain:(NSString *)bString inString:(NSString *)aString
++ (BOOL)contain:(NSString *)bString inString:(NSString *)aString
 {
     NSRange range = [aString rangeOfString:bString];
     if (range.location==NSNotFound) {
@@ -2195,7 +2825,7 @@ BOOL containString(NSString *string,NSString *aString)
     return YES;
 }
 
-+(CLLocation *)getLocationWith:(NSString *)locationStr
++ (CLLocation *)getLocationWith:(NSString *)locationStr
 {
     NSAssert([locationStr isKindOfClass:[NSString class]], @"locationStr不是字符串");
     
@@ -2212,7 +2842,7 @@ BOOL containString(NSString *string,NSString *aString)
 }
 
 #pragma mark - ==============判断是否为手机号========================
-+(BOOL)isMobile:(NSString *)mobile
++ (BOOL)isMobile:(NSString *)mobile
 {
     //手机号以13， 15，18开头，八个 \d 数字字符
     NSString *phoneRegex = @"^0{0,1}1[3|4|5|6|7|8|9][0-9]{9}$";
@@ -2221,13 +2851,13 @@ BOOL containString(NSString *string,NSString *aString)
 }
 
 #pragma mark - ===========设置状态栏字体颜色=========================
-+(void)setStatusBarStyleWith:(UIApplication *)application
++ (void)setStatusBarStyleWith:(UIApplication *)application
 {
     //[application setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
     [application setStatusBarStyle:UIStatusBarStyleDefault];
 }
 
-+(UIButton *)showMsgToStatusBarWith:(NSString *)message time:(NSTimeInterval)time
++ (UIButton *)showMsgToStatusBarWith:(NSString *)message time:(NSTimeInterval)time
 {
     UIView *BGView = nil;
     UILabel *lblMsg = nil;
@@ -2263,9 +2893,7 @@ BOOL containString(NSString *string,NSString *aString)
     
     lblMsg.text = message;
     
-    if (!Ctb) {
-        Ctb = [[CTB alloc] init];
-    }
+    CTB *Ctb = [CTB getInstance];
     [Ctb performSelector:select(HiddenStatusBar) withObject:nil afterDelay:0.5];
     [Ctb performSelector:select(ShowViewToWindow:) withObject:BGView afterDelay:0.15];
     
@@ -2278,7 +2906,7 @@ BOOL containString(NSString *string,NSString *aString)
     return btn;
 }
 
--(void)ShowViewToWindow:(UIView *)View
+- (void)ShowViewToWindow:(UIView *)View
 {
     View.hidden = NO;
     [CTB setAnimationWith:0.2 delegate:nil complete:nil];
@@ -2286,7 +2914,7 @@ BOOL containString(NSString *string,NSString *aString)
     [CTB commitAnimations];
 }
 
--(void)HiddenView:(UIView *)View
+- (void)HiddenView:(UIView *)View
 {
     if (View) {
         [CTB setAnimationWith:View size:CGSizeMake(Screen_Width, 0)];
@@ -2295,19 +2923,19 @@ BOOL containString(NSString *string,NSString *aString)
     }
 }
 
-+(void)HiddenStatusBarMsg
++ (void)HiddenStatusBarMsg
 {
     UIWindow *temWindow = [CTB getWindow];
     UIView *BGView = [temWindow viewWithTag:99];
     BGView.hidden = YES;
 }
 
--(void)HiddenStatusBar
+- (void)HiddenStatusBar
 {
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
 }
 
--(void)ShowStatusBar
+- (void)ShowStatusBar
 {
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
     UIWindow *temWindow = [CTB getWindow];
@@ -2315,28 +2943,163 @@ BOOL containString(NSString *string,NSString *aString)
     BGView.hidden = YES;
 }
 
-+(UIView *)setBottomLineAtTable:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+#pragma mark - ----------tableView添加底部线条(分隔线)------------------
++ (UIView *)setBottomLineAt:(UITableView *)tableView cell:(UITableViewCell *)cell cellH:(CGFloat)cellH
 {
-    return [[self class] setBottomLineAtTable:tableView dicData:@{@"indexPath":indexPath,@"cell":cell}];
-}
-
-+(UIView *)setBottomLineAtTable:(UITableView *)tableView dicData:(NSDictionary *)dicData
-{
-    NSIndexPath *indexPath = dicData[@"indexPath"];
-    CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
-    CGFloat h = [tableView rectForRowAtIndexPath:indexPath].size.height;
-    UIView *View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
+    CGFloat w = tableView.frame.size.width;
+    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    if (!View) {
+        View = [[UIView alloc] initWithFrame:CGRectMake(10, cellH-0.6, w-20, 0.6)];
+        [cell.contentView addSubview:View];
+    }
     View.tag = 200;
     View.backgroundColor = [UIColor clearColor];
     View.layer.masksToBounds = YES;
     View.layer.borderWidth = 0.3;
     View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
     
+    return View;
+}
+
++ (UIView *)setBottomLineAtTable:(UITableView *)tableView cell:(UITableViewCell *)cell delegate:(id)delegate
+{
+    NSIndexPath *indexPath = [tableView indexPathForCell:cell];
+    NSDictionary *dic = nil;
+    if (indexPath)
+        dic = @{@"indexPath":indexPath,@"cell":cell};
+    else
+        dic = @{@"cell":cell};
+    return [[self class] setBottomLineAtTable:tableView dicData:dic];
+}
+
++ (UIView *)setBottomLineAtTable:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath delegate:(id)delegate
+{
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    NSDictionary *dic = nil;
+    if (cell)
+        dic = @{@"indexPath":indexPath,@"cell":cell};
+    else
+        dic = @{@"indexPath":indexPath};
+    return [[self class] setBottomLineAtTable:tableView dicData:dic];
+}
+
++ (UIView *)setBottomLineAtTable:(UITableView *)tableView cell:(UITableViewCell *)cell
+{
+    NSIndexPath *indexPath = [tableView indexPathForCell:cell];
+    NSDictionary *dic = nil;
+    if (indexPath)
+        dic = @{@"indexPath":indexPath,@"cell":cell};
+    else
+        dic = @{@"cell":cell};
+    return [[self class] setBottomLineAtTable:tableView dicData:dic];
+}
+
++ (UIView *)setBottomLineAtTable:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    NSDictionary *dic = nil;
+    if (cell)
+        dic = @{@"indexPath":indexPath,@"cell":cell};
+    else
+        dic = @{@"indexPath":indexPath};
+    return [[self class] setBottomLineAtTable:tableView dicData:dic];
+}
+
++ (UIView *)setBottomLineAtTable:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
+    return [[self class] setBottomLineAtTable:tableView dicData:@{@"indexPath":indexPath,@"cell":cell}];
+}
+
++ (UIView *)setBottomLineAtTable:(UITableView *)tableView dicData:(NSDictionary *)dicData
+{
+    NSIndexPath *indexPath = dicData[@"indexPath"];
     UITableViewCell *cell = dicData[@"cell"];
-    [cell.contentView addSubview:View];
-    //[self.contentView addSubview:View];
+    //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
+    CGFloat w = tableView.frame.size.width;
+    CGFloat h = cell.contentView.frame.size.height;
+    id delegate = dicData[@"delegate"];
+    if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
+        h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
+    }else{
+        if (indexPath) {
+            h = [tableView rectForRowAtIndexPath:indexPath].size.height;
+        }
+    }
+    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    if (!View) {
+        View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
+        [cell.contentView addSubview:View];
+    }
+    View.tag = 200;
+    View.backgroundColor = [UIColor clearColor];
+    View.layer.masksToBounds = YES;
+    View.layer.borderWidth = 0.3;
+    View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
     
     return View;
+}
+
+
++ (UIView *)setBottomLineAtTables:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
+    return [[self class] setBottomLineAtTables:tableView dicData:@{@"indexPath":indexPath,@"cell":cell}];
+}
+
++ (UIView *)setBottomLineAtTables:(UITableView *)tableView dicData:(NSDictionary *)dicData
+{
+    NSIndexPath *indexPath = dicData[@"indexPath"];
+    UITableViewCell *cell = dicData[@"cell"];
+    //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
+    CGFloat w = tableView.frame.size.width;
+    CGFloat h = cell.contentView.frame.size.height;
+    id delegate = dicData[@"delegate"];
+    if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
+        h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
+    }else{
+        if (indexPath) {
+            h = [tableView rectForRowAtIndexPath:indexPath].size.height;
+        }
+    }
+    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    if (!View) {
+        View = [[UIView alloc] initWithFrame:CGRectMake(0, h-0.6, w, 0.6)];
+        [cell.contentView addSubview:View];
+    }
+    View.tag = 200;
+    View.backgroundColor = [UIColor clearColor];
+    View.layer.masksToBounds = YES;
+    View.layer.borderWidth = 0.3;
+    View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
+    
+    return View;
+}
+
+
++ (UIView *)setBottomLineAtTable:(UITableView *)tableView cell:(UITableViewCell *)cell h:(CGFloat)h
+{
+    CGFloat w = tableView.frame.size.width;
+    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    if (!View) {
+        View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
+        [cell.contentView addSubview:View];
+    }
+    View.tag = 200;
+    View.backgroundColor = [UIColor clearColor];
+    View.layer.masksToBounds = YES;
+    View.layer.borderWidth = 0.3;
+    View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
+    
+    return View;
+}
+
+void hiddenNavBar(UIViewController *VC,BOOL hidden,BOOL animaion)
+{
+    hiddenNavBarBy(VC.navigationController, hidden, animaion);
+}
+
+void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
+{
+    [nav setNavigationBarHidden:hidden animated:animaion];
 }
 
 #pragma mark - ============隐藏tabBar========================
@@ -2375,14 +3138,14 @@ BOOL containString(NSString *string,NSString *aString)
 }
 
 #pragma mark 获取系统时间
-+(NSString *)getDateWithFormat:(NSString *)format
++ (NSString *)getDateWithFormat:(NSString *)format
 {
     NSDateFormatter *data_time = [[NSDateFormatter alloc]init];
     [data_time setDateFormat:format];//@"yyyy-MM-dd HH:mm:ss"
     return [data_time stringFromDate:[NSDate date]];
 }
 
-+(NSString *)getSystemTime:(NSDate *)date format:(NSString *)format
++ (NSString *)getSystemTime:(NSDate *)date format:(NSString *)format
 {
     if (date==NULL) {
         date = [NSDate date];
@@ -2392,12 +3155,12 @@ BOOL containString(NSString *string,NSString *aString)
     return [data_time stringFromDate:date];
 }
 
-+(void)reSetPoint:(UIView *)View withHigh:(CGFloat)high
++ (void)reSetPoint:(UIView *)View withHigh:(CGFloat)high
 {
     View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y+high, View.frame.size.width, View.frame.size.height);
 }
 
-+(BOOL)isExistSelf:(UIViewController *)VC
++ (BOOL)isExistSelf:(UIViewController *)VC
 {
     NSArray *listNav = VC.navigationController.childViewControllers;
     if (!listNav || listNav.count<=0) {
@@ -2427,7 +3190,9 @@ BOOL containString(NSString *string,NSString *aString)
                 NSString *IP = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)cursor->ifa_addr)->sin_addr)];
                 
                 NSString *name = [NSString stringWithUTF8String:cursor->ifa_name];
-                [localIP setObject:IP forKey:name];
+                if (IP.length > 0) {
+                    [localIP setObject:IP forKey:name];
+                }
             }
             cursor = cursor->ifa_next;
         }
@@ -2449,11 +3214,12 @@ BOOL containString(NSString *string,NSString *aString)
                     NSString *IP = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)cursor->ifa_addr)->sin_addr)];
                     
                     NSString *name = [NSString stringWithUTF8String:cursor->ifa_name];
-                    //NSLog(@"%@ : %@",name,IP);
+                    NSLog(@"%@ : %@",name,IP);
                     
                     name = name ? name : @"en";
-                    IP = IP ? IP : @"0.0.0.0";
-                    [dicData setObject:IP forKey:name];
+                    if (IP.length > 0) {
+                        [dicData setObject:IP forKey:name];
+                    }
                 }
                 cursor = cursor->ifa_next;
             }
@@ -2498,9 +3264,100 @@ BOOL containString(NSString *string,NSString *aString)
     });
 }
 
+#pragma mark - =========UIViewController======================
++ (void)UIControllerEdgeNone:(UIViewController *)VC
+{
+    if (iPhone >= 7) {
+        VC.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+}
+
 #pragma mark - ======其它=======================
++ (void)duration:(NSTimeInterval)dur block:(dispatch_block_t)block
+{
+    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    //
+    //    [NSThread sleepForTimeInterval:dur];
+    //    dispatch_async(dispatch_get_main_queue(), block);
+    //});
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(dur * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
+}
+
++ (void)asyncWithBlock:(dispatch_block_t)block
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),block);
+}
+
++ (void)syncWithBlock:(dispatch_block_t)block
+{
+    dispatch_async(dispatch_get_main_queue(), block);
+}
+
++ (void)async:(dispatch_block_t)block complete:(dispatch_block_t)nextBlock
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^{
+        block();
+        dispatch_async(dispatch_get_main_queue(), nextBlock);
+    });
+}
+
++ (NSUserDefaults *)getUserDefaults
+{
+    return [NSUserDefaults standardUserDefaults];
+}
+
+NSUserDefaults *getUserDefaults()
+{
+    return [NSUserDefaults standardUserDefaults];
+}
+
+void setUserData(id obj,NSString *key)
+{
+    if (!key) return;
+    if (obj) {
+        [[NSUserDefaults standardUserDefaults] setObject:obj forKey:key];
+    }else{
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+void removeObjectForKey(NSString *key)
+{
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+}
+
+id getUserData(NSString *key)
+{
+    if (!key) return nil;
+    id obj = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+    return obj;
+}
+
++ (void)Request:(NSString *)urlString body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler
+{
+    if ([NSJSONSerialization isValidJSONObject:body])//判断是否有效
+    {
+        NSError* error;
+        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:body options:NSJSONWritingPrettyPrinted error: &error];//利用系统自带 JSON 工具封装 JSON 数据
+        NSURL* url = [NSURL URLWithString:urlString];
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:30.0];
+        [request setHTTPMethod:@"POST"];//设置为 POST
+        [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+        [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        [request setValue:[NSString stringWithFormat:@"%d",[jsonData length]] forHTTPHeaderField:@"Content-length"];
+        [request setHTTPBody:jsonData];//把刚才封装的 JSON 数据塞进去
+        
+        /*
+         *发起异步访问网络操作 并用 block 操作回调函数
+         */
+        [NSURLConnection sendAsynchronousRequest:request queue:[[NSOperationQueue alloc] init] completionHandler:handler];
+    }
+}
+
 #pragma mark ==========APP核对==========================
-+(NSArray *)checkHasOwnApp
++ (NSArray *)checkHasOwnApp
 {
     NSArray *mapSchemeArr = @[@"comgooglemaps://",@"iosamap://navi",@"baidumap://map/",@"sosomap://map/"];
     
@@ -2541,10 +3398,368 @@ BOOL containString(NSString *string,NSString *aString)
     
 }
 
++ (void)Try:(dispatch_block_t)try Catch:(dispatch_block_t)catch Finally:(dispatch_block_t)finally
+{
+    @try {
+        try();
+    }
+    @catch (NSException *exception) {
+        catch();
+    }
+    @finally {
+        finally();
+    }
+}
+
+#pragma mark - ---------Objective-C---------------------
+#pragma mark 生成长度为length的随机字符串
++ (NSString *)getRandomByString:(NSString *)string Length:(int)length
+{
+    if (![string isKindOfClass:[NSString class]] || string.length <= 0) {
+        //'A' ~ "Z",'a' ~ "z",'0' ~ "9"
+        string = @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    }
+    NSString *result = @"";
+    NSString *mStr = string;
+    for (int i = 0; i <length; i ++) {
+        int ran = arc4random() % mStr.length;
+        NSString *charStr = [mStr substringWithRange:NSMakeRange(ran, 1)];
+        result = [result stringByAppendingString:charStr];
+    }
+    return result;
+}
+
+#pragma mark 生成长度为length的随机字符串
++ (NSString *)getRandomByLength:(int)length
+{
+    return [self getRandomByString:nil Length:length];
+}
+
+#pragma mark 获取当前WIFI SSID信息
++ (NSDictionary *)currentWiFiSSID
+{
+    NSDictionary *result = nil;
+    NSArray *ifs = (__bridge_transfer id)CNCopySupportedInterfaces();
+    //NSLog(@"Supported interfaces: %@", ifs);
+    for (NSString *ifnam in ifs) {
+        NSDictionary *info = (__bridge_transfer id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
+        //NSLog(@"dici：%@",[info  allKeys]);
+        if (info && [info count]) {
+            result = info;//BSSID,SSID
+            break;
+        }
+    }
+    return result;
+}
+
 @end
 
-@implementation NSData (NSObject)
+#pragma mark - ===========类扩展======================
+#pragma mark - --------NSString------------------------
+@implementation NSString (NSObject)
 
++ (NSString *)stringWith:(NSString *)string
+{
+    if (string == nil) {
+        return @"";
+    }
+    
+    return string;
+}
+
++ (NSString *)stringSplicing:(NSArray *)array
+{
+    if (array == nil || ![array isKindOfClass:[NSArray class]]) {
+        return @"";
+    }
+    
+    NSString *result = @"";
+    for (NSString *str in array) {
+        NSAssert([str isKindOfClass:[NSString class]], @"Splicing the string must user NSString class");
+        result = [result AppendString:str];
+    }
+    
+    return result;
+}
+
++ (NSString *)jsonStringWithString:(NSString *) string
+{
+    NSString *result = [NSString stringWithFormat:@"\"%@\"",
+                        [[string stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"] stringByReplacingOccurrencesOfString:@"\""withString:@"\\\""]
+                        ];
+    return result;
+}
+
++ (NSString *)jsonStringWithArray:(NSArray *)array
+{
+    NSMutableString *reString = [NSMutableString string];
+    [reString appendString:@"["];
+    NSMutableArray *values = [NSMutableArray array];
+    for (id valueObj in array) {
+        NSString *value = [[self class] jsonStringWithObject:valueObj];
+        if (value) {
+            [values addObject:[NSString stringWithFormat:@"%@",value]];
+        }
+    }
+    [reString appendFormat:@"%@",[values componentsJoinedByString:@","]];
+    [reString appendString:@"]"];
+    return reString;
+}
+
++ (NSString *)jsonStringWithDictionary:(NSDictionary *)dictionary
+{
+    NSArray *keys = [dictionary allKeys];
+    NSMutableString *reString = [NSMutableString string];
+    [reString appendString:@"{"];
+    NSMutableArray *keyValues = [NSMutableArray array];
+    for (int i=0; i<[keys count]; i++) {
+        NSString *name = [keys objectAtIndex:i];
+        id valueObj = [dictionary objectForKey:name];
+        NSString *value = [[self class] jsonStringWithObject:valueObj];
+        if (value) {
+            [keyValues addObject:[NSString stringWithFormat:@"\"%@\":%@",name,value]];
+        }
+    }
+    [reString appendFormat:@"%@",[keyValues componentsJoinedByString:@","]];
+    [reString appendString:@"}"];
+    return reString;
+}
+
++ (NSString *)jsonStringWithObject:(id) object
+{
+    NSString *value = nil;
+    if (!object) {
+        return value;
+    }
+    if ([object isKindOfClass:[NSString class]]) {
+        value = [[self class] jsonStringWithString:object];
+    }else if([object isKindOfClass:[NSDictionary class]]){
+        value = [[self class] jsonStringWithDictionary:object];
+    }else if([object isKindOfClass:[NSArray class]]){
+        value = [[self class] jsonStringWithArray:object];
+    }
+    return value;
+}
+
++ (NSString *)format:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2)
+{
+    if (!format)
+        return nil;
+    
+    va_list arglist;
+    va_start(arglist, format);
+    NSString *outStr = [[NSString alloc] initWithFormat:format arguments:arglist];
+    va_end(arglist);
+    
+    return outStr;
+}
+
+- (NSString *)AppendString:(NSString *)aString
+{
+    if (!aString) return self;
+    return [self stringByAppendingString:aString];
+}
+
+- (NSString *)AppendFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2)
+{
+    va_list arglist;
+    va_start(arglist, format);
+    NSString *outStr = [[NSString alloc] initWithFormat:format arguments:arglist];
+    va_end(arglist);
+    
+    outStr = [self stringByAppendingString:outStr];
+    
+    return outStr;
+}
+
+#pragma mark 十六进制字符转data
+- (NSData *)dataByHexString
+{
+    NSString *str = [self stringByReplacingOccurrencesOfString:@" " withString:@""];
+    char const *myBuffer = str.UTF8String;
+    NSInteger charCount = strlen(myBuffer);
+    if (charCount %2 != 0) {
+        return nil;
+    }
+    NSInteger byteCount = charCount/2;
+    uint8_t *bytes = malloc(byteCount);
+    for (int i=0; i<byteCount; i++) {
+        unsigned int value;
+        sscanf(myBuffer + i*2, "%2x",&value);
+        bytes[i] = value;
+    }
+    NSData *data = [NSData dataWithBytes:bytes length:byteCount];
+    return data;
+}
+
+//字符串转化成字典
+- (NSDictionary *)convertToDic
+{
+    NSError *error = nil;
+    NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&error];
+    if (error) {
+        NSLog(@"字符串转换成字典失败,error : %@",error.localizedDescription);
+    }
+    
+    return jsonDic;
+}
+
+//判断是否包含字符串
+- (BOOL)containString:(NSString *)aString
+{
+    if (!self) return false;
+    if (iPhone < 8) {
+        BOOL isExist = false;
+        NSRange range = [self rangeOfString:aString];
+        if (range.location != NSNotFound) {
+            isExist = true;
+        }
+        
+        return isExist;
+    }
+    
+    return [self containsString:aString];
+}
+
+//获取中文字符的拼音
+- (NSString *) phonetic
+{
+    NSMutableString *source = [self mutableCopy];
+    CFStringTransform((__bridge CFMutableStringRef)source, NULL, kCFStringTransformMandarinLatin, NO);
+    CFStringTransform((__bridge CFMutableStringRef)source, NULL, kCFStringTransformStripDiacritics, NO);
+    return source;
+}
+
+- (NSString *)getPhonetic
+{
+    NSString *result = [self phonetic];
+    
+    NSArray *list = [result componentsSeparatedByString:@" "];
+    if (list.count > 1) {
+        result = @"";
+        for (NSString *str in list) {
+            if (str.length > 0) {
+                result = [result AppendString:[str substringToIndex:1]];
+            }
+        }
+    }
+    
+    return result;
+}
+
+- (NSData *)dataUsingUTF8
+{
+    return [self dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+#pragma mark 使用MD5加密
+- (NSString *)encryptUsingMD5
+{
+    const char *cStr = [self UTF8String];
+    unsigned char result[16];
+    CC_MD5(cStr, strlen(cStr), result); // This is the md5 call
+    NSString *value = [NSString stringWithFormat:
+            @"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+            result[0], result[1], result[2], result[3],
+            result[4], result[5], result[6], result[7],
+            result[8], result[9], result[10], result[11],
+            result[12], result[13], result[14], result[15]
+            ];
+    
+    return value;
+}
+
+#pragma mark 拿取文件路径
+- (NSString *)getFilePath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths firstObject];
+    if ([self hasSuffix:@".txt"]) {
+        documentsDirectory = [documentsDirectory stringByAppendingPathComponent:@"documents"];
+    }
+    else if ([self hasSuffix:@".png"]||[self hasSuffix:@".jpg"]||[self hasSuffix:@".gif"]) {
+        documentsDirectory = [documentsDirectory stringByAppendingPathComponent:@"images"];
+    }
+    else if ([self hasSuffix:@".amr"]||[self hasSuffix:@".wav"]) {
+        documentsDirectory = [documentsDirectory stringByAppendingPathComponent:@"audio"];
+    }
+    if (![NSFileManager fileExistsAtPath:documentsDirectory]) {
+        NSError *error = nil;
+        [[NSFileManager defaultManager] createDirectoryAtPath:documentsDirectory withIntermediateDirectories:YES attributes:Nil error:&error];
+        if (error) {
+            NSLog(@"路径创建失败:%@",error.localizedDescription);
+        }
+    }
+    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:self];
+    return filePath;
+}
+
+#pragma mark 根据随机数生成文件名
++ (NSString *)getFileNameWith:(NSString *)type
+{
+    NSString *timeString = [CTB getDateWithFormat:@"yyyyMMddHHmmss"];
+    NSString *randomCode = [CTB getRandomByLength:6];
+    timeString = [timeString AppendString:randomCode];
+    
+    if (type.length <= 0) {
+        return timeString;
+    }
+    
+    return [timeString AppendFormat:@"%@.%@",timeString,type];
+}
+
+- (NSArray *)componentSeparatedByString:(NSString *)key
+{
+    NSString *string = self;
+    if (key.length <= 0) {
+        return [string componentsSeparatedByString:key];
+    }
+    
+    if ([string hasPrefix:key]) {
+        NSInteger len = key.length;
+        string = [string substringFromIndex:len];
+    }
+    
+    if ([string hasSuffix:key]) {
+        NSInteger len = key.length;
+        string = [string substringToIndex:string.length-len];
+    }
+    
+    return [string componentsSeparatedByString:key];
+}
+
+- (NSString *)replaceString:(NSString *)target withString:(NSString *)replacement
+{
+    NSString *result = [self stringByReplacingOccurrencesOfString:target withString:replacement];
+    return result;
+}
+
+//移除前缀
+- (NSString *)removePrefix:(NSString *)aString
+{
+    if ([self hasPrefix:aString]) {
+        return [self substringFromIndex:aString.length];
+    }
+    
+    return self;
+}
+
+//移除后缀
+- (NSString *)removeSuffix:(NSString *)aString
+{
+    if ([self hasSuffix:aString]) {
+        return [self substringToIndex:self.length-aString.length];
+    }
+    
+    return self;
+}
+
+@end
+
+#pragma mark - --------NSData------------------------
+@implementation NSData (NSObject)
+#pragma mark NSData bytes转换成十六进制字符串
 - (NSString *)dataBytes2HexStr
 {
     if (!self) {
@@ -2562,6 +3777,553 @@ BOOL containString(NSString *string,NSString *aString)
     }
     
     return hexStr;
+}
+
+- (NSData *)contactData:(NSData *)data
+{
+    NSMutableData *result = [NSMutableData dataWithData:self];
+    [result appendData:data];
+    
+    return result;
+}
+
+- (NSString *)stringWithRange:(NSRange)range
+{
+    NSData *data = [self subdataWithRange:range];
+    
+    NSString *result = [data dataBytes2HexStr];
+    
+    return result;
+}
+
+#pragma mark 数据分割
+- (NSData *)dataWithStart:(NSInteger)start end:(NSInteger)end
+{
+    if (!self) {
+        return nil;
+    }
+    NSInteger count = self.length - start - end;
+    NSData *data = [self subdataWithRange:NSMakeRange(start, count)];
+    
+    return data;
+}
+
+- (id)unarchiveData
+{
+    id obj = [NSKeyedUnarchiver unarchiveObjectWithData:self];
+    return obj;
+}
+
+- (NSString *)stringUsingUTF8
+{
+    NSString *result = [self stringUsingEncode: NSUTF8StringEncoding];
+    return result;
+}
+
+- (NSString *)stringUsingEncode:(NSStringEncoding)encode
+{
+    NSString *result = [[NSString alloc] initWithData:self encoding: encode];
+    return result;
+}
+
+- (NSStringEncoding)getEncode
+{
+    BOOL isUser = true;
+    NSStringEncoding GBK = [NSString stringEncodingForData:self encodingOptions:nil convertedString:nil usedLossyConversion:&isUser];
+    
+    return GBK;
+}
+
+@end
+
+#pragma mark - --------NSArray------------------------
+@implementation NSArray (NSObject)
+
+- (void)perExecute:(SEL)aSelector
+{
+    [self makeObjectsPerformSelector:aSelector];
+}
+
+- (void)perExecute:(SEL)aSelector withObject:(id)argument
+{
+    [self makeObjectsPerformSelector:aSelector withObject:argument];
+}
+
+- (NSArray *)getListKey:(id)key
+{
+    NSMutableArray *list = [NSMutableArray array];
+    for (NSDictionary *dic in self) {
+        if (![dic isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        [list addObject:[dic objectForKey:key]];
+    }
+    
+    return list;
+}
+
+@end
+
+#pragma mark - --------NSDictionary------------------------
+@implementation NSDictionary (NSObject)
+
+- (NSDictionary *)dictionaryWithDictionary:(NSDictionary *)dict
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithDictionary:self];
+    [dic addEntriesFromDictionary:dict];
+    
+    NSDictionary *result = [NSDictionary dictionaryWithDictionary:dic];
+    
+    return result;
+}
+
+- (NSDictionary *)AppendDictionary:(NSDictionary *)dict
+{
+    return [self dictionaryWithDictionary:dict];
+}
+
+- (NSString *)convertToString
+{
+    NSError *error = nil;
+    NSData  *jsonData = [NSJSONSerialization dataWithJSONObject:self options:NSJSONWritingPrettyPrinted error:&error];
+    if (error) {
+        NSLog(@"NSDictionary转NSString出错,%@",error.localizedDescription);
+    }
+    
+    if (!jsonData) return nil;
+    
+    NSString *result = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    result = [result stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    
+    return result;
+}
+
+- (id)checkClass:(Class)aClass key:(id)key
+{
+    if (![self isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"该数据不是NSDictionary类型");
+        return 0;
+    }
+    
+    id result = [self objectForKey:key];
+    if (!result || ![result isKindOfClass:aClass]) {
+        return nil;
+    }
+    
+    return result;
+}
+
+#pragma mark 根据关键字获取对应数据
+- (int)intForKey:(id)key
+{
+    id value = [self checkClass:[NSNumber class] key:key];
+    value = value ?: [self checkClass:[NSString class] key:key];
+    int result = [value intValue];
+    return result;
+}
+
+- (NSInteger)integerForKey:(id)key
+{
+    id value = [self checkClass:[NSNumber class] key:key];
+    value = value ?: [self checkClass:[NSString class] key:key];
+    NSInteger result = [value integerValue];
+    return result;
+}
+
+- (long)longForKey:(id)key
+{
+    id value = [self checkClass:[NSNumber class] key:key];
+    value = value ?: [self checkClass:[NSString class] key:key];
+    long result = [value longValue];
+    return result;
+}
+
+- (float)floatForKey:(id)key
+{
+    id value = [self checkClass:[NSNumber class] key:key];
+    value = value ?: [self checkClass:[NSString class] key:key];
+    float result = [value floatValue];
+    return result;
+}
+
+- (double)doubleForKey:(id)key
+{
+    id value = [self checkClass:[NSNumber class] key:key];
+    value = value ?: [self checkClass:[NSString class] key:key];
+    double result = [value doubleValue];
+    return result;
+}
+
+- (BOOL)boolForKey:(id)key
+{
+    id value = [self checkClass:[NSNumber class] key:key];
+    value = value ?: [self checkClass:[NSString class] key:key];
+    BOOL result = [value boolValue];
+    return result;
+}
+
+- (NSString *)stringForKey:(id)key
+{
+    id value = [self checkClass:[NSString class] key:key];
+    return value;
+}
+
+- (NSArray *)arrayForKey:(id)key
+{
+    id value = [self checkClass:[NSArray class] key:key];
+    return value;
+}
+
+- (NSDictionary *)dictionaryForKey:(id)key
+{
+    id value = [self checkClass:[NSDictionary class] key:key];
+    return value;
+}
+
+- (NSData *)dataForKey:(id)key
+{
+    id value = [self checkClass:[NSData class] key:key];
+    return value;
+}
+
+//- (id)objectForKey:(id)key
+//{
+//    if (![self isKindOfClass:[NSDictionary class]]) {
+//        NSLog(@"该数据不是NSDictionary类型");
+//        return nil;
+//    }
+//    
+//    id result = [self objectForKey:key];
+//    
+//    return result;
+//}
+
+@end
+
+#pragma mark - --------UIColor------------------------
+@implementation UIColor (NSObject)
+
+- (UIColor *)colorWithAlpha:(CGFloat)alpha
+{
+    return [self colorWithAlphaComponent:alpha];
+}
+
+@end
+
+#pragma mark - --------UIImage------------------------
+@implementation UIImage (NSObject)
+
+- (UIImage *)imageWithCapInsets:(UIEdgeInsets)capInsets
+{
+    return [self resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];
+}
+
++ (UIImage *)imageFromLibrary:(NSString *)imgName
+{
+    NSString *filePath = [imgName getFilePath];
+    UIImage *image = [UIImage imageWithContentsOfFile:filePath];
+    return image;
+}
+
+@end
+
+#pragma mark - --------UIView------------------------
+@implementation UIView (NSObject)
+
+- (void)setOriginX:(CGFloat)x
+{
+    self.frame = CGRectMake(x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+}
+
+- (void)setOriginY:(CGFloat)y
+{
+    self.frame = CGRectMake(self.frame.origin.x, y, self.frame.size.width, self.frame.size.height);
+}
+
+- (void)setOriginX:(CGFloat)x Y:(CGFloat)y
+{
+    self.frame = CGRectMake(x, y, self.frame.size.width, self.frame.size.height);
+}
+
+- (void)setSizeToW:(CGFloat)w
+{
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, w, self.frame.size.height);
+}
+
+- (void)setSizeToH:(CGFloat)h
+{
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, h);
+}
+
+- (void)setSizeToW:(CGFloat)w height:(CGFloat)h
+{
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, w, h);
+}
+
+- (void)setOriginX:(CGFloat)x width:(CGFloat)w
+{
+    self.frame = CGRectMake(x, self.frame.origin.y, w, self.frame.size.height);
+}
+
+- (void)setOriginY:(CGFloat)y height:(CGFloat)h
+{
+    self.frame = CGRectMake(self.frame.origin.x, y, self.frame.size.width, h);
+}
+
+- (void)setOrigin:(CGPoint)origin
+{
+    self.frame = CGRectMake(origin.x, origin.y, self.frame.size.width, self.frame.size.height);
+}
+
+- (void)setSize:(CGSize)size
+{
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, size.width, size.height);
+}
+
+- (void)setCenterX:(CGFloat)x
+{
+    self.center = CGPointMake(x, self.center.y);
+}
+
+- (void)setCenterY:(CGFloat)y
+{
+    self.center = CGPointMake(self.center.x, y);
+}
+
+- (void)setCenterX:(CGFloat)x Y:(CGFloat)y
+{
+    self.center = CGPointMake(x, y);
+}
+
+- (id)viewWithClass:(Class)aClass tag:(NSInteger)tag
+{
+    NSArray *listView = self.subviews;
+    NSMutableArray *list = [NSMutableArray array];
+    for (UIView *v in listView) {
+        if ([v isKindOfClass:[aClass class]] && v.tag == tag) {
+            [list addObject:v];
+        }
+    }
+    
+    return list.firstObject;
+}
+
+@end
+
+#pragma mark - --------UIControl------------------------
+@implementation UIControl (NSObject)
+
+- (void)addDownTarget:(id)target action:(SEL)action
+{
+    [self addTarget:target action:action forControlEvents:UIControlEventTouchDown];
+}
+
+- (void)addUpOutsideTarget:(id)target action:(SEL)action
+{
+    [self addTarget:target action:action forControlEvents:UIControlEventTouchUpOutside];
+}
+
+- (void)addUpInsideTarget:(id)target action:(SEL)action
+{
+    [self addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
+}
+
+@end
+
+#pragma mark - --------UIButton------------------------
+@implementation UIButton (NSObject)
+
+- (void)setNormalTitleColor:(UIColor *)color
+{
+    [self setTitleColor:color forState:UIControlStateNormal];
+}
+
+- (void)setHighlightedTitleColor:(UIColor *)color
+{
+    [self setTitleColor:color forState:UIControlStateHighlighted];
+}
+
+- (void)setTitleColor:(UIColor *)color normal:(BOOL)normal highlighted:(BOOL)highlighted
+{
+    if (normal) {
+        [self setNormalTitleColor:color];
+    }
+    if (highlighted) {
+        [self setHighlightedTitleColor:color];
+    }
+}
+
+- (void)setNormalImage:(UIImage *)image
+{
+    [self setImage:image forState:UIControlStateNormal];
+}
+
+- (void)setHighlightedImage:(UIImage *)image
+{
+    [self setImage:image forState:UIControlStateHighlighted];
+}
+
+- (void)setImage:(UIImage *)image normal:(BOOL)normal highlighted:(BOOL)highlighted
+{
+    if (normal) {
+        [self setNormalImage:image];
+    }
+    if (highlighted) {
+        [self setHighlightedImage:image];
+    }
+}
+
+- (void)setNormalBackgroundImage:(UIImage *)image
+{
+    [self setBackgroundImage:image forState:UIControlStateNormal];
+}
+
+- (void)setHighlightedBackgroundImage:(UIImage *)image
+{
+    [self setBackgroundImage:image forState:UIControlStateHighlighted];
+}
+
+- (void)setBackgroundImage:(UIImage *)image normal:(BOOL)normal highlighted:(BOOL)highlighted
+{
+    if (normal) {
+        [self setNormalBackgroundImage:image];
+    }
+    if (highlighted) {
+        [self setHighlightedBackgroundImage:image];
+    }
+}
+
+@end
+
+#pragma mark - NSError
+@implementation NSError (NSObject)
+
++ (NSError *)initWithMsg:(NSString *)errMsg code:(NSInteger)code
+{
+    NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+				
+    NSError *errPtr = [NSError errorWithDomain:@"kCFStreamErrorDomainPOSIX" code:code userInfo:info];
+    
+    return errPtr;
+}
+
+@end
+
+#pragma mark - --------NSFileManager------------------------
+@implementation NSFileManager (NSObject)
+
++ (BOOL)fileExistsAtPath:(NSString *)path
+{
+    return [[NSFileManager defaultManager] fileExistsAtPath:path];
+}
+
++ (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory
+{
+    return [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:isDirectory];
+}
+
++ (BOOL)removeItemAtPath:(NSString *)path
+{
+    NSError *error = nil;
+    BOOL result = [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
+    if (error) {
+        NSLog(@"删除文件 : %@",error.localizedDescription);
+    }
+    return result;
+}
+
++ (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data attributes:(NSDictionary *)attr
+{
+    return [[NSFileManager defaultManager] createFileAtPath:path contents:data attributes:attr];
+}
+
++ (BOOL)moveItemAtPath:(NSString *)srcPath toPath:(NSString *)dstPath error:(NSError **)error
+{
+    return [[NSFileManager defaultManager] moveItemAtPath:srcPath toPath:dstPath error:error];
+}
+
+@end
+
+@implementation UITableView (NSObject)
+
+- (id)cellAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [self cellForRowAtIndexPath:indexPath];
+}
+
+@end
+
+@implementation UITableViewCell (NSObject)
+//cell high
+- (UIView *)cellAddBottomLineWithHigh:(CGFloat)h
+{
+    CGFloat w = self.contentView.frame.size.width;
+    
+    return [self cellAddBottomLineWithSize:CGSizeMake(w, h)];
+}
+
+//cell size
+- (UIView *)cellAddBottomLineWithSize:(CGSize)size
+{
+    CGFloat w = size.width;
+    CGFloat h = size.height;
+    UIView *View = getSubViewBy([UIView class], self.contentView, 200);
+    if (!View) {
+        View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
+        [self.contentView addSubview:View];
+    }
+    View.tag = 200;
+    View.backgroundColor = [UIColor clearColor];
+    View.layer.masksToBounds = YES;
+    View.layer.borderWidth = 0.3;
+    View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
+    
+    return View;
+}
+
+@end
+
+@implementation NSIndexPath (NSObject)
+
++ (NSIndexPath *)inRow:(NSInteger)row inSection:(NSInteger)section
+{
+    return [NSIndexPath indexPathForRow:row inSection:section];
+}
+
+@end
+
+@implementation NSUserDefaults (NSObject)
+
++ (NSUserDefaults *)defaults
+{
+    return [NSUserDefaults standardUserDefaults];
+}
+
+@end
+
+#pragma mark - --------NSObject------------------------
+@implementation NSObject (NSObject)
+
+- (void)duration:(NSTimeInterval)dur action:(SEL)action
+{
+    [self performSelector:action withObject:nil afterDelay:dur];
+}
+
+- (void)duration:(NSTimeInterval)dur action:(SEL)action with:(id)anArgument
+{
+    [self performSelector:action withObject:anArgument afterDelay:dur];
+}
+
+- (NSData *)archivedData
+{
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self];
+    return data;
+}
+
+- (void)isNULLToEqual:(id)obj
+{
+    if (self == nil) {
+    }
 }
 
 @end

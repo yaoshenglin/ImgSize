@@ -15,4 +15,6 @@
     UIButton *btnAddr;//最近使用的地址
 }
 
+@property (retain, nonatomic) NSDictionary *dicAccess;
+
 @end

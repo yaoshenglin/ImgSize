@@ -461,7 +461,7 @@
     "telePhone text, "
     "mobile text"
     ")";
-    [DB execSql:sql name:@"AddressBook"];
+    [DB execSql:sql];
 }
 
 +(NSString *)getTelStringWith:(NSArray *)list
@@ -499,7 +499,7 @@
 +(void)ReplacementAddressBook:(NSArray *)arrData
 {
     NSString *sql = [NSString stringWithFormat:@"delete from AddressBook"];
-    [DB execSql:sql name:@"AddressBook"];
+    [DB execSql:sql];
     arrData = arrData ?: [self getDataFromAddressBook];
     for (AddressBook *book in arrData) {
         [self insert:book];
@@ -543,7 +543,7 @@
                      
                      fullName,telePhone,entity.mobile];
     
-    [DB execSql:sql name:@"AddressBook"];
+    [DB execSql:sql];
     
     return YES;
 }
@@ -565,14 +565,14 @@
                      
                      entity.fullName,telePhone,entity.mobile, entity.ContactID];
     
-    [DB execSql:sql name:@"AddressBook"];
+    [DB execSql:sql];
 }
 
 #pragma mark - =======获取数据总条数============================
 +(NSInteger)getTotalRecord
 {
     NSString *sql = [NSString stringWithFormat:@"select count(*) from AddressBook"];
-    NSInteger count = [DB getAllTotalFrom:sql];
+    NSInteger count = [DB getTotalBySql:sql];
     return count;
 }
 
@@ -580,7 +580,7 @@
 + (void)deleteRecord:(NSInteger)ContactID
 {
     NSString *sql = [NSString stringWithFormat:@"delete from AddressBook where ContactID = %ld", (long)ContactID];
-    [DB execSql:sql name:@"AddressBook"];
+    [DB execSql:sql];
 }
 
 +(NSString *)getNameByMobile:(NSString *)mobile

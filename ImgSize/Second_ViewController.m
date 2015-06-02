@@ -10,10 +10,14 @@
 #import "CTB.h"
 #import "Tools.h"
 #import "MBProgressHUD.h"
+#import "UdpSocket.h"
+#import "Access.h"
 
-@interface Second_ViewController ()<CTBDelegate,UITextFieldDelegate,UIActionSheetDelegate,UITableViewDataSource,UITableViewDelegate,MBProgressHUDDelegate>
+@interface Second_ViewController ()<UITextFieldDelegate,UIActionSheetDelegate,UITableViewDataSource,UITableViewDelegate,MBProgressHUDDelegate>
 {
     BOOL isFirstAppear;
+    BOOL isStop;
+    int Type;
     
     NSMutableArray *listData;
     
@@ -22,6 +26,7 @@
     UITableView *myTableView;
     
     MBProgressHUD *hudView;
+    UdpSocket *sock;
 }
 
 @end
@@ -77,49 +82,141 @@
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"相册" target:self tag:1];
     
     listData = [NSMutableArray array];
-    [listData addObjectsFromArray:[[self getDic] allValues]];
     
     myTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, Screen_Width, Screen_Height-64) style:UITableViewStyleGrouped];
     myTableView.dataSource = self;
     myTableView.delegate = self;
     [self.view addSubview:myTableView];
     
-    [self performSelector:select(getKeyboardBy:) withObject:nil afterDelay:0.3];
+    Type = _tag;
+    sock = [[UdpSocket alloc] init];
+    sock.delegate = self;
+    if (Type == 1) {
+        [self searchAccessDevice];
+    }
+    else if (Type == 2) {
+        [self searchHostDevice];
+    }
 }
 
--(NSString *)getKeyboardBy:(UIKeyboardType)type
+- (void)searchAccessDevice
 {
-    NSDictionary *dic = [self getDic];
+    [sock enableBroadcast:YES port:8101];
+    [self duration:0.3 action:select(getDoorList)];
+}
+
+- (void)searchHostDevice
+{
+    [sock enableBroadcast:YES port:8003];
+    [listData removeAllObjects];
+    [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:select(getHostList:) userInfo:nil repeats:NO];
+}
+
+-(void)getDoorList
+{
+    [listData removeAllObjects];
     
-    if (type == 11) {
-        type = UIKeyboardTypeAlphabet;
+    NSString *SN = @"FF-FFFFFFFFFFFFF";
+    NSString *PWD = @"FFFFFFFF";
+    NSString *msg = @"030300D1";//开门
+    NSString *value = @"FFFF";//门1
+    NSString *control = [Tools makeControl:@"01FE00" dataLen:2 value:value];
+    NSData *buffer = [Tools makeDoorCommandWith:SN pwd:PWD msg:msg control:control];
+    
+    [sock sendData:buffer];
+}
+
+-(void)getHostList:(NSTimer *)timer
+{
+    if (isStop) {
+        [timer invalidate];
+        return;
+    }
+    NSString *host_mac = @"FFFFFFFFFFFF";
+    NSData *data = [[NSString stringWithFormat:@"A6%@00000000",host_mac] dataByHexString];
+    data = [Tools replaceCRCForSwitch:data];
+    
+    [sock sendData:data];
+}
+
+- (BOOL)onUdpSocket:(AsyncUdpSocket *)sock didReceiveData:(NSData *)data withTag:(long)tag fromHost:(NSString *)host port:(UInt16)port
+{
+    if ([host hasPrefix:@"::ffff:"]) {
+        return NO;
     }
     
-    NSString *result = dic[@(type)];
-    return result;
-}
-
--(NSDictionary *)getDic
-{
-    NSDictionary *dic = @{@(UIKeyboardTypeDefault):@"UIKeyboardTypeDefault",
-                          @(UIKeyboardTypeASCIICapable):@"UIKeyboardTypeASCIICapable",
-                          @(UIKeyboardTypeNumbersAndPunctuation):@"UIKeyboardTypeNumbersAndPunctuation",
-                          @(UIKeyboardTypeURL):@"UIKeyboardTypeURL",
-                          @(UIKeyboardTypeNumberPad):@"UIKeyboardTypeNumberPad",
-                          @(UIKeyboardTypePhonePad):@"UIKeyboardTypePhonePad",
-                          @(UIKeyboardTypeNamePhonePad):@"UIKeyboardTypeNamePhonePad",
-                          @(UIKeyboardTypeEmailAddress):@"UIKeyboardTypeEmailAddress",
-                          @(UIKeyboardTypeDecimalPad):@"UIKeyboardTypeDecimalPad",
-                          @(UIKeyboardTypeTwitter):@"UIKeyboardTypeTwitter",
-                          @(UIKeyboardTypeWebSearch):@"UIKeyboardTypeWebSearch",
-                          @(UIKeyboardTypeAlphabet):@"UIKeyboardTypeAlphabet",};
-    return dic;
-}
-
--(void)addDataFrom:(NSArray *)array
-{
-    [listData addObjectsFromArray:array];
-    [myTableView reloadData];
+    if (Type == 1 && data.length < 28) {
+        //门禁
+        return NO;
+    }
+    else if (Type == 2 && data.length < 12) {
+        //主机
+        return NO;
+    }
+    
+    if (Type == 1) {
+        NSString *lenString = [data stringWithRange:NSMakeRange(25, 3)];
+        if (![lenString isEqualToString:@"31FE00"]) {
+            //如果不是读取门禁IP信息
+            return NO;
+        }
+    }
+    else if (Type == 2) {
+        Byte *data_bytes = (Byte*)[data bytes];
+        Byte data_byte = data_bytes[0];
+        if (data_byte == 0xE6) {
+            NSString *hexStr = [data dataBytes2HexStr];
+            NSString *host_mac = [hexStr substringWithRange:NSMakeRange(2, 12)];
+            if (![host_mac isEqualToString:@"FFFFFFFFFFFF"]) {
+                NSDictionary *dic = @{@"SN":host_mac,
+                                      @"PWD":@"",
+                                      @"IP":host,
+                                      @"Port":@(port)};
+                NSString *result = [dic convertToString];
+                if (![listData containsObject:result]) {
+                    [listData addObject:result];
+                    [myTableView reloadData];
+                }
+            }
+        }
+        
+        return NO;
+    }
+    
+    Access *door = [[Access alloc] init];
+    NSString *result = @"";
+    long len = -1;
+    BOOL isSuccess = YES;
+    @try {
+        [door parseData:data];
+        NSData *value = [data subdataWithRange:NSMakeRange(59, 2)];
+        NSString *lenString = [value dataBytes2HexStr];
+        len = strtoul([lenString UTF8String],nil,16);//TCP端口
+        NSDictionary *dic = @{@"SN":door.SN,
+                              @"PWD":door.PWD,
+                              @"IP":host,
+                              @"Port":@(len)};
+        result = [dic convertToString];
+        if (![listData containsObject:result]) {
+            [listData addObject:result];
+            [myTableView reloadData];
+        }
+    }
+    @catch (NSException *exception) {
+        isSuccess = NO;
+        NSString *errMsg = [NSString format:@"IP信息解析失败,%@,%@,%@",host,exception.name,exception.reason];
+        hudView = [MBProgressHUD showRuningView:self.view];
+        [hudView showDetailMsg:errMsg delay:1.8f];
+        NSLog(@"********************");
+        NSLog(@"%@",errMsg);
+    }
+    @finally {
+        if (isSuccess) {
+            NSLog(@"--------------");
+            NSLog(@"%@",result);
+        }
+    }
+    return YES;
 }
 
 #pragma mark - ======tableView========================
@@ -141,7 +238,11 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identify];
     }
     
-    cell.textLabel.text = listData[indexPath.row];
+    NSDictionary *dic = [listData[indexPath.row] convertToDic];
+    NSString *msg = [NSString format:@"SN:%@,PWD:%@,IP:%@,Port:%@",dic[@"SN"],dic[@"PWD"],dic[@"IP"],dic[@"Port"]];
+    cell.textLabel.text = msg;
+    cell.textLabel.font = [UIFont systemFontOfSize:14.0];
+    cell.textLabel.numberOfLines = 0;
     
     return cell;
 }
@@ -150,8 +251,18 @@
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    [self showWord:10*indexPath.row];
-    [self performSelector:select(test:with:) withObject:@"OK" afterDelay:0.5];
+    NSString *msg = listData[indexPath.row];
+    [CTB showMessageWithString:msg to:self];
+    
+    if (Type == 2) {
+        return;
+    }
+    
+    NSDictionary *dic = [msg convertToDic];
+    NSString *host = dic[@"IP"] ?: @"";
+    UInt16 port = [dic[@"Port"] intValue];
+    [_tcpSocket connectToHost:host port:port];
+    [_dicAccess addEntriesFromDictionary:dic];
 }
 
 -(void)test:(NSString *)aString with:(NSString *)bString
@@ -238,6 +349,11 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+- (void)closeSocket
+{
+    [sock closeSocket];
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -256,6 +372,16 @@
     NSArray *list = self.navigationController.childViewControllers;
     if (![list containsObject:self]) {
         //self.hidesBottomBarWhenPushed = NO;
+        isStop = YES;
+        [sock closeCompletion:^{
+            sock = nil;
+            NSLog(@"关闭UDP连接");
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"关闭UDP连接" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
+            [alert show];
+            [CTB duration:0.6 block:^{
+                [alert dismissWithClickedButtonIndex:0 animated:YES];
+            }];
+        }];
     }
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];

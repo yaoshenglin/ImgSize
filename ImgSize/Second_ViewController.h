@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "iTcpSocket.h"
 
 @interface Second_ViewController : UIViewController<UIScrollViewDelegate>
 {
@@ -14,7 +15,10 @@
     UIImageView *myImageView;
 }
 
-@property(retain,nonatomic)UIScrollView *myScrollView;
-@property(retain,nonatomic)UIImageView *myImageView;
+@property (retain, nonatomic) UIScrollView *myScrollView;
+@property (retain, nonatomic) UIImageView *myImageView;
+@property (retain, nonatomic) NSMutableDictionary *dicAccess;
+@property (retain, nonatomic) iTcpSocket *tcpSocket;
+@property (assign, nonatomic) int tag;
 
 @end

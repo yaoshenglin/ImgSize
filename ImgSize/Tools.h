@@ -27,4 +27,16 @@
 + (NSData *)getHost2:(BOOL)isOn;
 + (NSData *)getHostConfig;
 
+#pragma mark - -------开关的CRC校验----------------
++(NSData*)replaceCRCForSwitch:(NSData *)buffer;
+
+#pragma mark 构造开门动作
++ (NSData*)makeOpenDoorActionWithSN:(NSString*)SN parmsDoor:(NSString*)parmsDoor;
+
+#pragma mark - -------组合门禁控制命令----------------
++ (NSString *)makeControl:(NSString *)control value:(NSString *)value;
++ (NSString *)makeControl:(NSString *)control dataLen:(int)len value:(NSString *)value;
+
++ (NSData *)makeDoorCommandWith:(NSString *)SN pwd:(NSString *)pwd msg:(NSString *)msg control:(NSString *)control;
+
 @end
