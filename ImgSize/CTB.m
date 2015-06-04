@@ -4008,6 +4008,32 @@ id getUserData(NSString *key)
     return [self colorWithAlphaComponent:alpha];
 }
 
+- (CGFloat *)getValue
+{
+    const CGFloat *cs=CGColorGetComponents(self.CGColor);
+    size_t index = CGColorGetNumberOfComponents(self.CGColor);
+    
+    CGFloat *result = (CGFloat *)malloc(sizeof(CGFloat)*4);
+    
+    if (index == 2) {
+        result[0] = result[1] = result[2] = cs[0];
+        result[3] = cs[1];
+    }
+    else if (index == 3) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请重新选择颜色" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+        [alert show];
+    }
+    else if (index == 4) {
+        result[0] = cs[0];
+        result[1] = cs[1];
+        result[2] = cs[2];
+        
+        result[3] = cs[3];
+    }
+    
+    return result;
+}
+
 @end
 
 #pragma mark - --------UIImage------------------------

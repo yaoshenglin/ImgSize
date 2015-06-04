@@ -614,6 +614,8 @@ id getUserData(NSString *key);
 
 - (UIColor *)colorWithAlpha:(CGFloat)alpha;
 
+- (CGFloat *)getValue;
+
 @end
 
 #pragma mark - UIImage

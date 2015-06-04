@@ -28,6 +28,14 @@
     // Override point for customization after application launch.
     return YES;
 }
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+    UITabBarController *tabBar = (UITabBarController *)_window.rootViewController;
+    NSArray *list = tabBar.viewControllers;
+    UINavigationController *nav = list.firstObject;
+    NSLog(@"%@",nav.visibleViewController);
+}
 							
 - (void)applicationWillResignActive:(UIApplication *)application
 {

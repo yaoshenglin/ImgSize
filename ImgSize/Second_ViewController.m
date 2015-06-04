@@ -382,6 +382,10 @@
                 [alert dismissWithClickedButtonIndex:0 animated:YES];
             }];
         }];
+    }else{
+        NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
+        [viewControllers removeObject:self];
+        [self.navigationController setViewControllers:viewControllers animated:YES];
     }
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];

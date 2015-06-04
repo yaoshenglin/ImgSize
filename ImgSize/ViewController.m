@@ -116,11 +116,15 @@ static NSString *const SBStyle2 = @"SBStyle2";
     }
     if (button.tag == 3) {
         
-        self.hidesBottomBarWhenPushed = YES;
-        UIViewController *Test = getController(@"Test", nil);
-        [Test setValue:dicAccess forKey:@"dicAccess"];
-        [self.navigationController pushViewController:Test animated:YES];
-        self.hidesBottomBarWhenPushed = NO;
+        UIColor *color = [[UIColor redColor] colorWithAlpha:0.5];
+        CGFloat *cs = [color getValue];
+        NSLog(@"r %f,g %f,b %f,alp %f",cs[0],cs[1],cs[2],cs[3]);
+        
+        //self.hidesBottomBarWhenPushed = YES;
+        //UIViewController *Test = getController(@"Test", nil);
+        //[Test setValue:dicAccess forKey:@"dicAccess"];
+        //[self.navigationController pushViewController:Test animated:YES];
+        //self.hidesBottomBarWhenPushed = NO;
     }
 }
 
