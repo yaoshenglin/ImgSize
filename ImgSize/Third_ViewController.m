@@ -38,18 +38,6 @@
     [super viewWillAppear:animated];
     [CTB setViewBounds:self];
     self.view.backgroundColor = [CTB colorWithHexString:@"#E5E5E5"];
-    
-    [self duration:2.0f action:select(removeFromSuperViewController)];
-}
-
-- (void)removeFromSuperViewController
-{
-//    UIViewController *Second = getControllerFor(self, @"Second_ViewController");
-//    if (Second) {
-//        NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
-//        [viewControllers removeObject:Second];
-//        [self.navigationController setViewControllers:viewControllers animated:YES];
-//    }
 }
 
 - (void)viewDidLoad
