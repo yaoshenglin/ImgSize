@@ -50,13 +50,17 @@ typedef void (^myBlock)(AsyncUdpSocket *sock);
     }
     
     _port = port;
-    [udpSocket receiveWithTimeout:-1 tag:0];
 }
 
 - (void)sendData:(NSData *)data
 {
+    [udpSocket sendData:data toHost:_host port:_port withTimeout:15.0 tag:0];
     [udpSocket sendData:data toHost:_host port:_port withTimeout:-1 tag:0];
-    [udpSocket receiveWithTimeout:15.0 tag:0];
+}
+
+- (void)receiveWithTimeout:(NSTimeInterval)timeout tag:(long)tag
+{
+    [udpSocket receiveWithTimeout:timeout tag:tag];
 }
 
 #pragma mark - --------AsyncUdpSocket-------------------------
@@ -74,7 +78,8 @@ typedef void (^myBlock)(AsyncUdpSocket *sock);
 {
     Access *door = [[Access alloc] init];
     [door parseData:data];
-    NSString *localIP = [CTB getLocalIPAddress][@"en0"];
+    NSDictionary *dic = [CTB getLocalIPAddress];
+    NSString *localIP = dic[dic.allKeys.firstObject];
     if (![host hasSuffix:localIP]) {
         //NSLog(@"已经接收来自%@数据,端口:%d",host,port);
         //NSLog(@"data : %@",data);

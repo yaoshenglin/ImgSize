@@ -26,7 +26,7 @@
     UITableView *myTableView;
     
     MBProgressHUD *hudView;
-    UdpSocket *sock;
+    UdpSocket *udpSocket;
 }
 
 @end
@@ -89,8 +89,8 @@
     [self.view addSubview:myTableView];
     
     Type = _tag;
-    sock = [[UdpSocket alloc] init];
-    sock.delegate = self;
+    udpSocket = [[UdpSocket alloc] init];
+    udpSocket.delegate = self;
     if (Type == 1) {
         [self searchAccessDevice];
     }
@@ -101,15 +101,15 @@
 
 - (void)searchAccessDevice
 {
-    [sock enableBroadcast:YES port:8101];
+    [udpSocket enableBroadcast:YES port:8101];
     [self duration:0.3 action:select(getDoorList)];
 }
 
 - (void)searchHostDevice
 {
-    [sock enableBroadcast:YES port:8003];
+    [udpSocket enableBroadcast:YES port:8003];
     [listData removeAllObjects];
-    [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:select(getHostList:) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:select(getHostList:) userInfo:nil repeats:NO];
 }
 
 -(void)getDoorList
@@ -123,7 +123,7 @@
     NSString *control = [Tools makeControl:@"01FE00" dataLen:2 value:value];
     NSData *buffer = [Tools makeDoorCommandWith:SN pwd:PWD msg:msg control:control];
     
-    [sock sendData:buffer];
+    [udpSocket sendData:buffer];
 }
 
 -(void)getHostList:(NSTimer *)timer
@@ -136,7 +136,7 @@
     NSData *data = [[NSString stringWithFormat:@"A6%@00000000",host_mac] dataByHexString];
     data = [Tools replaceCRCForSwitch:data];
     
-    [sock sendData:data];
+    [udpSocket sendData:data];
 }
 
 - (BOOL)onUdpSocket:(AsyncUdpSocket *)sock didReceiveData:(NSData *)data withTag:(long)tag fromHost:(NSString *)host port:(UInt16)port
@@ -262,7 +262,10 @@
     NSString *host = dic[@"IP"] ?: @"";
     UInt16 port = [dic[@"Port"] intValue];
     [_tcpSocket connectToHost:host port:port];
-    [_dicAccess addEntriesFromDictionary:dic];
+    
+    UIViewController *Test = getController(@"Test", nil);
+    [Test setValue:dic forKey:@"dicAccess"];
+    [self.navigationController pushViewController:Test animated:YES];
 }
 
 -(void)test:(NSString *)aString with:(NSString *)bString
@@ -351,7 +354,7 @@
 
 - (void)closeSocket
 {
-    [sock closeSocket];
+    [udpSocket closeSocket];
 }
 
 - (void)didReceiveMemoryWarning
@@ -373,8 +376,8 @@
     if (![list containsObject:self]) {
         //self.hidesBottomBarWhenPushed = NO;
         isStop = YES;
-        [sock closeCompletion:^{
-            sock = nil;
+        [udpSocket closeCompletion:^{
+            udpSocket = nil;
             NSLog(@"关闭UDP连接");
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"关闭UDP连接" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
             [alert show];
@@ -382,10 +385,6 @@
                 [alert dismissWithClickedButtonIndex:0 animated:YES];
             }];
         }];
-    }else{
-        NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
-        [viewControllers removeObject:self];
-        [self.navigationController setViewControllers:viewControllers animated:YES];
     }
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];

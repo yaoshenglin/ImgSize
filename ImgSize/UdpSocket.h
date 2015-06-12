@@ -19,6 +19,7 @@
 
 - (void)enableBroadcast:(BOOL)flag port:(UInt16)port;
 - (void)sendData:(NSData *)data;
+- (void)receiveWithTimeout:(NSTimeInterval)timeout tag:(long)tag;
 - (void)closeSocket;
 - (void)closeCompletion:(void (^)(void)) handler;
 

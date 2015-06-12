@@ -120,11 +120,8 @@ static NSString *const SBStyle2 = @"SBStyle2";
         CGFloat *cs = [color getValue];
         NSLog(@"r %f,g %f,b %f,alp %f",cs[0],cs[1],cs[2],cs[3]);
         
-        //self.hidesBottomBarWhenPushed = YES;
-        //UIViewController *Test = getController(@"Test", nil);
-        //[Test setValue:dicAccess forKey:@"dicAccess"];
-        //[self.navigationController pushViewController:Test animated:YES];
-        //self.hidesBottomBarWhenPushed = NO;
+        NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
+        NSLog(@"DeviceType:%@",infoDict);
     }
 }
 
@@ -154,7 +151,6 @@ static NSString *const SBStyle2 = @"SBStyle2";
     else if (alertView.tag == 2) {
         UIViewController *Second = [CTB getControllerWithIdentity:@"Second" storyboard:nil];
         self.hidesBottomBarWhenPushed = YES;
-        [Second setValue:dicAccess forKey:@"dicAccess"];
         if ([btnTitle isEqualToString:@"门禁"]) {
             [Second setValue:@(1) forKey:@"tag"];
             [self.navigationController pushViewController:Second animated:YES];
