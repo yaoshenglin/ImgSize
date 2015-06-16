@@ -10,6 +10,8 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <ifaddrs.h>
+#include <netdb.h>
+#import <objc/runtime.h>//对象转Dic用
 #include <CommonCrypto/CommonDigest.h>
 #import <SystemConfiguration/CaptiveNetwork.h>//获取WiFi信息
 
@@ -97,7 +99,7 @@ id getController(NSString *identifier,NSString *title)
 }
 
 #pragma mark - ========按钮=UIButton=============================
-+ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName
++ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(NSInteger)tag title:(NSString *)title img:(NSString *)imgName
 {
     type = type ?: UIButtonTypeCustom;
     UIButton *button = [UIButton buttonWithType:type];
@@ -138,7 +140,7 @@ id getController(NSString *identifier,NSString *title)
     return button;
 }
 
-+ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName action:(SEL)action
++ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(NSInteger)tag title:(NSString *)title img:(NSString *)imgName action:(SEL)action
 {
     UIButton *button = [[self class] buttonType:type delegate:nil to:View tag:tag title:title img:imgName];
     if ([delegate respondsToSelector:action]) {
@@ -768,6 +770,19 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return alert;
 }
 
++ (UIAlertView *)alertWithTitle:(NSString *)title Delegate:(id)delegate tag:(int)tag
+{
+    UIAlertView *alert = nil;
+    if (delegate) {
+        alert = [[UIAlertView alloc] initWithTitle:title message:nil delegate:delegate cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    }else{
+        alert = [[UIAlertView alloc] initWithTitle:title message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+    }
+    alert.tag = tag;
+    [alert show];
+    return alert;
+}
+
 + (UIAlertView *)alertWithMessage:(NSString *)message Delegate:(id)delegate tag:(int)tag
 {
     UIAlertView *alert = nil;
@@ -900,17 +915,10 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 id getSuperView(Class aClass,UIView *View)
 {
     id obj = nil;
-    for (UIView* next = [View superview]; next; next = next.superview) {
+    for (UIResponder* next = View.nextResponder; next; next = next.nextResponder) {
         
         if ([next isKindOfClass:aClass]) {
             obj = next;
-            break;
-        }
-        
-        UIResponder* nextResponder = [next nextResponder];
-        if ([nextResponder isKindOfClass:aClass]) {
-            obj = (UITableViewCell *)nextResponder;
-            //NSLog(@"%@",cell);
             break;
         }
     }
@@ -1124,11 +1132,30 @@ UIViewController *getParentController(UIViewController *VC,NSString *className)
     NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
     for (UIViewController *V in listNav) {
         if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            [V.view removeFromSuperview];
             [listResult removeObject:V];
         }
     }
     
-    Nav.viewControllers = listResult;
+    [Nav setViewControllers:listResult animated:YES];
+}
+
++ (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav
+{
+    if (![Nav isKindOfClass:[UINavigationController class]]) {
+        return;
+    }
+    
+    NSArray *listNav = Nav.viewControllers;
+    NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
+    for (UIViewController *V in listNav) {
+        if (V == viewController) {
+            [V.view removeFromSuperview];
+            [listResult removeObject:V];
+        }
+    }
+    
+    [Nav setViewControllers:listResult animated:YES];
 }
 
 void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
@@ -1919,7 +1946,9 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 #pragma mark 截取部分图像
 + (UIImage*)getSubImage:(UIImage *)image rect:(CGRect)rect
 {
-    UIImage *newImage = [UIImage imageWithCGImage:CGImageCreateWithImageInRect(image.CGImage, rect)];
+    CGImageRef cgImage = CGImageCreateWithImageInRect(image.CGImage, rect);
+    UIImage *newImage = [UIImage imageWithCGImage:cgImage];
+    CFRelease(cgImage);
     return newImage;
 }
 
@@ -2174,120 +2203,6 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     }
     
     result = [NSString stringWithFormat:@"%@",result];
-    
-    return result;
-}
-
-int getIntFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return 0;
-    }
-    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
-    int result = [content intValue];
-    return result;
-}
-
-long getLongFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return 0;
-    }
-    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
-    long result = (long)[content doubleValue];
-    return result;
-}
-
-float getFloatFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return 0;
-    }
-    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
-    float result = [content floatValue];
-    return result;
-}
-
-double getDoubleFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return 0;
-    }
-    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
-    double result = [content doubleValue];
-    return result;
-}
-
-bool getBoolFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return NO;
-    }
-    NSString *content = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
-    BOOL result = [content boolValue];
-    return result;
-}
-
-NSString *getStringFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return nil;
-    }
-    
-    NSString *result = [dic objectForKey:key];
-    if (!result || ![result isKindOfClass:[NSString class]]) {
-        return @"";
-    }
-    
-    result = [NSString stringWithFormat:@"%@",result];
-    
-    return result;
-}
-
-NSArray *getArrayFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return nil;
-    }
-    
-    NSArray *result = [dic objectForKey:key];
-    if (!result || ![result isKindOfClass:[NSArray class]]) {
-        return nil;
-    }
-    
-    return result;
-}
-
-NSDictionary *getDicFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return nil;
-    }
-    
-    NSDictionary *result = [dic objectForKey:key];
-    if (!result || ![result isKindOfClass:[NSDictionary class]]) {
-        return nil;
-    }
-    
-    return result;
-}
-
-id getDataFrom(NSDictionary *dic,id key)
-{
-    if (![dic isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
-        return nil;
-    }
-    
-    id result = [dic objectForKey:key];
     
     return result;
 }
@@ -2766,6 +2681,14 @@ NSArray *getDBPath()
 + (NSArray *)getDBPath
 {
     return getDBPath();
+}
+
+#pragma mark 获取-info.plist中的数据
++ (NSDictionary *)infoDictionary
+{
+    //获取APP相关的各项参数信息
+    NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
+    return infoDict;
 }
 
 #pragma mark - =============字符串的编码和解码===================
@@ -3284,11 +3207,13 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(dur * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
 }
 
+//异步
 + (void)asyncWithBlock:(dispatch_block_t)block
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),block);
 }
 
+//同步
 + (void)syncWithBlock:(dispatch_block_t)block
 {
     dispatch_async(dispatch_get_main_queue(), block);
@@ -3346,7 +3271,7 @@ id getUserData(NSString *key)
         [request setHTTPMethod:@"POST"];//设置为 POST
         [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-        [request setValue:[NSString stringWithFormat:@"%d",[jsonData length]] forHTTPHeaderField:@"Content-length"];
+        [request setValue:[NSString stringWithFormat:@"%ld",(long)[jsonData length]] forHTTPHeaderField:@"Content-length"];
         [request setHTTPBody:jsonData];//把刚才封装的 JSON 数据塞进去
         
         /*
@@ -3354,6 +3279,58 @@ id getUserData(NSString *key)
          */
         [NSURLConnection sendAsynchronousRequest:request queue:[[NSOperationQueue alloc] init] completionHandler:handler];
     }
+}
+
+//解析域名
++ (char *)parseDomain:(NSString *)domain
+{
+    if (!domain || ![domain isKindOfClass:[NSString class]]) return nil;
+    NSString *domainLow = [domain lowercaseString];
+    if ([domainLow hasPrefix:@"http://"]) {
+        domain = [domain substringFromIndex:7];
+    }
+    else if ([domainLow hasPrefix:@"https://"]) {
+        domain = [domain substringFromIndex:8];
+    }
+    struct in_addr addr;
+    char *IP = (char *)[domain UTF8String];
+    if (inet_addr(IP) != INADDR_NONE) {
+        //如果是IP地址
+        return IP;
+    }
+    struct hostent *pHost = gethostbyname(IP);
+    if (pHost) {
+        memcpy(&addr, pHost->h_addr_list[0], pHost->h_length);
+        IP = inet_ntoa(addr);
+    }else{
+        int result = h_errno;
+        NSString *errMsg = @"域名解析失败";
+        if (result == HOST_NOT_FOUND) {
+            errMsg = @"找不到指定的主机";
+        }
+        else if (result == NO_ADDRESS) {
+            errMsg = @"该主机有名称却无IP地址";
+        }
+        else if (result == NO_RECOVERY) {
+            errMsg = @"域名服务器有错误发生";
+        }
+        else if (result == TRY_AGAIN) {
+            errMsg = @"请再调用一次";
+        }
+        
+        NSLog(@"%@",errMsg);
+    }
+    
+    return IP;
+}
+
++ (NSString *)parserDomain:(NSString *)domain
+{
+    char *IP = [self parseDomain:domain];
+    if (!IP) return nil;
+    
+    NSString *result = [NSString stringWithCString:IP encoding:NSUTF8StringEncoding];
+    return result;
 }
 
 #pragma mark ==========APP核对==========================
@@ -3554,6 +3531,28 @@ id getUserData(NSString *key)
     return outStr;
 }
 
++ (NSString *)readFile:(NSString *)path encoding:(NSStringEncoding)enc
+{
+    NSError *error = nil;
+    NSString *content = [NSString stringWithContentsOfFile:path encoding:enc error:&error];
+    if (error) {
+        NSLog(@"读取文件出错,%@",error.localizedDescription);
+    }
+    
+    return content;
+}
+
+- (BOOL)writeToFile:(NSString *)path encoding:(NSStringEncoding)enc
+{
+    NSError *error = nil;
+    BOOL result = [self writeToFile:path atomically:YES encoding:enc error:&error];
+    if (error) {
+        NSLog(@"写入文件异常,%@",error.localizedDescription);
+    }
+    
+    return result;
+}
+
 - (NSString *)AppendString:(NSString *)aString
 {
     if (!aString) return self;
@@ -3648,6 +3647,29 @@ id getUserData(NSString *key)
     return result;
 }
 
+- (NSDate *)dateWithFormat:(NSString *)format
+{
+    if (!format) {
+        format = @"yyyy-MM-dd HH:mm:ss";
+    }
+    NSString *strDate = [self stringByReplacingOccurrencesOfString:@"T" withString:@" "];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:(format ? format : @"yyyy-MM-dd HH:mm:ss")];
+    NSDate *date = [dateFormatter dateFromString:strDate];
+    return date;
+}
+
+//获取第一个字符
+- (NSString *)firstString
+{
+    if (self.length > 1) {
+        NSString *result = [self substringToIndex:1];
+        return result;
+    }
+    
+    return self;
+}
+
 - (NSData *)dataUsingUTF8
 {
     return [self dataUsingEncoding:NSUTF8StringEncoding];
@@ -3658,7 +3680,7 @@ id getUserData(NSString *key)
 {
     const char *cStr = [self UTF8String];
     unsigned char result[16];
-    CC_MD5(cStr, strlen(cStr), result); // This is the md5 call
+    CC_MD5(cStr, (int)strlen(cStr), result); // This is the md5 call
     NSString *value = [NSString stringWithFormat:
             @"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
             result[0], result[1], result[2], result[3],
@@ -3755,6 +3777,48 @@ id getUserData(NSString *key)
     return self;
 }
 
+- (BOOL)isNull
+{
+    if ([self isKindOfClass:[NSNull class]] || self.length <= 0) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (long)parseInt:(int)type
+{
+    long value = strtoul([self UTF8String],nil,type);
+    return value;
+}
+
+#pragma mark 解析字符串中的网址
+- (NSArray *)getURL
+{
+    NSMutableArray *array = [NSMutableArray array];
+    
+    NSError *error = nil;;
+    NSString *regulaStr = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)";
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regulaStr
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:&error];
+    if (error == nil)
+    {
+        NSMatchingOptions options = NSMatchingReportProgress;
+        NSArray *arrayOfAllMatches = [regex matchesInString:self
+                                                    options:options
+                                                      range:NSMakeRange(0, [self length])];
+        for (NSTextCheckingResult *match in arrayOfAllMatches)
+        {
+            NSString* substringForMatch = [self substringWithRange:match.range];
+            
+            [array addObject:substringForMatch];
+        }
+    }
+    
+    return array;
+}
+
 @end
 
 #pragma mark - --------NSData------------------------
@@ -3834,10 +3898,37 @@ id getUserData(NSString *key)
     return GBK;
 }
 
+- (NSData *)subdataWithRanges:(NSRange)range
+{
+    if (range.location + range.length <= self.length) {
+        return [self subdataWithRange:range];
+    }
+    
+    NSInteger length = self.length - range.location;
+    range.length = length;
+    return [self subdataWithRange:range];
+}
+
+- (long)parseInt:(int)type
+{
+    long value = strtoul([[self dataBytes2HexStr] UTF8String],nil,type);
+    return value;
+}
+
+
 @end
 
 #pragma mark - --------NSArray------------------------
 @implementation NSArray (NSObject)
+
+- (id)objAtIndex:(NSUInteger)index
+{
+    if (self.count > index) {
+        return [self objectAtIndex:index];
+    }
+    
+    return nil;
+}
 
 - (void)perExecute:(SEL)aSelector
 {
@@ -3859,6 +3950,68 @@ id getUserData(NSString *key)
         [list addObject:[dic objectForKey:key]];
     }
     
+    return list;
+}
+
+//根据对象中的键值和值找到对象
+- (id)getObjByKey:(NSString *)key value:(id)value
+{
+    for (id obj in self) {
+        
+        id result = [obj valueForKey:key];
+        if([value isEqual:result])
+        {
+            return obj;
+        }
+    }
+    
+    return nil;
+}
+
+//根据对象中的键值和值找到对象所在下标
+- (int)getIndexByKey:(NSString *)key value:(id)value
+{
+    int index = -1;
+    for (int i=0; i<self.count; i++) {
+        id obj = self[i];
+        id result = [obj valueForKey:key];
+        if([value isEqual:result])
+        {
+            index = i;
+            break;
+        }
+    }
+    
+    return index;
+}
+
+//删除重复的对象
+- (NSArray *)removeRepeatFor:(NSString *)key
+{
+    NSArray *result = [NSArray array];
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    for (id obj in self) {
+        id value = [obj valueForKey:key];
+        [dic setObject:obj forKey:value];
+    }
+    for (id obj in self) {
+        id value = [obj valueForKey:key];
+        id theObj = dic[value];
+        if (theObj && ![result containsObject:theObj]) {
+            result = [result arrayByAddingObject:theObj];
+        }
+    }
+    
+    return result;
+}
+
+//替换对象
+- (NSArray *)replaceObject:(NSUInteger)index with:(id)anObject
+{
+    NSMutableArray *list = [NSMutableArray arrayWithArray:self];
+    if (self.count > index) {
+        [list replaceObjectAtIndex:index withObject:anObject];
+    }
     return list;
 }
 
@@ -3895,13 +4048,15 @@ id getUserData(NSString *key)
     NSString *result = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     result = [result stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     
+    getUserData(nil);
+    
     return result;
 }
 
 - (id)checkClass:(Class)aClass key:(id)key
 {
     if (![self isKindOfClass:[NSDictionary class]]) {
-        NSLog(@"该数据不是NSDictionary类型");
+        NSLog(@"该数据不是NSDictionary类型,%@,%@",self,key);
         return 0;
     }
     
@@ -3997,6 +4152,33 @@ id getUserData(NSString *key)
 //    
 //    return result;
 //}
+
+@end
+
+#pragma mark - --------NSTimer------------------------
+@implementation NSTimer (NSObject)
++ (NSTimer *)scheduled:(NSTimeInterval)ti target:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo repeats:(BOOL)yesOrNo
+{
+    return [NSTimer scheduledTimerWithTimeInterval:ti target:aTarget selector:aSelector userInfo:userInfo repeats:yesOrNo];
+}
+
+@end
+
+#pragma mark - --------UIColor------------------------
+@implementation NSDate (NSObject)
++ (NSString *)dateWithFormat:(NSString *)format
+{
+    NSDateFormatter *data_time = [[NSDateFormatter alloc] init];
+    [data_time setDateFormat:format];//@"yyyy-MM-dd HH:mm:ss"
+    return [data_time stringFromDate:[NSDate date]];
+}
+
+- (NSString *)dateWithFormat:(NSString *)format
+{
+    NSDateFormatter *data_time = [[NSDateFormatter alloc] init];
+    [data_time setDateFormat:format];//@"yyyy-MM-dd HH:mm:ss"
+    return [data_time stringFromDate:self];
+}
 
 @end
 
@@ -4121,6 +4303,25 @@ id getUserData(NSString *key)
     self.center = CGPointMake(x, y);
 }
 
+- (void)rotation:(CGFloat)angle
+{
+    self.layer.transform = CATransform3DMakeRotation(angle, 0, 0, 1);//旋转angle度
+    //self.transform = CGAffineTransformMakeRotation(angle);//旋转angle度
+}
+
+- (id)viewWithClass:(Class)aClass
+{
+    NSArray *listView = self.subviews;
+    NSMutableArray *list = [NSMutableArray array];
+    for (UIView *v in listView) {
+        if ([v isKindOfClass:[aClass class]]) {
+            [list addObject:v];
+        }
+    }
+    
+    return list.firstObject;
+}
+
 - (id)viewWithClass:(Class)aClass tag:(NSInteger)tag
 {
     NSArray *listView = self.subviews;
@@ -4221,60 +4422,30 @@ id getUserData(NSString *key)
 
 @end
 
-#pragma mark - NSError
-@implementation NSError (NSObject)
-
-+ (NSError *)initWithMsg:(NSString *)errMsg code:(NSInteger)code
-{
-    NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
-				
-    NSError *errPtr = [NSError errorWithDomain:@"kCFStreamErrorDomainPOSIX" code:code userInfo:info];
-    
-    return errPtr;
-}
-
-@end
-
-#pragma mark - --------NSFileManager------------------------
-@implementation NSFileManager (NSObject)
-
-+ (BOOL)fileExistsAtPath:(NSString *)path
-{
-    return [[NSFileManager defaultManager] fileExistsAtPath:path];
-}
-
-+ (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory
-{
-    return [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:isDirectory];
-}
-
-+ (BOOL)removeItemAtPath:(NSString *)path
-{
-    NSError *error = nil;
-    BOOL result = [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
-    if (error) {
-        NSLog(@"删除文件 : %@",error.localizedDescription);
-    }
-    return result;
-}
-
-+ (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data attributes:(NSDictionary *)attr
-{
-    return [[NSFileManager defaultManager] createFileAtPath:path contents:data attributes:attr];
-}
-
-+ (BOOL)moveItemAtPath:(NSString *)srcPath toPath:(NSString *)dstPath error:(NSError **)error
-{
-    return [[NSFileManager defaultManager] moveItemAtPath:srcPath toPath:dstPath error:error];
-}
-
-@end
-
+#pragma mark - --------UITableView------------------------
 @implementation UITableView (NSObject)
 
 - (id)cellAtIndexPath:(NSIndexPath *)indexPath
 {
     return [self cellForRowAtIndexPath:indexPath];
+}
+
+- (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount
+{
+    [self deleteAtIndexPath:indexPath rowCount:rowCount withRowAnimation:UITableViewRowAnimationLeft];
+}
+
+- (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount withRowAnimation:(UITableViewRowAnimation)animation
+{
+    if (rowCount <= 0) {
+        //删除区间
+        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:indexPath.section];
+        //[self deleteSections:indexSet withRowAnimation:animation];
+        [self reloadSections:indexSet withRowAnimation:animation];
+    }else{
+        //删除某一行
+        [self deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:animation];
+    }
 }
 
 @end
@@ -4327,6 +4498,82 @@ id getUserData(NSString *key)
 
 @end
 
+#pragma mark - UINavigationController
+@implementation UINavigationController (NSObject)
+
+- (UIViewController *)getControllerFromClassName:(NSString *)className
+{
+    NSArray *listNav = self.viewControllers;
+    for (UIViewController *V in listNav) {
+        if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            return V;
+        }
+    }
+    
+    return NULL;
+}
+
+@end
+
+#pragma mark - UIApplication
+@implementation UIApplication (NSObject)
+
++ (id)sharedApplicationDelegate
+{
+    return [[UIApplication sharedApplication] delegate];
+}
+
+@end
+
+#pragma mark - NSError
+@implementation NSError (NSObject)
+
++ (NSError *)initWithMsg:(NSString *)errMsg code:(NSInteger)code
+{
+    NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+				
+    NSError *errPtr = [NSError errorWithDomain:@"kCFStreamErrorDomainPOSIX" code:code userInfo:info];
+    
+    return errPtr;
+}
+
+@end
+
+#pragma mark - --------NSFileManager------------------------
+@implementation NSFileManager (NSObject)
+
++ (BOOL)fileExistsAtPath:(NSString *)path
+{
+    return [[NSFileManager defaultManager] fileExistsAtPath:path];
+}
+
++ (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory
+{
+    return [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:isDirectory];
+}
+
++ (BOOL)removeItemAtPath:(NSString *)path
+{
+    NSError *error = nil;
+    BOOL result = [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
+    if (error) {
+        NSLog(@"删除文件 : %@",error.localizedDescription);
+    }
+    return result;
+}
+
++ (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data attributes:(NSDictionary *)attr
+{
+    return [[NSFileManager defaultManager] createFileAtPath:path contents:data attributes:attr];
+}
+
++ (BOOL)moveItemAtPath:(NSString *)srcPath toPath:(NSString *)dstPath error:(NSError **)error
+{
+    return [[NSFileManager defaultManager] moveItemAtPath:srcPath toPath:dstPath error:error];
+}
+
+@end
+
 #pragma mark - --------NSObject------------------------
 @implementation NSObject (NSObject)
 
@@ -4350,6 +4597,64 @@ id getUserData(NSString *key)
 {
     if (self == nil) {
     }
+}
+
+#pragma mark - 通过对象返回一个NSDictionary，键是属性名称，值是属性值。
+- (NSDictionary *)getObjectData
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    unsigned int propsCount;
+    objc_property_t *props = class_copyPropertyList([self class], &propsCount);
+    for(int i = 0;i < propsCount; i++)
+    {
+        objc_property_t prop = props[i];
+        
+        NSString *propName = [NSString stringWithUTF8String:property_getName(prop)];
+        id value = [self valueForKey:propName];
+        if(value == nil)
+        {
+            value = [NSNull null];
+        }
+        else
+        {
+            value = [value getObjectInternal];
+        }
+        [dic setObject:value forKey:propName];
+    }
+    return dic;
+}
+
+- (id)getObjectInternal
+{
+    if([self isKindOfClass:[NSString class]]
+       || [self isKindOfClass:[NSNumber class]]
+       || [self isKindOfClass:[NSNull class]])
+    {
+        return self;
+    }
+    
+    if([self isKindOfClass:[NSArray class]])
+    {
+        NSArray *objarr = (NSArray *)self;
+        NSMutableArray *arr = [NSMutableArray arrayWithCapacity:objarr.count];
+        for(int i = 0;i < objarr.count; i++)
+        {
+            [arr setObject:[[objarr objectAtIndex:i] getObjectInternal] atIndexedSubscript:i];
+        }
+        return arr;
+    }
+    
+    if([self isKindOfClass:[NSDictionary class]])
+    {
+        NSDictionary *objdic = (NSDictionary *)self;
+        NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithCapacity:[objdic count]];
+        for(NSString *key in objdic.allKeys)
+        {
+            [dic setObject:[[objdic objectForKey:key] getObjectInternal] forKey:key];
+        }
+        return dic;
+    }
+    return [self getObjectData];
 }
 
 @end

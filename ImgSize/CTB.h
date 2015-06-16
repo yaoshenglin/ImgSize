@@ -145,6 +145,8 @@ NS_INLINE LatLng LatLngMake(double lat,double lng) {
 //
 //@end
 
+/** @file */
+
 // <#(NSString *)#>
 @interface CTB : NSObject<UIActionSheetDelegate,UIAlertViewDelegate>
 //获取MainStoryboard中的UIViewController
@@ -153,8 +155,8 @@ id getController(NSString *identifier,NSString *title);
 //获取App窗口
 + (UIWindow *)getWindow;
 //创建按钮
-+ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName;
-+ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(int)tag title:(NSString *)title img:(NSString *)imgName action:(SEL)action;
++ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(NSInteger)tag title:(NSString *)title img:(NSString *)imgName;
++ (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(NSInteger)tag title:(NSString *)title img:(NSString *)imgName action:(SEL)action;
 + (void)setImg:(NSDictionary *)dicData button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION;
 + (void)settitleColor:(NSDictionary *)dicData button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION;
 + (void)addTarget:(id)delegate action:(SEL)action button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION;
@@ -211,6 +213,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic);
 + (UIAlertView *)showMsgWithTitle:(NSString *)title msg:(NSString *)msg;
 + (UIAlertView *)showMsg:(NSString *)msg;
 + (UIAlertView *)showMsg:(NSString *)msg tag:(int)tag delegate:(id)delegate;
++ (UIAlertView *)alertWithTitle:(NSString *)title Delegate:(id)delegate tag:(int)tag;
 + (UIAlertView *)alertWithMessage:(NSString *)message Delegate:(id)delegate tag:(int)tag;
 + (UIAlertView *)alertWithTitle:(NSString *)title msg:(NSString *)message Delegate:(id)delegate tag:(int)tag;
 
@@ -241,6 +244,7 @@ UIViewController *getControllerFrom(UINavigationController *Nav,NSString *classN
 UIViewController *getControllerFor(UIViewController *VC,NSString *className);
 UIViewController *getParentController(UIViewController *VC,NSString *className);
 + (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav;
++ (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav;
 void forbiddenNavPan(UIViewController *VC,BOOL isForbid);
 //
 + (UIView *)showMessageWithString:(NSString *)msg to:(UIViewController *)viewController;
@@ -372,15 +376,6 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row);
 
 #pragma mark - ========处理字典中的NSNull类数据=====================
 + (NSString *)stringWith:(NSDictionary *)dic key:(NSString *)key;
-int getIntFrom(NSDictionary *dic,id key);
-long getLongFrom(NSDictionary *dic,id key);
-float getFloatFrom(NSDictionary *dic,id key);
-double getDoubleFrom(NSDictionary *dic,id key);
-bool getBoolFrom(NSDictionary *dic,id key);
-NSString *getStringFrom(NSDictionary *dic,id key);
-NSArray *getArrayFrom(NSDictionary *dic,id key);
-NSDictionary *getDicFrom(NSDictionary *dic,id key);
-id getDataFrom(NSDictionary *dic,id key);
 #pragma mark 合并字符串
 NSString *mergedString(NSString *aString,NSString *bString);
 NSString *pooledString(NSString *aString,NSString *bString,NSString *midString);
@@ -415,6 +410,15 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha);
 #pragma mark 获取AppCaidan.db的路径
 NSArray *getDBPath();
 + (NSArray *)getDBPath;
+
+#pragma mark 获取-info.plist中的数据
+/**
+ 获取-info.plist中的数据
+ @param message CFBundleVersion -> Build, CFBundleShortVersionString -> Version
+ 
+ @return App信息详情
+ */
++ (NSDictionary *)infoDictionary;
 
 NSString *getPartString(NSString *string,NSString *aString,NSString *bString);
 NSString *getUTF8String(NSString *string);//使用UTF8编码
@@ -488,6 +492,9 @@ void setUserData(id obj,NSString *key);
 void removeObjectForKey(NSString *key);
 id getUserData(NSString *key);
 + (void)Request:(NSString *)urlString body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler NS_AVAILABLE(10_7, 5_0);
+//解析域名
++ (char *)parseDomain:(NSString *)domain;
++ (NSString *)parserDomain:(NSString *)domain;
 
 #pragma mark APP核对
 + (NSArray *)checkHasOwnApp;
@@ -526,6 +533,8 @@ id getUserData(NSString *key);
 + (NSString *)jsonStringWithDictionary:(NSDictionary *)dictionary;
 + (NSString *)jsonStringWithObject:(id) object;
 + (NSString *)format:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
++ (NSString *)readFile:(NSString *)path encoding:(NSStringEncoding)enc;
+- (BOOL)writeToFile:(NSString *)path encoding:(NSStringEncoding)enc;
 - (NSString *)AppendString:(NSString *)aString;
 - (NSString *)AppendFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
@@ -538,6 +547,8 @@ id getUserData(NSString *key);
 //获取中文字符的拼音
 - (NSString *) phonetic;
 - (NSString *)getPhonetic;
+- (NSDate *)dateWithFormat:(NSString *)format;//字符串转化为时间
+- (NSString *)firstString;//获取第一个字符
 - (NSData *)dataUsingUTF8;
 #pragma mark 使用MD5加密
 - (NSString *)encryptUsingMD5;//字符md5加密
@@ -556,6 +567,13 @@ id getUserData(NSString *key);
 //移除后缀
 - (NSString *)removeSuffix:(NSString *)aString;
 
+- (BOOL)isNull;//判断是否为空字符串
+
+- (long)parseInt:(int)type;//转化为十进制
+
+#pragma mark 解析字符串中的网址
+- (NSArray *)getURL;
+
 @end
 
 #pragma mark - NSData
@@ -572,16 +590,28 @@ id getUserData(NSString *key);
 - (NSString *)stringUsingUTF8;
 - (NSString *)stringUsingEncode:(NSStringEncoding)encode;
 - (NSStringEncoding)getEncode;
+- (NSData *)subdataWithRanges:(NSRange)range;
+- (long)parseInt:(int)type;
 
 @end
 
 #pragma mark - NSArray
 @interface NSArray (NSObject)
 
+- (id)objAtIndex:(NSUInteger)index;//根据下标获取数据
+
 - (void)perExecute:(SEL)aSelector;
 - (void)perExecute:(SEL)aSelector withObject:(id)argument;
 
 - (NSArray *)getListKey:(id)key;
+
+- (id)getObjByKey:(NSString *)key value:(id)value;//根据对象中的键值和值找到对象
+//根据对象中的键值和值找到对象所在下标
+- (int)getIndexByKey:(NSString *)key value:(id)value;
+//删除重复的对象
+- (NSArray *)removeRepeatFor:(NSString *)key;
+//替换对象
+- (NSArray *)replaceObject:(NSUInteger)index with:(id)anObject;
 
 @end
 
@@ -606,6 +636,19 @@ id getUserData(NSString *key);
 - (BOOL)boolForKey:(id)key;
 - (int)intForKey:(id)key;
 - (long)longForKey:(id)key;
+
+@end
+
+#pragma mark - --------NSTimer------------------------
+@interface NSTimer (NSObject)
++ (NSTimer *)scheduled:(NSTimeInterval)ti target:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo repeats:(BOOL)yesOrNo;
+
+@end
+
+#pragma mark - --------
+@interface NSDate (NSObject)
++ (NSString *)dateWithFormat:(NSString *)format;
+- (NSString *)dateWithFormat:(NSString *)format;
 
 @end
 
@@ -645,6 +688,9 @@ id getUserData(NSString *key);
 - (void)setCenterY:(CGFloat)y;
 - (void)setCenterX:(CGFloat)x Y:(CGFloat)y;
 
+- (void)rotation:(CGFloat)angle;//旋转angle度
+
+- (id)viewWithClass:(Class)aClass;
 - (id)viewWithClass:(Class)aClass tag:(NSInteger)tag;
 
 @end
@@ -675,6 +721,20 @@ id getUserData(NSString *key);
 
 @end
 
+#pragma mark - UINavigationController
+@interface UINavigationController (NSObject)
+
+- (UIViewController *)getControllerFromClassName:(NSString *)className;
+
+@end
+
+#pragma mark - UIApplication
+@interface UIApplication (NSObject)
+
++ (id)sharedApplicationDelegate;
+
+@end
+
 #pragma mark - NSError
 @interface NSError (NSObject)
 
@@ -696,6 +756,8 @@ id getUserData(NSString *key);
 @interface UITableView (NSObject)
 
 - (id)cellAtIndexPath:(NSIndexPath *)indexPath;
+- (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount;
+- (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount withRowAnimation:(UITableViewRowAnimation)animation;
 
 @end
 
@@ -724,6 +786,8 @@ id getUserData(NSString *key);
 - (void)duration:(NSTimeInterval)dur action:(SEL)action;
 - (void)duration:(NSTimeInterval)dur action:(SEL)action with:(id)anArgument;
 - (NSData *)archivedData;//存档数据
+#pragma mark - 通过对象返回一个NSDictionary，键是属性名称，值是属性值。
+- (NSDictionary *)getObjectData;
 
 @end
 
