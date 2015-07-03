@@ -12,7 +12,7 @@
 
 @interface UdpSocket : NSObject
 
-@property (retain, nonatomic) id delegate;
+@property (weak, nonatomic) id delegate;
 @property (assign, nonatomic) UInt16 port;
 @property (retain, nonatomic) NSString *host;
 @property (retain, nonatomic) AsyncUdpSocket *udpSocket;

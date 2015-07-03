@@ -34,12 +34,12 @@
 {
     if (state == UIControlStateNormal) {
         imgViewNormal.image = image;
-        [CTB setRectWith:imgViewNormal toWidth:image.size.width toHeight:image.size.height];
+        [imgViewNormal setSizeToW:image.size.width height:image.size.height];
         imgViewNormal.center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
     }
     else if (state == UIControlStateHighlighted) {
         imgViewHighlighted.image = image;
-        [CTB setRectWith:imgViewHighlighted toWidth:image.size.width toHeight:image.size.height];
+        [imgViewHighlighted setSizeToW:image.size.width height:image.size.height];
         imgViewHighlighted.center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
     }
 }
@@ -48,13 +48,13 @@
 {
     if (state == UIControlStateNormal) {
         imgViewNormal.image = image;
-        [CTB setRectWith:imgViewNormal toWidth:image.size.width toHeight:image.size.height];
+        [imgViewNormal setSizeToW:image.size.width height:image.size.height];
         imgViewNormal.center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
     }
     else if (state == UIControlStateHighlighted) {
         imgViewHighlighted.image = image;
-        [CTB setRectWith:imgViewHighlighted toWidth:image.size.width toHeight:image.size.height];
-        [CTB setCenterWith:imgViewHighlighted];
+        [imgViewHighlighted setSizeToW:image.size.width height:image.size.height];
+        [imgViewHighlighted setToParentCenter];
     }
 }
 
@@ -105,13 +105,13 @@
     UIImage *imgHighlighted = imgViewHighlighted.image;
     if (imgNormal.size.width>self.frame.size.width || imgNormal.size.height>self.frame.size.height) {
         CGSize size = [self getSizeBy:imgNormal];
-        [CTB setRectWith:imgViewNormal toWidth:size.width toHeight:size.height];
-        [CTB setCenterWith:imgViewNormal];
+        [imgViewNormal setSizeToW:size.width height:size.height];
+        [imgViewNormal setToParentCenter];
     }
     if (imgHighlighted.size.width>self.frame.size.width || imgHighlighted.size.height>self.frame.size.height) {
         CGSize size = [self getSizeBy:imgHighlighted];
-        [CTB setRectWith:imgViewHighlighted toWidth:size.width toHeight:size.height];
-        [CTB setCenterWith:imgViewHighlighted];
+        [imgViewHighlighted setSizeToW:size.width height:size.height];
+        [imgViewHighlighted setToParentCenter];
     }
 }
 

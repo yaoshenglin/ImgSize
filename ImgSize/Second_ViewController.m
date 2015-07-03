@@ -12,6 +12,7 @@
 #import "MBProgressHUD.h"
 #import "UdpSocket.h"
 #import "Access.h"
+#import "Toast+UIView.h"
 
 @interface Second_ViewController ()<UITextFieldDelegate,UIActionSheetDelegate,UITableViewDataSource,UITableViewDelegate,MBProgressHUDDelegate>
 {
@@ -124,6 +125,7 @@
     NSData *buffer = [Tools makeDoorCommandWith:SN pwd:PWD msg:msg control:control];
     
     [udpSocket sendData:buffer];
+    [udpSocket receiveWithTimeout:20.0 tag:0];
 }
 
 -(void)getHostList:(NSTimer *)timer
@@ -137,10 +139,12 @@
     data = [Tools replaceCRCForSwitch:data];
     
     [udpSocket sendData:data];
+    [udpSocket receiveWithTimeout:20.0 tag:0];
 }
 
 - (BOOL)onUdpSocket:(AsyncUdpSocket *)sock didReceiveData:(NSData *)data withTag:(long)tag fromHost:(NSString *)host port:(UInt16)port
 {
+    [sock receiveWithTimeout:-1 tag:tag];
     if ([host hasPrefix:@"::ffff:"]) {
         return NO;
     }
@@ -165,7 +169,7 @@
         Byte *data_bytes = (Byte*)[data bytes];
         Byte data_byte = data_bytes[0];
         if (data_byte == 0xE6) {
-            NSString *hexStr = [data dataBytes2HexStr];
+            NSString *hexStr = [data hexString];
             NSString *host_mac = [hexStr substringWithRange:NSMakeRange(2, 12)];
             if (![host_mac isEqualToString:@"FFFFFFFFFFFF"]) {
                 NSDictionary *dic = @{@"SN":host_mac,
@@ -190,7 +194,7 @@
     @try {
         [door parseData:data];
         NSData *value = [data subdataWithRange:NSMakeRange(59, 2)];
-        NSString *lenString = [value dataBytes2HexStr];
+        NSString *lenString = [value hexString];
         len = strtoul([lenString UTF8String],nil,16);//TCP端口
         NSDictionary *dic = @{@"SN":door.SN,
                               @"PWD":door.PWD,
@@ -252,7 +256,7 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     NSString *msg = listData[indexPath.row];
-    [CTB showMessageWithString:msg to:self];
+    [self.view makeToast:msg];
     
     if (Type == 2) {
         return;
@@ -283,7 +287,7 @@
 -(void)showWord:(CGFloat)y
 {
     NSString *msg = @"您好！您好！您好！您好！您好?您好?您好?您好?您好?您好?您好?您好?";
-    [CTB showMessageWithString:msg to:self];
+    [self.view makeToast:msg];
 }
 
 -(UILabel *)getLabelWith:(NSString *)msg
@@ -310,7 +314,7 @@
                      }
                      completion:^(BOOL finished) {
                          //动画完成,可为空
-                         [CTB setRectWith:myTableView toHeight:height];
+                         [myTableView setSizeToH:height];
                      }];
 }
 
@@ -332,8 +336,13 @@
 {
     if (button.tag==1) {
         
-        UIViewController *Third = [CTB getControllerWithIdentity:@"Third" storyboard:@"Main"];
-        [self.navigationController pushViewController:Third animated:YES];
+//        [listData removeAllObjects];
+        [listData removeObjectAtIndex:0];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        [myTableView deleteAtIndexPath:indexPath rowCount:0];
+        
+        //UIViewController *Third = [CTB getControllerWithIdentity:@"Third" storyboard:@"Main"];
+        //[self.navigationController pushViewController:Third animated:YES];
         //[self.navigationController presentViewController:Third animated:YES completion:nil];
     }
     if (button.tag==2) {
@@ -379,11 +388,7 @@
         [udpSocket closeCompletion:^{
             udpSocket = nil;
             NSLog(@"关闭UDP连接");
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"关闭UDP连接" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
-            [alert show];
-            [CTB duration:0.6 block:^{
-                [alert dismissWithClickedButtonIndex:0 animated:YES];
-            }];
+            [self.view makeToast:@"关闭UDP连接"];
         }];
     }
     

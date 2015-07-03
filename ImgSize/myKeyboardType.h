@@ -22,7 +22,7 @@
 @property (nonatomic) BOOL isRegist;
 @property (nonatomic) BOOL isShow;
 @property (retain,nonatomic) UIButton *doneButton;
-@property (retain,nonatomic) id target;
+@property (weak,nonatomic) id target;
 @property (nonatomic) SEL action;
 
 + (myKeyboardType *)sharedInstance;

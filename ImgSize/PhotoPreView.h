@@ -21,7 +21,7 @@
     UIActivityIndicatorView *activity;
     
     BOOL isCroped;
-    id<PhotoPreViewDelegate> myDelegate;
+    __weak id<PhotoPreViewDelegate> myDelegate;
     BOOL isOnlyRead;
 }
 

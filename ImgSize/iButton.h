@@ -10,7 +10,7 @@
 
 @interface iButton : UIButton
 {
-    id delegate;
+    __weak id delegate;
     SEL actionMethod;
     UIImageView *imgViewNormal;
     UIImageView *imgViewHighlighted;

@@ -21,15 +21,15 @@
 
 @implementation CTB
 
-+ (CTB *)getInstance
-{
-    static dispatch_once_t once;
-    static CTB *sharedInstance;
-    dispatch_once(&once, ^ {
-        sharedInstance = [[CTB alloc] init];
-    });
-    return sharedInstance;
-}
+//+ (CTB *)getInstance
+//{
+//    static dispatch_once_t once;
+//    static CTB *sharedInstance;
+//    dispatch_once(&once, ^ {
+//        sharedInstance = [[CTB alloc] init];
+//    });
+//    return sharedInstance;
+//}
 
 + (id)getControllerWithIdentity:(NSString *)identifier storyboard:(NSString *)title
 {
@@ -70,6 +70,119 @@ id getController(NSString *identifier,NSString *title)
     return viewController;
 }
 
++ (UIViewController *)getControllerFrom:(UINavigationController *)Nav className:(NSString *)className
+{
+    if (![Nav isKindOfClass:[UINavigationController class]]) {
+        return NULL;
+    }
+    
+    NSArray *listNav = Nav.viewControllers;
+    for (UIViewController *V in listNav) {
+        if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            return V;
+        }
+    }
+    
+    return NULL;
+}
+
+UIViewController *getControllerFrom(UINavigationController *Nav,NSString *className)
+{
+    if (![Nav isKindOfClass:[UINavigationController class]]) {
+        return NULL;
+    }
+    
+    NSArray *listNav = Nav.viewControllers;
+    for (UIViewController *V in listNav) {
+        if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            return V;
+        }
+    }
+    
+    return NULL;
+}
+
+UIViewController *getControllerFor(UIViewController *VC,NSString *className)
+{
+    UINavigationController *Nav = VC.navigationController;
+    if (![Nav isKindOfClass:[UINavigationController class]]) {
+        return NULL;
+    }
+    
+    NSArray *listNav = Nav.viewControllers;
+    for (UIViewController *V in listNav) {
+        if ([NSStringFromClass(V.class) hasPrefix:className]) {
+            //类名相同
+            if (V != VC) {
+                //排除自己
+                return V;
+            }
+        }
+    }
+    
+    return NULL;
+}
+
+UIViewController *getParentController(UIViewController *VC,NSString *className)
+{
+    if (![VC isKindOfClass:[UIViewController class]]) {
+        return NULL;
+    }
+    
+    UIViewController *result = nil;
+    for (UIViewController *V = VC.parentViewController; V; V = V.parentViewController) {
+        if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            result = V;
+            break;
+        }
+    }
+    
+    return result;
+}
+
++ (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav
+{
+    if (![Nav isKindOfClass:[UINavigationController class]]) {
+        return;
+    }
+    
+    NSArray *listNav = Nav.viewControllers;
+    NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
+    for (UIViewController *V in listNav) {
+        if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            [V.view removeFromSuperview];
+            [listResult removeObject:V];
+        }
+    }
+    
+    [Nav setViewControllers:listResult animated:YES];
+}
+
++ (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav
+{
+    if (![Nav isKindOfClass:[UINavigationController class]]) {
+        return;
+    }
+    
+    NSArray *listNav = Nav.viewControllers;
+    NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
+    for (UIViewController *V in listNav) {
+        if (V == viewController) {
+            [V.view removeFromSuperview];
+            [listResult removeObject:V];
+        }
+    }
+    
+    [Nav setViewControllers:listResult animated:YES];
+}
+
+void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
+{
+    if (iPhone >= 7) {
+        VC.navigationController.interactivePopGestureRecognizer.enabled = !isForbid;
+    }
+}
+
 + (UIWindow *)getWindow
 {
     //活跃的window
@@ -89,16 +202,7 @@ id getController(NSString *identifier,NSString *title)
     }
 }
 
-#pragma mark UIView
-+ (UIView *)viewWithColor:(UIColor *)color
-{
-    color = color ? color : [UIColor clearColor];
-    UIView *View = [[UIView alloc] initWithFrame:CGRectZero];
-    View.backgroundColor = color;
-    return View;
-}
-
-#pragma mark - ========按钮=UIButton=============================
+#pragma mark - --------按钮UIButton------------------------
 + (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(NSInteger)tag title:(NSString *)title img:(NSString *)imgName
 {
     type = type ?: UIButtonTypeCustom;
@@ -150,76 +254,23 @@ id getController(NSString *identifier,NSString *title)
     return button;
 }
 
-typedef NS_ENUM(NSInteger, ImgType)
++ (UISearchBar *)searchBarStyle:(UISearchBarStyle)style tintColor:(UIColor *)tintColor toV:(UIView *)View delegate:(id)delegate
 {
-    Img_Normal  = 1,
-    Img_Background = 2
-};
-
-+ (void)setImg:(NSDictionary *)dicData button:(UIButton *)button, ...
-{
-    va_list args;
-    // scan for arguments after firstObject.
-    va_start(args, button);
+    UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectZero];
+    searchBar.delegate = delegate;
+    searchBar.backgroundColor = [UIColor whiteColor];
+    searchBar.keyboardType = UIKeyboardTypeDefault;
+    searchBar.clipsToBounds = YES;
+    //searchBar.barStyle = UIBarStyleBlackTranslucent;
     
-    // get rest of the objects until nil is found
-    for (UIButton *btn = button; btn != nil; btn = va_arg(args,UIButton *)) {
-        UIImage *image = dicData[@"image"];
-        if (!image) {
-            NSString *imgName = dicData[@"imgName"];
-            image = [UIImage imageNamed:imgName];
-        }
-        
-        UIControlState state = dicData[@"state"] ? [dicData[@"state"] intValue] : UIControlStateNormal;
-        ImgType type = dicData[@"type"] ? [dicData[@"type"] intValue] : 1;
-        
-        if (image) {
-            if (type == Img_Normal) {
-                [btn setImage:image forState:state];
-            }
-            else if (type == Img_Background) {
-                [btn setBackgroundImage:image forState:state];
-            }
-        }
+    if (iPhone >= 7) {
+        searchBar.searchBarStyle = style;
+        searchBar.barTintColor = tintColor;
     }
     
-    va_end(args);
-}
-
-+ (void)settitleColor:(NSDictionary *)dicData button:(UIButton *)button, ...
-{
-    va_list args;
-    // scan for arguments after firstObject.
-    va_start(args, button);
+    [View addSubview:searchBar];
     
-    // get rest of the objects until nil is found
-    for (UIButton *btn = button; btn != nil; btn = va_arg(args,UIButton *)) {
-        UIControlState state = dicData[@"state"] ? [dicData[@"state"] intValue] : UIControlStateNormal;
-        UIColor *color = dicData[@"color"] ? dicData[@"color"] : [UIColor blackColor];
-        [btn setTitleColor:color forState:state];
-    }
-    
-    va_end(args);
-}
-
-+ (NSMutableDictionary *)dicWith:(NSDictionary *)dic
-{
-    NSMutableDictionary *result = [NSMutableDictionary dictionary];
-    if (dic) {
-        [result setDictionary:dic];
-    }
-    
-    return result;
-}
-
-NSMutableDictionary *DicWith(NSDictionary *dic)
-{
-    NSMutableDictionary *result = [NSMutableDictionary dictionary];
-    if (dic && [dic isKindOfClass:[NSDictionary class]]) {
-        result.dictionary = dic;
-    }
-    
-    return result;
+    return searchBar;
 }
 
 + (void)addTarget:(id)delegate action:(SEL)action button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION
@@ -271,6 +322,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     va_end(args);
 }
 
+#pragma mark 设置圆角
 + (void)setRadius:(CGFloat)radius View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION
 {
     va_list args;
@@ -326,7 +378,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     // get rest of the objects until nil is found
     for (UIButton *btn = button; btn != nil; btn = va_arg(args,UIButton *)) {
         if ([btn isKindOfClass:[UIButton class]]) {
-            UIView *lineView = getSubViewBy([UIView class], btn, 99);
+            UIView *lineView = [btn viewWITHTag:99];
             if (!lineView) {
                 lineView = [[UIView alloc] initWithFrame:GetRect(0, GetVHeight(btn)-1, GetVWidth(btn), 1)];
                 lineView.tag = 99;
@@ -350,7 +402,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     // get rest of the objects until nil is found
     for (UIButton *btn = button; btn != nil; btn = va_arg(args,UIButton *)) {
         if ([btn isKindOfClass:[UIButton class]]) {
-            UIView *lineView = getSubViewBy([UIView class], btn, 99);
+            UIView *lineView = [btn viewWithTag:99];
             if (!lineView) {
                 lineView = [[UIView alloc] initWithFrame:GetRect(0, GetVHeight(btn)-high, GetVWidth(btn), high)];
                 lineView.tag = 99;
@@ -381,7 +433,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     va_end(args);
 }
 
-#pragma mark 添加圆角
+#pragma mark 添加圆角,设置边框和边框颜色
 + (void)drawBorder:(UIView *)view radius:(float)radius borderWidth:(float)borderWidth borderColor:(UIColor *)borderColor
 {
     CALayer *layer = [view layer];
@@ -507,7 +559,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     lblTitle.frame = CGRectMake(50, 0, 60, 44);
     lblTitle.textAlignment = NSTextAlignmentLeft;
     CGSize size = [CTB getSizeWith:title wordSize:15 size:CGSizeMake(200, 44)];
-    [CTB setRectWith:lblTitle toWidth:size.width];
+    [lblTitle setSizeToW:size.width];
     btnBack.frame = CGRectMake(0, 0, 66+size.width, 44);
     
     [btnBack addTarget:delegate action:action forControlEvents:UIControlEventTouchUpInside];
@@ -515,7 +567,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return barItem;
 }
 
-+ (NSArray *)BarButtonWithTitle:(NSArray *)array delegate:(id)delegate
++ (NSArray *)BarButtonWithTitles:(NSArray *)array delegate:(id)delegate
 {
     NSMutableArray *result = [NSMutableArray array];
     if (array.count>1) {
@@ -539,9 +591,9 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return result;
 }
 
-+ (NSArray *)BarButtonWithImg:(NSArray *)array delegate:(id)delegate
++ (NSArray *)BarButtonWithImgs:(NSArray *)array delegate:(id)delegate
 {
-    NSMutableArray *result = [NSMutableArray array];
+    NSMutableArray *result = [@[] mutableCopy];
     if (array.count>1) {
         for (int i=0; i<array.count-1; i++) {
             NSArray *arrData = [array[i] componentsSeparatedByString:@"/"];
@@ -574,19 +626,6 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     dic = @{UITextAttributeTextColor:bColor};
     //设置tabbar字体颜色(选中)
     [[UITabBarItem appearance] setTitleTextAttributes:dic forState:UIControlStateSelected];
-}
-
-#pragma mark - ==============创建导航栏退出按钮===========================
-+ (void)createQuitBarButtonItem:(UIViewController *)VC delegate:(id)delegate location:(int)location
-{
-    UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"X" style:UIBarButtonItemStylePlain target:delegate action:select(ButtonEvents:)];
-    button.tag = 1;
-    if (location == 1) {
-        VC.navigationItem.leftBarButtonItem = button;
-    }
-    else if (location == 2) {
-        VC.navigationItem.rightBarButtonItem = button;
-    }
 }
 
 #pragma mark - ========实用TextField==============================
@@ -673,6 +712,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return segControl;
 }
 
+#pragma mark - ========UITableView==============================
 + (UITableView *)tableViewStyle:(UITableViewStyle)style delegate:(id)delegate toV:(UIView *)View
 {
     UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectZero style:style];
@@ -685,6 +725,9 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     
     tableView.separatorColor = [UIColor clearColor];
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    //tableView.sectionIndexColor = MasterColor;//索引文字颜色
+    tableView.sectionIndexBackgroundColor = [UIColor clearColor];//索引栏背景色
     
     return tableView;
 }
@@ -718,14 +761,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     tableView.tableFooterView = finishView;
 }
 
-+ (id)cellWithRow:(NSInteger)row inTable:(UITableView *)tableView
-{
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
-    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    
-    return cell;
-}
-
+//创建动画视图
 + (UIWebView *)gifViewInitWithFile:(NSString *)Path
 {
     NSData *gifData = [NSData dataWithContentsOfFile:Path];
@@ -739,6 +775,25 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     return webView;
 }
 
+#pragma mark - ========UIImagePickerController==============================
++ (UIImagePickerController *)imagePickerType:(UIImagePickerControllerSourceType)sourceType delegate:(id)delegate
+{
+    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+    //imagePicker.allowsEditing = YES;
+    imagePicker.delegate = delegate;
+    imagePicker.sourceType = sourceType;
+    if (iPhone >= 7) {
+        imagePicker.navigationBar.tintColor = [UIColor whiteColor];
+    }
+    
+    if ([delegate respondsToSelector:select(presentViewController:animated:completion:)]) {
+        [delegate presentViewController:imagePicker animated:YES completion:nil];
+    }
+    
+    return imagePicker;
+}
+
+#pragma mark - ========UIAlertView==============================
 + (UIAlertView *)showMsgWithTitle:(NSString *)title msg:(NSString *)msg
 {
     title = title.length>0 ? title : @"确定";
@@ -772,12 +827,9 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 
 + (UIAlertView *)alertWithTitle:(NSString *)title Delegate:(id)delegate tag:(int)tag
 {
-    UIAlertView *alert = nil;
-    if (delegate) {
-        alert = [[UIAlertView alloc] initWithTitle:title message:nil delegate:delegate cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-    }else{
-        alert = [[UIAlertView alloc] initWithTitle:title message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
-    }
+    NSString *cancelTitle = delegate ? @"取消" : nil;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:nil delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:@"确定", nil];
+    alert.delegate = delegate;
     alert.tag = tag;
     [alert show];
     return alert;
@@ -785,12 +837,9 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 
 + (UIAlertView *)alertWithMessage:(NSString *)message Delegate:(id)delegate tag:(int)tag
 {
-    UIAlertView *alert = nil;
-    if (delegate) {
-        alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:delegate cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-    }else{
-        alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
-    }
+    NSString *cancelTitle = delegate ? @"取消" : nil;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:@"确定", nil];
+    alert.delegate = delegate;
     alert.tag = tag;
     [alert show];
     return alert;
@@ -798,12 +847,9 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
 
 + (UIAlertView *)alertWithTitle:(NSString *)title msg:(NSString *)message Delegate:(id)delegate tag:(int)tag
 {
-    UIAlertView *alert = nil;
-    if (delegate) {
-        alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:delegate cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-    }else{
-        alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
-    }
+    NSString *cancelTitle = delegate ? @"取消" : nil;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:@"确定", nil];
+    alert.delegate = delegate;
     alert.tag = tag;
     [alert show];
     return alert;
@@ -882,36 +928,7 @@ NSMutableDictionary *DicWith(NSDictionary *dic)
     aView.frame = CGRectMake(0, 0, bView.frame.size.width, bView.frame.size.height);
 }
 
-#pragma mark 设置透明背景色
-+ (void)setClearColor:(UITableView *)tableView
-{
-    tableView.backgroundColor = [UIColor clearColor];
-    tableView.backgroundView = nil;
-}
-
 #pragma mark - =============从指定的视图上获取想要的视图类============================
-//从View上获取父级视图
-+ (id)getObjType:(Class)aClass toView:(UIView *)View
-{
-    return getSuperView(aClass, View);
-}
-
-+ (id)getObjType:(Class)aClass tag:(int)tag toView:(UIView *)View
-{
-    return getSuperViewBy(aClass, View, tag);
-}
-
-//从View上获取子视图
-+ (id)getObjType:(Class)aClass fromView:(UIView *)View
-{
-    return getSubView(aClass, View);
-}
-
-+ (id)getObjType:(Class)aClass tag:(int)tag fromView:(UIView *)View
-{
-    return getSubViewBy(aClass, View, tag);
-}
-
 id getSuperView(Class aClass,UIView *View)
 {
     id obj = nil;
@@ -947,224 +964,6 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     return obj;
 }
 
-id getSubView(Class aClass,UIView *View)
-{
-    id obj = nil;
-    NSArray *listView = View.subviews;
-    for (UIView *v in listView) {
-        if ([v isKindOfClass:[aClass class]]) {
-            obj = v;
-            break;
-        }
-    }
-    
-    return obj;
-}
-
-NSArray *getSubViewList(Class aClass,UIView *View)
-{
-    NSMutableArray *list = [NSMutableArray array];
-    NSArray *listView = View.subviews;
-    for (UIView *v in listView) {
-        if ([v isKindOfClass:[aClass class]]) {
-            [list addObject:v];
-        }
-    }
-    
-    return list;
-}
-
-id getSubViewBy(Class aClass,UIView *View,NSInteger tag)
-{
-    id obj = nil;
-    NSArray *listView = View.subviews;
-    for (UIView *v in listView) {
-        if ([v isKindOfClass:[aClass class]] && v.tag == tag) {
-            obj = v;
-            break;
-        }
-    }
-    
-    return obj;
-}
-
-NSString *getBtnTitleBy(UIButton *button)
-{
-    if ([button isKindOfClass:[UIButton class]]) {
-        return button.currentTitle;
-    }
-    
-    return @"";
-}
-
-#pragma mark -
-+ (UIView *)showMessageWithString:(NSString *)msg to:(UIViewController *)viewController
-{
-    CGSize locatiion = [UIScreen mainScreen].bounds.size;
-    CGFloat w=msg.length*17;
-    if (w>300) {
-        w=300;
-    }
-    int x=(locatiion.width-w)/2;
-    int y=locatiion.height/2-100;
-    CGRect rect=CGRectMake(x-10, y, w+20, 70);
-    
-    UIView *View = [[UIView alloc] initWithFrame:rect];
-    View.backgroundColor = [UIColor colorWithWhite:0 alpha:0.7];
-    View.clipsToBounds = YES;
-    View.layer.cornerRadius = 5;
-    [viewController.view addSubview:View];
-    
-    CGSize size = [[self class] getSizeWith:msg wordSize:[self setFontSize:msg] size:GetSize(300, 350)];
-    
-    CGFloat label_x = 0;
-    if ([msg hasSuffix:@"!"]||[msg hasSuffix:@"！"]) {
-        label_x = 5;
-    }
-    CGRect labelRect = CGRectMake(5+label_x, 5, size.width+10+label_x*2, size.height);
-    UILabel *infoLabel = [[UILabel alloc] initWithFrame:labelRect];
-    infoLabel.text = msg;
-    infoLabel.numberOfLines = 0;
-    //infoLabel.adjustsFontSizeToFitWidth = YES;
-    infoLabel.textColor = [UIColor whiteColor];
-    infoLabel.font = [UIFont systemFontOfSize:[self setFontSize:msg]];
-    infoLabel.textAlignment = NSTextAlignmentCenter;
-    infoLabel.backgroundColor = [UIColor clearColor];
-    [View addSubview:infoLabel];
-    
-    CGPoint center = View.center;
-    [[self class] setRectWith:View toWidth:size.width+10 toHeight:size.height+10];
-    View.center = center;
-    
-    infoLabel.center = GetPoint(GetVWidth(View)/2, infoLabel.center.y);
-    
-    [UIView animateWithDuration:2.0f animations:^{
-        View.alpha = 0.98f;
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.5f animations:^{
-            View.alpha = 0.02f;
-        } completion:^(BOOL finished) {
-            View.hidden = YES;
-            [View removeFromSuperview];
-        }];
-    }];
-    
-    return View;
-}
-
-+ (UIViewController *)getControllerFrom:(UINavigationController *)Nav className:(NSString *)className
-{
-    if (![Nav isKindOfClass:[UINavigationController class]]) {
-        return NULL;
-    }
-    
-    NSArray *listNav = Nav.viewControllers;
-    for (UIViewController *V in listNav) {
-        if ([NSStringFromClass(V.class) isEqualToString:className]) {
-            return V;
-        }
-    }
-    
-    return NULL;
-}
-
-UIViewController *getControllerFrom(UINavigationController *Nav,NSString *className)
-{
-    if (![Nav isKindOfClass:[UINavigationController class]]) {
-        return NULL;
-    }
-    
-    NSArray *listNav = Nav.viewControllers;
-    for (UIViewController *V in listNav) {
-        if ([NSStringFromClass(V.class) isEqualToString:className]) {
-            return V;
-        }
-    }
-    
-    return NULL;
-}
-
-UIViewController *getControllerFor(UIViewController *VC,NSString *className)
-{
-    UINavigationController *Nav = VC.navigationController;
-    if (![Nav isKindOfClass:[UINavigationController class]]) {
-        return NULL;
-    }
-    
-    NSArray *listNav = Nav.viewControllers;
-    for (UIViewController *V in listNav) {
-        if ([NSStringFromClass(V.class) hasPrefix:className]) {
-            //类名相同
-            if (V != VC) {
-                //排除自己
-                return V;
-            }
-        }
-    }
-    
-    return NULL;
-}
-
-UIViewController *getParentController(UIViewController *VC,NSString *className)
-{
-    if (![VC isKindOfClass:[UIViewController class]]) {
-        return NULL;
-    }
-    
-    UIViewController *result = nil;
-    for (UIViewController *V = VC.parentViewController; V; V = V.parentViewController) {
-        if ([NSStringFromClass(V.class) isEqualToString:className]) {
-            result = V;
-            break;
-        }
-    }
-    
-    return result;
-}
-
-+ (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav
-{
-    if (![Nav isKindOfClass:[UINavigationController class]]) {
-        return;
-    }
-    
-    NSArray *listNav = Nav.viewControllers;
-    NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
-    for (UIViewController *V in listNav) {
-        if ([NSStringFromClass(V.class) isEqualToString:className]) {
-            [V.view removeFromSuperview];
-            [listResult removeObject:V];
-        }
-    }
-    
-    [Nav setViewControllers:listResult animated:YES];
-}
-
-+ (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav
-{
-    if (![Nav isKindOfClass:[UINavigationController class]]) {
-        return;
-    }
-    
-    NSArray *listNav = Nav.viewControllers;
-    NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
-    for (UIViewController *V in listNav) {
-        if (V == viewController) {
-            [V.view removeFromSuperview];
-            [listResult removeObject:V];
-        }
-    }
-    
-    [Nav setViewControllers:listResult animated:YES];
-}
-
-void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
-{
-    if (iPhone >= 7) {
-        VC.navigationController.interactivePopGestureRecognizer.enabled = !isForbid;
-    }
-}
-
 #pragma mark - ============活动指示器============================
 + (void)showActivityInView:(UIView *)View
 {
@@ -1182,12 +981,14 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     
     if (!activity) {
         activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:style];
-        //activity.center = View.center;
-        activity.center=CGPointMake(View.frame.size.width/2, View.frame.size.height/2);
+        activity.center = CGPointMake(GetVWidth(View)/2, GetVHeight(View)/2);
+        activity.hidesWhenStopped = YES;
         [View addSubview:activity];
     }
     
-    [activity startAnimating];
+    if (!activity.isAnimating) {
+        [activity startAnimating];
+    }
 }
 
 + (void)hiddenActivityInView:(UIView *)View
@@ -1203,8 +1004,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 + (void)showSignView:(UIView *)View
 {
     UIActivityIndicatorView *Design = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    Design.frame = CGRectMake(0, 0, 20, 20);
-    Design.center=CGPointMake(View.frame.size.width/2, View.frame.size.height/2);
+    Design.center = CGPointMake(GetVWidth(View)/2, GetVHeight(View)/2);
     Design.hidesWhenStopped = YES;
     [View addSubview:Design];
     [Design startAnimating];
@@ -1214,7 +1014,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 {
     UIActivityIndicatorView *Design = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     Design.frame = CGRectMake(0, 0, 20, 20);
-    Design.center=CGPointMake(View.frame.size.width/2, View.frame.size.height/2);
+    Design.center = CGPointMake(GetVWidth(View)/2, GetVHeight(View)/2);;
     Design.hidesWhenStopped = YES;
     [View addSubview:Design];
     [Design startAnimating];
@@ -1229,17 +1029,6 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
             [Design stopAnimating];
         }
     }
-}
-
-+ (int)setFontSize:(NSString *)text
-{
-    CGFloat result = 17;
-    if (text.length>17) {
-        result = 300/text.length;
-        result = MAX(15, result);
-    }
-    
-    return result;
 }
 
 + (void)printfView:(UIView *)View
@@ -1257,23 +1046,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 
 
 
-#pragma mark - ===========状态栏字体颜色============================
-//+ (UIStatusBarStyle)setStatusBarStyle
-//{
-//    return UIStatusBarStyleBlackOpaque;
-//}
-//
-//+ (void)setFrame:(UIViewController *)viewController
-//{
-//    if (iPhone>=7) {
-//        if (viewController.view.frame.size.height==Screen_Height&&[Tool getData].isSetView) {
-//            viewController.view.bounds=CGRectMake(0, -20, 320, viewController.view.frame.size.height-20);
-//        }
-//        viewController.edgesForExtendedLayout =UIEventSubtypeNone;
-//    }
-//}
-
-//隐藏键盘
+#pragma mark - ===========隐藏键盘============================
 + (void)HiddenKeyboard:(id)txtField, ...
 {
     va_list args;
@@ -1416,7 +1189,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 }
 
 //颜色转换成图片
-+(void)imgColor:(UIColor *)color to:(UIViewController *)viewController
++ (void)imgColor:(UIColor *)color to:(UIViewController *)viewController
 {
     CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
     UIGraphicsBeginImageContext(rect.size);
@@ -1695,89 +1468,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     [theView.layer addAnimation:animation forKey:nil];
 }
 
-#pragma mark 获取底部坐标
-+ (CGFloat)getBottomPositionBy:(UIView *)View
-{
-    return View.frame.origin.y + View.frame.size.height;
-}
-
-#pragma mark 获取右边尾端坐标
-+ (CGFloat)getRightPositionBy:(UIView *)View
-{
-    return View.frame.origin.x + View.frame.size.width;
-}
-
-NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
-{
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
-    return indexPath;
-}
-
 #pragma mark - ===========重新设置视图的位置和尺寸=========================
-+ (CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width
-{
-    View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, width, View.frame.size.height);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toHeight:(CGFloat)high
-{
-    View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, View.frame.size.width, high);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x
-{
-    View.frame = CGRectMake(x, View.frame.origin.y, View.frame.size.width, View.frame.size.height);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toY:(CGFloat)y
-{
-    if (View.frame.origin.y == y) {
-        return View.frame;
-    }
-    
-    View.frame = CGRectMake(View.frame.origin.x, y, View.frame.size.width, View.frame.size.height);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toWidth:(CGFloat)width
-{
-    View.frame = CGRectMake(x, View.frame.origin.y, width, View.frame.size.height);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toY:(CGFloat)y
-{
-    View.frame = CGRectMake(x, y, View.frame.size.width, View.frame.size.height);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toOrigin:(CGPoint)origin
-{
-    View.frame = CGRectMake(origin.x, origin.y, View.frame.size.width, View.frame.size.height);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toY:(CGFloat)y toHeight:(CGFloat)high
-{
-    View.frame = CGRectMake(View.frame.origin.x, y, View.frame.size.width, high);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width toHeight:(CGFloat)high
-{
-    View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, width, high);
-    return View.frame;
-}
-
-+ (CGRect)setRectWith:(UIView *)View toSize:(CGSize)size
-{
-    View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y, size.width, size.height);
-    return View.frame;
-}
-
 + (CGRect)setRectByX:(CGFloat)x Y:(CGFloat)y W:(CGFloat)w H:(CGFloat)h scale:(CGFloat)scale
 {
     CGRect rect = CGRectMake(x*scale, y*scale, w*scale, h*scale);
@@ -1788,32 +1479,6 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 {
     rect = CGRectMake(rect.origin.x*scale, rect.origin.y*scale, rect.size.width*scale, rect.size.height*scale);
     return rect;
-}
-
-+ (CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x Y:(CGFloat)y
-{
-    View.center = CGPointMake(x, y);
-    return View.center;
-}
-
-+ (CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x
-{
-    View.center = CGPointMake(x, View.center.y);
-    return View.center;
-}
-
-+ (CGPoint)setCenterWith:(UIView *)View Y:(CGFloat)y
-{
-    View.center = CGPointMake(View.center.x, y);
-    return View.center;
-}
-
-+ (void)setCenterWith:(UIView *)View
-{
-    UIView *parentView = View.superview;
-    if (parentView) {
-        View.center = CGPointMake(parentView.frame.size.width/2, parentView.frame.size.height/2);
-    }
 }
 
 + (BOOL)containsPoint:(CGPoint)point inRect:(CGRect)rect
@@ -1862,6 +1527,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     CGContextTranslateCTM(context, -pointX, pointY-(CGFloat)height);
     CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, (CGFloat)width, (CGFloat)height), cgImage);
     CGContextRelease(context);
+    CGImageRelease(cgImage);
     // Convert color values [0..255] to floats [0.0..1.0]
     CGFloat red = (CGFloat)pixelData[0] / 255.0f;
     CGFloat green = (CGFloat)pixelData[1] / 255.0f;
@@ -1878,19 +1544,19 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     if (image.size.height > image.size.width) {
         
         float width = imageView.frame.size.height * image.size.width / image.size.height;
-        [CTB setRectWith:imageView toWidth:width];
+        [imageView setSizeToW:width];
         imageView.center = center;
     }
     else {
         
         float height = imageView.frame.size.width * image.size.height / image.size.width;
-        [CTB setRectWith:imageView toHeight:height];
+        [imageView setSizeToH:height];
         imageView.center = center;
     }
     
     if (minY >= 0 && imageView.frame.origin.y < minY) {
         
-        [CTB setRectWith:imageView toY:minY];
+        [imageView setOriginY:minY];
     }
     
     if (maxY > 0 && imageView.frame.origin.y + imageView.frame.size.height > maxY) {
@@ -1898,7 +1564,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
         float height = minY >= 0 ? maxY - minY : maxY;
         float width = imageView.frame.size.width * height / imageView.frame.size.height;
         
-        [CTB setRectWith:imageView toWidth:width toHeight:height];
+        [imageView setSizeToW:width height:height];
         
         if (minY >= 0) {
             imageView.center = CGPointMake(center.x, minY + height/2);
@@ -1911,18 +1577,11 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     imageView.image = image;
 }
 
-//获取图片尺寸
-+ (CGSize)getImgSizeBy:(UIImage *)img
-{
-    CGSize size = CGSizeMake(img.size.width, img.size.height);
-    return size;
-}
-
 //设置图片并调整尺寸到图片大小
 + (void)setSizeWithView:(UIImageView *)imgView withImg:(UIImage *)img
 {
     CGSize size = CGSizeMake(img.size.width, img.size.height);
-    imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, size.width, size.height);
+    [imgView setSizeToW:size.width height:size.height];
     imgView.image = img;
     //imgView.contentMode = UIViewContentModeScaleAspectFit;
 }
@@ -1944,11 +1603,12 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 #pragma mark 截取部分图像
-+ (UIImage*)getSubImage:(UIImage *)image rect:(CGRect)rect
++ (UIImage *)getSubImage:(UIImage *)image rect:(CGRect)rect
 {
+    if (!image) return nil;
     CGImageRef cgImage = CGImageCreateWithImageInRect(image.CGImage, rect);
     UIImage *newImage = [UIImage imageWithCGImage:cgImage];
-    CFRelease(cgImage);
+    CGImageRelease(cgImage);
     return newImage;
 }
 
@@ -1965,33 +1625,21 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
 }
 
 #pragma mark 将图片分解成图片数组
-+ (NSArray *)getImagesWithPath:(NSString *)path count:(int)count
++ (NSArray *)getImagesWith:(UIImage *)image count:(int)count
 {
-    if (!path || path.length <= 0) {
+    if (!image || image.size.width <= 0) {
         return nil;
     }
     
-    CGFloat scale = 1.0f;
-    NSString *imgName = [path lastPathComponent];
-    if (imgName.length > 7) {
-        NSString *suffix = [imgName substringFromIndex:imgName.length-7];
-        
-        if ([suffix hasPrefix:@"@"] && [suffix hasSuffix:@"x.png"]) {
-            suffix = replaceString(suffix, @"@", @"");
-            suffix = replaceString(suffix, @"x.png", @"");
-            
-            scale = MAX(scale, [suffix floatValue]);
-        }
-    }
-    UIImage *image = [UIImage imageWithContentsOfFile:path];
     CGFloat w = image.size.width/count;
     CGFloat h = image.size.height;
-    NSMutableArray *listImg = [NSMutableArray array];
+    CGFloat scale = image.scale;
+    NSArray *listImg = @[];
     for (int i=0; i<count; i++) {
-        CGRect rect = GetRect(w*i*scale, 0, w*scale, h*scale);
-        UIImage *img = [CTB getSubImage:image rect:rect];
+        CGRect rect = GetRect(w*i*scale, 0, w*scale, h*scale);//截取位置尺寸
+        UIImage *img = [CTB getSubImage:image rect:rect];//截取图像
         if (img) {
-            [listImg addObject:img];
+            listImg = [listImg arrayByAddingObject:img];
         }
     }
     
@@ -2057,13 +1705,13 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
     if (imgSize.width>size.width || imgSize.height>size.height) {
         if (imgSize.width/imgSize.height > size.width/size.height) {
             //过宽
-            [CTB setRectWith:imgView toWidth:imgSize.width/scale_H toHeight:size.height];
+            [imgView setSizeToW:imgSize.width/scale_H height:size.height];
         }else{
             //过高
-            [CTB setRectWith:imgView toWidth:size.width toHeight:imgSize.height/scale_W];
+            [imgView setSizeToW:size.width height:imgSize.height/scale_W];
         }
     }else{
-        [CTB setRectWith:imgView toWidth:imgSize.width toHeight:imgSize.height];
+        [imgView setSizeToW:imgSize.width height:imgSize.height];
     }
     
     if (imgView.superview) {
@@ -2155,7 +1803,7 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row)
         labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
     }
     label.text = content;
-    [CTB setRectWith:label toWidth:labelsize.width];
+    [label setSizeToW:labelsize.width];
 }
 
 + (CGFloat)getLabelHighBy:(NSString *)content wordSize:(CGFloat)big width:(CGFloat)width
@@ -2250,6 +1898,13 @@ NSString *pooledString(NSString *aString,NSString *bString,NSString *midString)
     CGFloat h = font.pointSize * 1.2;//1.1930001
     CGSize sizeTest = [CTB getSizeWith:temp font:font size:GetSize(50000, h)];
     return sizeTest;
+}
+
++ (NSAttributedString *)attribute:(NSString *)aString font:(UIFont *)font range:(NSRange)range
+{
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:aString];
+    [str addAttribute:NSFontAttributeName value:font range:range];
+    return str;
 }
 
 #pragma mark - =========颜色转换=============================
@@ -2770,7 +2425,17 @@ BOOL containString(NSString *string,NSString *aString)
     //手机号以13， 15，18开头，八个 \d 数字字符
     NSString *phoneRegex = @"^0{0,1}1[3|4|5|6|7|8|9][0-9]{9}$";
     NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",phoneRegex];
-    return [phoneTest evaluateWithObject:mobile];
+    BOOL isValid = [phoneTest evaluateWithObject:mobile];
+    return isValid;
+}
+
++ (BOOL)isEmail:(NSString *)email
+{
+    //x@y.z,x∈[A-Z0-9a-z._%+-],y∈[A-Za-z0-9.-],z∈[A-Za-z]且长度限制为{2,4}
+    NSString *regex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    BOOL isValid = [predicate evaluateWithObject:email];
+    return isValid;
 }
 
 #pragma mark - ===========设置状态栏字体颜色=========================
@@ -2780,97 +2445,11 @@ BOOL containString(NSString *string,NSString *aString)
     [application setStatusBarStyle:UIStatusBarStyleDefault];
 }
 
-+ (UIButton *)showMsgToStatusBarWith:(NSString *)message time:(NSTimeInterval)time
-{
-    UIView *BGView = nil;
-    UILabel *lblMsg = nil;
-    UIButton *btn = nil;
-    UIWindow *temWindow = [CTB getWindow];
-    BGView = [temWindow viewWithTag:99];
-    lblMsg = [CTB getObjType:[UILabel class] fromView:BGView];
-    btn = [CTB getObjType:[UIButton class] fromView:BGView];
-    if (!BGView) {
-        BGView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, Screen_Width, 0)];
-        BGView.backgroundColor = [CTB colorWithHexString:@"#F2F2F2"];
-        BGView.layer.masksToBounds = YES;
-        BGView.hidden = YES;
-        BGView.tag = 99;
-        [temWindow addSubview:BGView];
-        
-        lblMsg = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, Screen_Width, 20)];
-        lblMsg.backgroundColor = [UIColor clearColor];
-        lblMsg.textColor = [UIColor blackColor];
-        lblMsg.textAlignment = NSTextAlignmentCenter;
-        lblMsg.font = [UIFont systemFontOfSize:12];
-        [BGView addSubview:lblMsg];
-    }
-    
-    BGView.hidden = NO;
-    
-    if (!btn) {
-        btn = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn.frame = CGRectMake(0, 0, Screen_Width, 20);
-        btn.backgroundColor = [UIColor clearColor];
-        [BGView addSubview:btn];
-    }
-    
-    lblMsg.text = message;
-    
-    CTB *Ctb = [CTB getInstance];
-    [Ctb performSelector:select(HiddenStatusBar) withObject:nil afterDelay:0.5];
-    [Ctb performSelector:select(ShowViewToWindow:) withObject:BGView afterDelay:0.15];
-    
-    NSTimeInterval duration = time>0.5 ? time : 0.5;
-    if (time > 0) {
-        [Ctb performSelector:select(HiddenView:) withObject:BGView afterDelay:duration-0.3];
-        [Ctb performSelector:select(ShowStatusBar) withObject:nil afterDelay:time];
-    }
-    
-    return btn;
-}
-
-- (void)ShowViewToWindow:(UIView *)View
-{
-    View.hidden = NO;
-    [CTB setAnimationWith:0.2 delegate:nil complete:nil];
-    [CTB setRectWith:View toHeight:20];
-    [CTB commitAnimations];
-}
-
-- (void)HiddenView:(UIView *)View
-{
-    if (View) {
-        [CTB setAnimationWith:View size:CGSizeMake(Screen_Width, 0)];
-        UILabel *lblMsg = [CTB getObjType:[UILabel class] fromView:View];
-        lblMsg.text = @"";
-    }
-}
-
-+ (void)HiddenStatusBarMsg
-{
-    UIWindow *temWindow = [CTB getWindow];
-    UIView *BGView = [temWindow viewWithTag:99];
-    BGView.hidden = YES;
-}
-
-- (void)HiddenStatusBar
-{
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-}
-
-- (void)ShowStatusBar
-{
-    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
-    UIWindow *temWindow = [CTB getWindow];
-    UIView *BGView = [temWindow viewWithTag:99];
-    BGView.hidden = YES;
-}
-
 #pragma mark - ----------tableView添加底部线条(分隔线)------------------
 + (UIView *)setBottomLineAt:(UITableView *)tableView cell:(UITableViewCell *)cell cellH:(CGFloat)cellH
 {
     CGFloat w = tableView.frame.size.width;
-    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    UIView *View = [cell.contentView viewWithTag:200];
     if (!View) {
         View = [[UIView alloc] initWithFrame:CGRectMake(10, cellH-0.6, w-20, 0.6)];
         [cell.contentView addSubview:View];
@@ -2940,7 +2519,7 @@ BOOL containString(NSString *string,NSString *aString)
     //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
     CGFloat w = tableView.frame.size.width;
     CGFloat h = cell.contentView.frame.size.height;
-    id delegate = dicData[@"delegate"];
+    __weak id delegate = dicData[@"delegate"];
     if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
         h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
     }else{
@@ -2948,7 +2527,7 @@ BOOL containString(NSString *string,NSString *aString)
             h = [tableView rectForRowAtIndexPath:indexPath].size.height;
         }
     }
-    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    UIView *View = [cell.contentView viewWithTag:200];;
     if (!View) {
         View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
         [cell.contentView addSubview:View];
@@ -2975,7 +2554,7 @@ BOOL containString(NSString *string,NSString *aString)
     //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
     CGFloat w = tableView.frame.size.width;
     CGFloat h = cell.contentView.frame.size.height;
-    id delegate = dicData[@"delegate"];
+    __weak id delegate = dicData[@"delegate"];
     if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
         h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
     }else{
@@ -2983,7 +2562,7 @@ BOOL containString(NSString *string,NSString *aString)
             h = [tableView rectForRowAtIndexPath:indexPath].size.height;
         }
     }
-    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    UIView *View = [cell.contentView viewWithTag:200];;
     if (!View) {
         View = [[UIView alloc] initWithFrame:CGRectMake(0, h-0.6, w, 0.6)];
         [cell.contentView addSubview:View];
@@ -3001,7 +2580,7 @@ BOOL containString(NSString *string,NSString *aString)
 + (UIView *)setBottomLineAtTable:(UITableView *)tableView cell:(UITableViewCell *)cell h:(CGFloat)h
 {
     CGFloat w = tableView.frame.size.width;
-    UIView *View = getSubViewBy([UIView class], cell.contentView, 200);
+    UIView *View = [cell.contentView viewWithTag:200];;
     if (!View) {
         View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
         [cell.contentView addSubview:View];
@@ -3204,19 +2783,21 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
     //    dispatch_async(dispatch_get_main_queue(), block);
     //});
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(dur * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(dur * NSEC_PER_SEC)), queue, block);
 }
 
 //异步
 + (void)asyncWithBlock:(dispatch_block_t)block
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),block);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue,block);
 }
 
 //同步
 + (void)syncWithBlock:(dispatch_block_t)block
 {
-    dispatch_async(dispatch_get_main_queue(), block);
+    dispatch_sync(dispatch_get_main_queue(), block);
 }
 
 + (void)async:(dispatch_block_t)block complete:(dispatch_block_t)nextBlock
@@ -3258,6 +2839,16 @@ id getUserData(NSString *key)
     if (!key) return nil;
     id obj = [[NSUserDefaults standardUserDefaults] objectForKey:key];
     return obj;
+}
+
++ (void)postNoticeName:(NSString *)aName object:(id)anObject
+{
+    [NotificationCenter postNotificationName:aName object:anObject];
+}
+
++ (void)postNoticeName:(NSString *)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo
+{
+    [NotificationCenter postNotificationName:aName object:anObject userInfo:aUserInfo];
 }
 
 + (void)Request:(NSString *)urlString body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler
@@ -3329,7 +2920,7 @@ id getUserData(NSString *key)
     char *IP = [self parseDomain:domain];
     if (!IP) return nil;
     
-    NSString *result = [NSString stringWithCString:IP encoding:NSUTF8StringEncoding];
+    NSString *result = [NSString stringWithUTF8String:IP];
     return result;
 }
 
@@ -3792,12 +3383,20 @@ id getUserData(NSString *key)
     return value;
 }
 
+#pragma mark 根据格式(regex)匹配
+- (BOOL)evaluateWithFormat:(NSString *)regex
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    BOOL isValid = [predicate evaluateWithObject:self];
+    return isValid;
+}
+
 #pragma mark 解析字符串中的网址
 - (NSArray *)getURL
 {
     NSMutableArray *array = [NSMutableArray array];
     
-    NSError *error = nil;;
+    NSError *error = nil;
     NSString *regulaStr = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)";
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regulaStr
                                                                            options:NSRegularExpressionCaseInsensitive
@@ -3824,23 +3423,29 @@ id getUserData(NSString *key)
 #pragma mark - --------NSData------------------------
 @implementation NSData (NSObject)
 #pragma mark NSData bytes转换成十六进制字符串
-- (NSString *)dataBytes2HexStr
+- (NSString *)hexString
 {
     if (!self) {
         return nil;
     }
-    Byte *bytes = (Byte*)[self bytes];
-    NSString *hexStr = @"";
-    for(int i=0;i<[self length];i++)
-    {
-        NSString *newHexStr = [NSString stringWithFormat:@"%X",bytes[i]&0xff];///16进制数
-        if([newHexStr length] == 1)
-            hexStr=[NSString stringWithFormat:@"%@0%@",hexStr,newHexStr];
-        else
-            hexStr=[NSString stringWithFormat:@"%@%@",hexStr,newHexStr];
-    }
+    //Byte *bytes = (Byte*)[self bytes];
+    //NSString *hexStr = @"";
+    //for(int i=0;i<[self length];i++)
+    //{
+    //    NSString *newHexStr = [NSString stringWithFormat:@"%X",bytes[i]&0xff];///16进制数
+    //    if([newHexStr length] == 1)
+    //        hexStr=[NSString stringWithFormat:@"%@0%@",hexStr,newHexStr];
+    //    else
+    //        hexStr=[NSString stringWithFormat:@"%@%@",hexStr,newHexStr];
+    //}
     
-    return hexStr;
+    NSString *dataStr = self.description;
+    dataStr = [dataStr substringFromIndex:1];//去掉'<'
+    dataStr = [dataStr substringToIndex:dataStr.length-1];//去掉'>'
+    dataStr = [dataStr replaceString:@" " withString:@""];//去掉空格
+    dataStr = [dataStr uppercaseString];//转为大写
+    
+    return dataStr;
 }
 
 - (NSData *)contactData:(NSData *)data
@@ -3855,7 +3460,7 @@ id getUserData(NSString *key)
 {
     NSData *data = [self subdataWithRange:range];
     
-    NSString *result = [data dataBytes2HexStr];
+    NSString *result = [data hexString];
     
     return result;
 }
@@ -3911,7 +3516,7 @@ id getUserData(NSString *key)
 
 - (long)parseInt:(int)type
 {
-    long value = strtoul([[self dataBytes2HexStr] UTF8String],nil,type);
+    long value = strtoul([[self hexString] UTF8String],nil,type);
     return value;
 }
 
@@ -4162,9 +3767,16 @@ id getUserData(NSString *key)
     return [NSTimer scheduledTimerWithTimeInterval:ti target:aTarget selector:aSelector userInfo:userInfo repeats:yesOrNo];
 }
 
+- (void)destroy
+{
+    if ([self isValid]) {
+        [self invalidate];
+    }
+}
+
 @end
 
-#pragma mark - --------UIColor------------------------
+#pragma mark - --------NSDate------------------------
 @implementation NSDate (NSObject)
 + (NSString *)dateWithFormat:(NSString *)format
 {
@@ -4214,6 +3826,25 @@ id getUserData(NSString *key)
     }
     
     return result;
+}
+
+@end
+
+#pragma mark - --------UIFont------------------------
+@implementation UIFont (NSObject)
+
++ (CGFloat)sizeWithString:(NSString *)aString forWidth:(CGFloat)width
+{
+    return [self sizeWithString:aString forWidth:width lineBreakMode:NSLineBreakByTruncatingTail];
+}
+
++ (CGFloat)sizeWithString:(NSString *)aString forWidth:(CGFloat)width lineBreakMode:(NSLineBreakMode)lineBreakMode
+{
+    CGFloat fontSize;
+    UIFont *font = [UIFont systemFontOfSize:Screen_Width*1.1];
+    [aString sizeWithFont:font minFontSize:10.0f actualFontSize:&fontSize forWidth:width lineBreakMode:lineBreakMode];
+    
+    return fontSize;
 }
 
 @end
@@ -4303,10 +3934,23 @@ id getUserData(NSString *key)
     self.center = CGPointMake(x, y);
 }
 
+- (void)setToParentCenter
+{
+    UIView *parentView = self.superview;
+    if (parentView) {
+        self.center = CGPointMake(parentView.frame.size.width/2, parentView.frame.size.height/2);
+    }
+}
+
 - (void)rotation:(CGFloat)angle
 {
     self.layer.transform = CATransform3DMakeRotation(angle, 0, 0, 1);//旋转angle度
     //self.transform = CGAffineTransformMakeRotation(angle);//旋转angle度
+}
+
+- (id)viewWITHTag:(NSInteger)tag
+{
+    return [self viewWithTag:tag];
 }
 
 - (id)viewWithClass:(Class)aClass
@@ -4333,6 +3977,19 @@ id getUserData(NSString *key)
     }
     
     return list.firstObject;
+}
+
+- (NSArray *)viewsWithClass:(Class)aClass
+{
+    NSArray *list = @[];
+    NSArray *listView = self.subviews;
+    for (UIView *v in listView) {
+        if ([v isKindOfClass:[aClass class]]) {
+            list = [list arrayByAddingObject:v];
+        }
+    }
+    
+    return list;
 }
 
 @end
@@ -4430,6 +4087,13 @@ id getUserData(NSString *key)
     return [self cellForRowAtIndexPath:indexPath];
 }
 
+- (id)cellWithRow:(NSInteger)row
+{
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+    id cell = [self cellForRowAtIndexPath:indexPath];
+    return cell;
+}
+
 - (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount
 {
     [self deleteAtIndexPath:indexPath rowCount:rowCount withRowAnimation:UITableViewRowAnimationLeft];
@@ -4440,8 +4104,7 @@ id getUserData(NSString *key)
     if (rowCount <= 0) {
         //删除区间
         NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:indexPath.section];
-        //[self deleteSections:indexSet withRowAnimation:animation];
-        [self reloadSections:indexSet withRowAnimation:animation];
+        [self deleteSections:indexSet withRowAnimation:animation];
     }else{
         //删除某一行
         [self deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:animation];
@@ -4464,7 +4127,7 @@ id getUserData(NSString *key)
 {
     CGFloat w = size.width;
     CGFloat h = size.height;
-    UIView *View = getSubViewBy([UIView class], self.contentView, 200);
+    UIView *View = [self.contentView viewWithTag:200];;
     if (!View) {
         View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
         [self.contentView addSubview:View];
@@ -4539,6 +4202,21 @@ id getUserData(NSString *key)
 
 @end
 
+#pragma mark - --------NSNotificationCenter------------------------
+@implementation NSNotificationCenter (NSObject)
+
++ (void)postNoticeName:(NSString *)aName object:(id)anObject
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:aName object:anObject];
+}
+
++ (void)postNoticeName:(NSString *)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:aName object:anObject userInfo:aUserInfo];
+}
+
+@end
+
 #pragma mark - --------NSFileManager------------------------
 @implementation NSFileManager (NSObject)
 
@@ -4570,6 +4248,26 @@ id getUserData(NSString *key)
 + (BOOL)moveItemAtPath:(NSString *)srcPath toPath:(NSString *)dstPath error:(NSError **)error
 {
     return [[NSFileManager defaultManager] moveItemAtPath:srcPath toPath:dstPath error:error];
+}
+
+@end
+
+#pragma mark - --------NSBundle------------------------
+@implementation NSBundle (NSObject)
+
++ (NSString *)pathForResource:(NSString *)name ofType:(NSString *)ext
+{
+    return [[NSBundle mainBundle] pathForResource:name ofType:ext];
+}
+
+@end
+
+#pragma mark - --------NSThread------------------------
+@implementation NSThread (NSObject)
+
++ (void)sleep:(NSTimeInterval)ti
+{
+    [NSThread sleepForTimeInterval:ti];
 }
 
 @end

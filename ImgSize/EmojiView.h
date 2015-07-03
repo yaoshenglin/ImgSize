@@ -13,7 +13,7 @@
     UIPageControl *iPageControl;
 }
 
-@property (retain, nonatomic) id delegate;
+@property (weak, nonatomic) id delegate;
 @property (retain, nonatomic) UIPageControl *iPageControl;
 
 @end

@@ -56,6 +56,7 @@
 #define currrentNavH (CGFloat)(self.navigationController.navigationBar.frame.size.height)
 #define navH (CGFloat)((currrentNavH > 0) ? currrentNavH : 44.0)
 #define topH (CGFloat)((iPhone >= 7) ? barH : 0)
+#define viewW Screen_Width
 #define viewH Screen_Height-topH-navH
 
 #define iPhone6S_Width 414.0f
@@ -157,8 +158,7 @@ id getController(NSString *identifier,NSString *title);
 //创建按钮
 + (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(NSInteger)tag title:(NSString *)title img:(NSString *)imgName;
 + (UIButton *)buttonType:(UIButtonType)type delegate:(id)delegate to:(UIView *)View tag:(NSInteger)tag title:(NSString *)title img:(NSString *)imgName action:(SEL)action;
-+ (void)setImg:(NSDictionary *)dicData button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION;
-+ (void)settitleColor:(NSDictionary *)dicData button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION;
++ (UISearchBar *)searchBarStyle:(UISearchBarStyle)style tintColor:(UIColor *)tintColor toV:(UIView *)View delegate:(id)delegate;
 + (void)addTarget:(id)delegate action:(SEL)action button:(UIButton *)button, ... NS_REQUIRES_NIL_TERMINATION;
 + (void)setTextColor:(UIColor *)color View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION;
 + (void)setRadius:(CGFloat)radius View:(UIView *)View, ... NS_REQUIRES_NIL_TERMINATION;
@@ -169,8 +169,6 @@ id getController(NSString *identifier,NSString *title);
 + (void)setBottomLineHigh:(CGFloat)high Color:(UIColor *)color toV:(id)button, ...NS_REQUIRES_NIL_TERMINATION;
 + (void)setLeftViewWithWidth:(CGFloat)w textField:(UITextField *)textField, ... NS_REQUIRES_NIL_TERMINATION;
 
-+ (NSMutableDictionary *)dicWith:(NSDictionary *)dic;
-NSMutableDictionary *DicWith(NSDictionary *dic);
 
 #pragma mark 添加圆角
 + (void)drawBorder:(UIView *)view radius:(float)radius borderWidth:(float)borderWidth borderColor:(UIColor *)borderColor;
@@ -188,11 +186,9 @@ NSMutableDictionary *DicWith(NSDictionary *dic);
 + (UIBarButtonItem *)BarButtonWithCustomView:(UIView *)View;
 + (UIBarButtonItem *)BarWithWidth:(CGFloat)w title:(NSString *)title;
 + (UIBarButtonItem *)BarWithTitle:(NSString *)title delegate:(id)delegate action:(SEL)action;
-+ (NSArray *)BarButtonWithTitle:(NSArray *)array delegate:(id)delegate;
-+ (NSArray *)BarButtonWithImg:(NSArray *)array delegate:(id)delegate;
++ (NSArray *)BarButtonWithTitles:(NSArray *)array delegate:(id)delegate;
++ (NSArray *)BarButtonWithImgs:(NSArray *)array delegate:(id)delegate;
 + (void)tabBarTextColor:(UIColor *)aColor selected:(UIColor *)bColor;
-#pragma mark 创建导航栏退出按钮
-+ (void)createQuitBarButtonItem:(UIViewController *)VC delegate:(id)delegate location:(int)location;
 //创建个性化文本输入框
 + (UITextField *)createTextField:(int)tag hintTxt:(NSString *)placeholder V:(UIView *)View;
 //创建标签
@@ -205,10 +201,11 @@ NSMutableDictionary *DicWith(NSDictionary *dic);
 //表格视图
 + (UITableView *)tableViewStyle:(UITableViewStyle)style delegate:(id)delegate toV:(UIView *)View;
 + (id)tableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath;
-+ (id)cellWithRow:(NSInteger)row inTable:(UITableView *)tableView;
 + (void)showFinishView:(UITableView *)tableView;
 //添加GIF图片
 + (UIWebView *)gifViewInitWithFile:(NSString *)Path;
+#pragma mark UIImagePickerController
++ (UIImagePickerController *)imagePickerType:(UIImagePickerControllerSourceType)sourceType delegate:(id)delegate;
 //创建弹出提示框
 + (UIAlertView *)showMsgWithTitle:(NSString *)title msg:(NSString *)msg;
 + (UIAlertView *)showMsg:(NSString *)msg;
@@ -224,20 +221,9 @@ NSMutableDictionary *DicWith(NSDictionary *dic);
 //将a视图添加到b视图上并约束b视图的边界
 + (void)addView:(UIView *)aView toView:(UIView *)bView;
 
-//设置透明背景色
-+ (void)setClearColor:(UITableView *)tableView;
-
 #pragma mark 从指定的视图上获取想要的视图类
-+ (id)getObjType:(Class)aClass toView:(UIView *)View;//从View上获取父级视图
-+ (id)getObjType:(Class)aClass tag:(int)tag toView:(UIView *)View;
-+ (id)getObjType:(Class)aClass fromView:(UIView *)View;//从View上获取子视图
-+ (id)getObjType:(Class)aClass tag:(int)tag fromView:(UIView *)View;
 id getSuperView(Class aClass,UIView *View);
 id getSuperViewBy(Class aClass,UIView *View,NSInteger tag);
-id getSubView(Class aClass,UIView *View);
-NSArray *getSubViewList(Class aClass,UIView *View);
-id getSubViewBy(Class aClass,UIView *View,NSInteger tag);
-NSString *getBtnTitleBy(UIButton *button);
 //根据类名从导航中获取指定视图
 + (UIViewController *)getControllerFrom:(UINavigationController *)Nav className:(NSString *)className;
 UIViewController *getControllerFrom(UINavigationController *Nav,NSString *className);
@@ -246,8 +232,6 @@ UIViewController *getParentController(UIViewController *VC,NSString *className);
 + (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav;
 + (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav;
 void forbiddenNavPan(UIViewController *VC,BOOL isForbid);
-//
-+ (UIView *)showMessageWithString:(NSString *)msg to:(UIViewController *)viewController;
 //显示活动指示器
 + (void)showActivityInView:(UIView *)View;
 + (void)showActivityInView:(UIView *)View style:(UIActivityIndicatorViewStyle)style;
@@ -288,7 +272,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid);
 #pragma mark 设置Navigation Bar背景图片
 + (void)setNavigationBarBackground:(NSString *)imgName to:(UIViewController *)viewController;
 + (void)setNavBackImg:(NSString *)imgName to:(UIViewController *)viewController;
-+(void)imgColor:(UIColor *)color to:(UIViewController *)viewController; 
++ (void)imgColor:(UIColor *)color to:(UIViewController *)viewController; 
 
 #pragma mark - ---------------设置动画---------------------------------
 + (void)setAnimationWith:(UIView *)View rect:(CGRect)rect;
@@ -312,32 +296,9 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid);
 + (void)commitAnimations;
 //***************
 
-#pragma mark 获取底部坐标
-+ (CGFloat)getBottomPositionBy:(UIView *)View;
-#pragma mark 获取右边尾端坐标
-+ (CGFloat)getRightPositionBy:(UIView *)View;
-
-NSIndexPath *getIndexPath(NSInteger section,NSInteger row);
-
 //重新设置视图的位置和尺寸
-+ (CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width;
-+ (CGRect)setRectWith:(UIView *)View toHeight:(CGFloat)high;
-+ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x;
-+ (CGRect)setRectWith:(UIView *)View toY:(CGFloat)y;
-+ (CGRect)setRectWith:(UIView *)View toOrigin:(CGPoint)origin;
-+ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toY:(CGFloat)y;
-+ (CGRect)setRectWith:(UIView *)View toX:(CGFloat)x toWidth:(CGFloat)width;
-+ (CGRect)setRectWith:(UIView *)View toY:(CGFloat)y toHeight:(CGFloat)high;
-+ (CGRect)setRectWith:(UIView *)View toSize:(CGSize)size;
-+ (CGRect)setRectWith:(UIView *)View toWidth:(CGFloat)width toHeight:(CGFloat)high;
-
-+ (CGRect)setRectByX:(CGFloat)x Y:(CGFloat)y W:(CGFloat)w H:(CGFloat)h scale:(CGFloat)scale;
 + (CGRect)setRect:(CGRect)rect scale:(CGFloat)scale;
 
-+ (CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x;
-+ (CGPoint)setCenterWith:(UIView *)View Y:(CGFloat)y;
-+ (CGPoint)setCenterWith:(UIView *)View X:(CGFloat)x Y:(CGFloat)y;
-+ (void)setCenterWith:(UIView *)View;
 + (BOOL)containsPoint:(CGPoint)point inRect:(CGRect)rect;//rect中包含点point
 
 + (UIColor *)colorWith:(NSString *)imgName atPixel:(CGPoint)point;
@@ -346,14 +307,13 @@ NSIndexPath *getIndexPath(NSInteger section,NSInteger row);
 #pragma mark 绑定图片，保证图片不变形
 + (void)bindImageToFitSize:(UIImageView *)imageView image:(UIImage *)image minY:(float)minY maxY:(float)maxY;
 
-+ (CGSize)getImgSizeBy:(UIImage *)img;
 + (void)setSizeWithView:(UIImageView *)imgView withImg:(UIImage *)img;//设置图片，保证不变形
 + (UIImage *)fixRotaion:(UIImage *)image;
 #pragma mark 截取部分图像
 + (UIImage*)getSubImage:(UIImage *)image rect:(CGRect)rect;
 + (void)getSubImgView:(UIImageView *)imgView;
 #pragma mark 将图片分解成图片数组
-+ (NSArray *)getImagesWithPath:(NSString *)path count:(int)count;
++ (NSArray *)getImagesWith:(UIImage *)image count:(int)count;
 + (UIImage *)resizeImage:(UIImage *)image size:(CGSize)size;
 + (void)setImgView:(UIImageView *)imgView withImgName:(NSString *)imgName;//根据图片名字设置图片，保证不变形
 + (void)setView:(UIView *)View toCentre_X:(CGFloat)x Y:(CGFloat)y;//设置视图的中心坐标
@@ -381,6 +341,7 @@ NSString *mergedString(NSString *aString,NSString *bString);
 NSString *pooledString(NSString *aString,NSString *bString,NSString *midString);
 
 + (CGSize)getWidthBy:(NSString *)string font:(UIFont *)font;
++ (NSAttributedString *)attribute:(NSString *)aString font:(UIFont *)font range:(NSRange)range;
 
 #pragma mark 颜色转换
 + (UIColor *)colorWithHexString: (NSString *) stringToConvert;
@@ -438,6 +399,7 @@ BOOL containString(NSString *string,NSString *aString);
 
 #pragma mark 判断是否为手机号
 + (BOOL)isMobile:(NSString *)mobile;
++ (BOOL)isEmail:(NSString *)email;//判断是否为邮箱
 
 #pragma mark tableView添加底部线条(分隔线)
 + (UIView *)setBottomLineAt:(UITableView *)tableView cell:(UITableViewCell *)cell cellH:(CGFloat)cellH;
@@ -491,6 +453,10 @@ NSUserDefaults *getUserDefaults();
 void setUserData(id obj,NSString *key);
 void removeObjectForKey(NSString *key);
 id getUserData(NSString *key);
+
++ (void)postNoticeName:(NSString *)aName object:(id)anObject;
++ (void)postNoticeName:(NSString *)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo;
+
 + (void)Request:(NSString *)urlString body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler NS_AVAILABLE(10_7, 5_0);
 //解析域名
 + (char *)parseDomain:(NSString *)domain;
@@ -571,6 +537,9 @@ id getUserData(NSString *key);
 
 - (long)parseInt:(int)type;//转化为十进制
 
+#pragma mark 根据格式(regex)匹配
+- (BOOL)evaluateWithFormat:(NSString *)regex;
+
 #pragma mark 解析字符串中的网址
 - (NSArray *)getURL;
 
@@ -579,7 +548,7 @@ id getUserData(NSString *key);
 #pragma mark - NSData
 @interface NSData (NSObject)
 //NSData bytes转换成十六进制字符串
-- (NSString *)dataBytes2HexStr;
+- (NSString *)hexString;
 - (NSData *)contactData:(NSData *)data;
 - (NSString *)stringWithRange:(NSRange)range;
 //数据分割
@@ -643,9 +612,11 @@ id getUserData(NSString *key);
 @interface NSTimer (NSObject)
 + (NSTimer *)scheduled:(NSTimeInterval)ti target:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo repeats:(BOOL)yesOrNo;
 
+- (void)destroy;
+
 @end
 
-#pragma mark - --------
+#pragma mark - --------NSDate
 @interface NSDate (NSObject)
 + (NSString *)dateWithFormat:(NSString *)format;
 - (NSString *)dateWithFormat:(NSString *)format;
@@ -658,6 +629,14 @@ id getUserData(NSString *key);
 - (UIColor *)colorWithAlpha:(CGFloat)alpha;
 
 - (CGFloat *)getValue;
+
+@end
+
+#pragma mark - UIFont
+@interface UIFont (NSObject)
+
++ (CGFloat)sizeWithString:(NSString *)aString forWidth:(CGFloat)width;
++ (CGFloat)sizeWithString:(NSString *)aString forWidth:(CGFloat)width lineBreakMode:(NSLineBreakMode)lineBreakMode;
 
 @end
 
@@ -687,11 +666,14 @@ id getUserData(NSString *key);
 - (void)setCenterX:(CGFloat)x;
 - (void)setCenterY:(CGFloat)y;
 - (void)setCenterX:(CGFloat)x Y:(CGFloat)y;
+- (void)setToParentCenter;
 
 - (void)rotation:(CGFloat)angle;//旋转angle度
 
+- (id)viewWITHTag:(NSInteger)tag;
 - (id)viewWithClass:(Class)aClass;
 - (id)viewWithClass:(Class)aClass tag:(NSInteger)tag;
+- (NSArray *)viewsWithClass:(Class)aClass;//该类的合集
 
 @end
 
@@ -742,6 +724,14 @@ id getUserData(NSString *key);
 
 @end
 
+#pragma mark - NSNotificationCenter
+@interface NSNotificationCenter (NSObject)
+
++ (void)postNoticeName:(NSString *)aName object:(id)anObject;
++ (void)postNoticeName:(NSString *)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo;
+
+@end
+
 #pragma mark - NSFileManager
 @interface NSFileManager (NSObject)
 
@@ -756,6 +746,7 @@ id getUserData(NSString *key);
 @interface UITableView (NSObject)
 
 - (id)cellAtIndexPath:(NSIndexPath *)indexPath;
+- (id)cellWithRow:(NSInteger)row;
 - (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount;
 - (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount withRowAnimation:(UITableViewRowAnimation)animation;
 
@@ -777,6 +768,20 @@ id getUserData(NSString *key);
 @interface NSUserDefaults (NSObject)
 
 + (NSUserDefaults *)defaults;
+
+@end
+
+#pragma mark - --------NSBundle------------------------
+@interface NSBundle (NSObject)
+
++ (NSString *)pathForResource:(NSString *)name ofType:(NSString *)ext;
+
+@end
+
+#pragma mark - --------NSThread------------------------
+@interface NSThread (NSObject)
+
++ (void)sleep:(NSTimeInterval)ti;
 
 @end
 

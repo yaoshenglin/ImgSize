@@ -60,6 +60,7 @@
 		E2866C971AAEE5B400D8B6D3 /* UdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E2866C961AAEE5B400D8B6D3 /* UdpSocket.m */; };
 		E28EBFA319FA00ED007753E5 /* MyDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = E28EBFA219FA00ED007753E5 /* MyDrawView.m */; };
 		E295DC1A1B0194FD0012DE19 /* Access.m in Sources */ = {isa = PBXBuildFile; fileRef = E295DC191B0194FD0012DE19 /* Access.m */; };
+		E2A1FFFA1B4272FE00E7BA97 /* 配置iface信号发射@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2A1FFF91B4272FE00E7BA97 /* 配置iface信号发射@2x.png */; };
 		E2A455B01AC8E9B200AC7293 /* AsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E2A455AF1AC8E9B200AC7293 /* AsyncUdpSocket.m */; };
 		E2A455B21AC8E9EF00AC7293 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2A455B11AC8E9EF00AC7293 /* CFNetwork.framework */; };
 		E2B3B8A91B1D456C004ED953 /* msg1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8A81B1D456C004ED953 /* msg1@2x.png */; };
@@ -75,6 +76,8 @@
 		E2B3B8BE1B1D4590004ED953 /* 语音-红@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */; };
 		E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */; };
 		E2B3B8C11B1D45D6004ED953 /* msg2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8C01B1D45D6004ED953 /* msg2@2x.png */; };
+		E2BCF2861B46225B00485CC0 /* Brands.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BCF2851B46225B00485CC0 /* Brands.m */; };
+		E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,6 +177,7 @@
 		E295DC181B0194FD0012DE19 /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Access.h; sourceTree = "<group>"; };
 		E295DC191B0194FD0012DE19 /* Access.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Access.m; sourceTree = "<group>"; };
 		E295DC1B1B0195230012DE19 /* EnumTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumTypes.h; sourceTree = "<group>"; };
+		E2A1FFF91B4272FE00E7BA97 /* 配置iface信号发射@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "配置iface信号发射@2x.png"; sourceTree = "<group>"; };
 		E2A455AE1AC8E9B200AC7293 /* AsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncUdpSocket.h; sourceTree = "<group>"; };
 		E2A455AF1AC8E9B200AC7293 /* AsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncUdpSocket.m; sourceTree = "<group>"; };
 		E2A455B11AC8E9EF00AC7293 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -190,6 +194,11 @@
 		E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "语音-红@2x.png"; sourceTree = "<group>"; };
 		E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "语音-绿@2x.png"; sourceTree = "<group>"; };
 		E2B3B8C01B1D45D6004ED953 /* msg2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "msg2@2x.png"; sourceTree = "<group>"; };
+		E2BCF2841B46225B00485CC0 /* Brands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Brands.h; sourceTree = "<group>"; };
+		E2BCF2851B46225B00485CC0 /* Brands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Brands.m; sourceTree = "<group>"; };
+		E2BCF2871B46227E00485CC0 /* EnumInfraredType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumInfraredType.h; sourceTree = "<group>"; };
+		E2BFE72C1B2FD59E00B5F622 /* Toast+UIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Toast+UIView.h"; sourceTree = "<group>"; };
+		E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		E2E7E5EC1A27008200E6A108 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -275,12 +284,13 @@
 				E228DFD7196F7FF200C882E0 /* Test_ViewController.h */,
 				E228DFD8196F7FF200C882E0 /* Test_ViewController.m */,
 				E275EE7C1A08CF4C00483DE5 /* ImgSize-Bridging-Header.h */,
+				E2BCF2831B46225000485CC0 /* class */,
 				E2727A6B1A6A59EA00CC57D6 /* GesturePassword */,
 				E28EBFA019FA004B007753E5 /* UIView */,
 				E25B076319A491B1001EA090 /* JDStatusBarNotification */,
-				E2231D4F19496404003ADE6F /* Resource */,
 				E21EE62419270FAE0051408C /* Tool */,
 				E2B3B8A71B1D42EE004ED953 /* Image */,
+				E2231D4F19496404003ADE6F /* Resource */,
 				E21EE5EE19270DBF0051408C /* Supporting Files */,
 			);
 			path = ImgSize;
@@ -347,6 +357,7 @@
 				E271E88F1B04783800D915BF /* AsyncSocket.h */,
 				E271E8901B04783800D915BF /* AsyncSocket.m */,
 				E295DC1B1B0195230012DE19 /* EnumTypes.h */,
+				E2BCF2871B46227E00485CC0 /* EnumInfraredType.h */,
 			);
 			name = Tool;
 			sourceTree = "<group>";
@@ -412,6 +423,7 @@
 				E216D3C31942F76200A81FC6 /* EmojiView.m */,
 				E28EBFA119FA00ED007753E5 /* MyDrawView.h */,
 				E28EBFA219FA00ED007753E5 /* MyDrawView.m */,
+				E2BFE72B1B2FD59E00B5F622 /* Toast */,
 			);
 			name = UIView;
 			sourceTree = "<group>";
@@ -432,8 +444,27 @@
 				E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */,
 				E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */,
 				E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */,
+				E2A1FFF91B4272FE00E7BA97 /* 配置iface信号发射@2x.png */,
 			);
 			path = Image;
+			sourceTree = "<group>";
+		};
+		E2BCF2831B46225000485CC0 /* class */ = {
+			isa = PBXGroup;
+			children = (
+				E2BCF2841B46225B00485CC0 /* Brands.h */,
+				E2BCF2851B46225B00485CC0 /* Brands.m */,
+			);
+			path = class;
+			sourceTree = "<group>";
+		};
+		E2BFE72B1B2FD59E00B5F622 /* Toast */ = {
+			isa = PBXGroup;
+			children = (
+				E2BFE72C1B2FD59E00B5F622 /* Toast+UIView.h */,
+				E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */,
+			);
+			path = Toast;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -522,6 +553,7 @@
 				E2B3B8BA1B1D4590004ED953 /* 微菜单超大-@2x.png in Resources */,
 				E2231D5A19496404003ADE6F /* voice_note_start.wav in Resources */,
 				E2B3B8B51B1D4590004ED953 /* 底部表情@2x.png in Resources */,
+				E2A1FFFA1B4272FE00E7BA97 /* 配置iface信号发射@2x.png in Resources */,
 				E2231D5B19496404003ADE6F /* voice_note_stop.wav in Resources */,
 				E2231D5819496404003ADE6F /* n106.wav in Resources */,
 				E2B3B8BD1B1D4590004ED953 /* 叶子大@2x.png in Resources */,
@@ -567,6 +599,7 @@
 				E25B076B19A491B1001EA090 /* JDStatusBarStyle.m in Sources */,
 				E216DD40192B352A00B17105 /* Second_ViewController.m in Sources */,
 				E21EE62119270E240051408C /* MBProgressHUD.m in Sources */,
+				E2BCF2861B46225B00485CC0 /* Brands.m in Sources */,
 				E216D3C41942F76200A81FC6 /* EmojiView.m in Sources */,
 				E21A88351946A9BD00BF3164 /* iButton.m in Sources */,
 				E2727A791A6A59EA00CC57D6 /* GesturePasswordView.m in Sources */,
@@ -580,6 +613,7 @@
 				E22C944519CC354B00D9EAC1 /* DB.m in Sources */,
 				E2A455B01AC8E9B200AC7293 /* AsyncUdpSocket.m in Sources */,
 				E2727A7B1A6A59EA00CC57D6 /* TentacleView.m in Sources */,
+				E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */,
 				E228DFD9196F7FF200C882E0 /* Test_ViewController.m in Sources */,
 				E22C944219CC351F00D9EAC1 /* AddressBook.m in Sources */,
 				E21EE5F419270DBF0051408C /* main.m in Sources */,

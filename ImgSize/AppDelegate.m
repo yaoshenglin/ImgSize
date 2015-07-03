@@ -19,18 +19,13 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    NSArray *listWindow = [[UIApplication sharedApplication] windows];
-    if ([listWindow containsObject:self.window]) {
-        NSLog(@"OK");
-    }else{
-        NSLog(@"Fail");
-    }
     // Override point for customization after application launch.
     return YES;
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
+    //本地通知
     UITabBarController *tabBar = (UITabBarController *)_window.rootViewController;
     NSArray *list = tabBar.viewControllers;
     UINavigationController *nav = list.firstObject;

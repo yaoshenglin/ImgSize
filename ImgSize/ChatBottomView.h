@@ -22,7 +22,7 @@
 @interface ChatBottomView : UIView<UITextFieldDelegate>
 
 @property (nonatomic) BOOL isSendVoice;
-@property (retain, nonatomic) id delegate;
+@property (weak, nonatomic) id delegate;
 @property (retain, nonatomic) UITextField *txtInputMsg;//信息输入框
 @property (retain, nonatomic) UIButton *btnBrow;//表情
 @property (retain, nonatomic) iButton *btnVoice;//语音

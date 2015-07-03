@@ -13,7 +13,7 @@
     BOOL isConnect;
 }
 
-@property (retain, nonatomic) id delegate;
+@property (weak, nonatomic) id delegate;
 @property (assign, nonatomic, readonly) UInt16 port;
 @property (retain, nonatomic, readonly) NSString *host;
 

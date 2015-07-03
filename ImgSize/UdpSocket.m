@@ -55,7 +55,7 @@ typedef void (^myBlock)(AsyncUdpSocket *sock);
 - (void)sendData:(NSData *)data
 {
     [udpSocket sendData:data toHost:_host port:_port withTimeout:15.0 tag:0];
-    [udpSocket sendData:data toHost:_host port:_port withTimeout:-1 tag:0];
+    //[udpSocket sendData:data toHost:_host port:_port withTimeout:-1 tag:0];
 }
 
 - (void)receiveWithTimeout:(NSTimeInterval)timeout tag:(long)tag
@@ -130,7 +130,7 @@ typedef void (^myBlock)(AsyncUdpSocket *sock);
 
 - (void)pasreData:(NSData *)data host:(NSString *)host
 {
-    NSString *hexStr = [data dataBytes2HexStr];
+    NSString *hexStr = [data hexString];
     
     Byte *data_bytes = (Byte*)[data bytes];
     Byte data_byte = data_bytes[0];

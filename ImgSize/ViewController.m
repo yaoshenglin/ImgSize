@@ -12,6 +12,8 @@
 #import "CTB.h"
 #import "Tools.h"
 #import "AddressBook.h"
+#import "Toast+UIView.h"
+#import "Brands.h"
 
 static NSString *const JDButtonName = @"JDButtonName";
 static NSString *const JDButtonInfo = @"JDButtonInfo";
@@ -29,6 +31,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     bool isShow;
     BOOL isOn;
     BOOL isConnect;
+    BOOL isAnimating;
     
     int count;
     NSString *status;
@@ -41,7 +44,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     UIButton *btnTest;
     
     MBProgressHUD *hudView;
-    NSDate *date;
+    //NSDate *date;
     UILabel *lblInstantSpeed;
     UILabel *lblPeakSpeed;
 }
@@ -116,16 +119,15 @@ static NSString *const SBStyle2 = @"SBStyle2";
     }
     if (button.tag == 3) {
         
-        UIColor *color = [[UIColor redColor] colorWithAlpha:0.5];
-        CGFloat *cs = [color getValue];
-        NSLog(@"r %f,g %f,b %f,alp %f",cs[0],cs[1],cs[2],cs[3]);
-        
-        NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
-        NSLog(@"DeviceType:%@",infoDict);
     }
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)clearCacheSuccess
+{
+    NSLog(@"清理成功");
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSString *btnTitle = [alertView buttonTitleAtIndex:buttonIndex];
     if (alertView.tag == 1) {
