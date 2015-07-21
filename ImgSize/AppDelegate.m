@@ -7,10 +7,14 @@
 //
 
 #import "AppDelegate.h"
+#import "CTB.h"
+#import "BackRequest.h"
+#import "HTTPRequest.h"
 
 @interface AppDelegate ()
 {
     int count;
+    BackRequest *backRequest;
 }
 
 @end
@@ -19,6 +23,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    backRequest = [[BackRequest alloc] init];
     // Override point for customization after application launch.
     return YES;
 }
@@ -71,6 +76,52 @@
 {
     count ++ ;
     NSLog(@"count = %d",count);
+}
+
+#pragma mark 后台获取回调事件（Background Fetch）暂时不启用
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+    NSLog(@"后台执行任务");
+    [self backgroundTask];
+    completionHandler(UIBackgroundFetchResultNewData);
+}
+
+- (void)backgroundTask
+{
+    [CTB sendLocalNotice];//发送本地通知
+    
+    //[backRequest backgroundTask];
+    NSString *urlString = @"http://121.201.17.130:8100/Content/Uploads/58/face/20150710175341.jpg";
+    [HTTPRequest run:urlString body:nil delegate:self];
+    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:select(testDate:) userInfo:nil repeats:YES];
+}
+
+- (void)testDate:(NSTimer *)timer
+{
+    count ++ ;
+    NSLog(@"后台操作已经用时 %d s",count);
+}
+
+- (void)wsOK:(HTTPRequest *)iWS
+{
+    if ([iWS.method isEqualToString:@"fileDownload"]) {
+        NSLog(@"下载成功");
+        NSData *imageData = iWS.responseData;
+        NSString *path = @"/Users/Yin-Mac/Desktop/Chaches/test1.jpg";
+        [imageData writeToFile:path atomically:YES];
+    }
+}
+
+- (void)wsFailed:(HTTPRequest *)iWS
+{
+    NSLog(@"请求失败");
+}
+
+//在这个函数中检查是否传输已经完成
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler
+{
+    completionHandler(UIBackgroundFetchResultNewData);
+    NSLog(@"传输已经完成");
 }
 
 @end

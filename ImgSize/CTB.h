@@ -48,16 +48,12 @@
 
 #define Screen_Height [UIScreen mainScreen].bounds.size.height
 #define Screen_Width [UIScreen mainScreen].bounds.size.width
-#if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_6_1
-    #define barH (CGFloat)[UIApplication sharedApplication].statusBarFrame.size.height
-#else
-    #define barH (CGFloat)0
-#endif
+#define barH (CGFloat)[UIApplication sharedApplication].statusBarFrame.size.height
 #define currrentNavH (CGFloat)(self.navigationController.navigationBar.frame.size.height)
 #define navH (CGFloat)((currrentNavH > 0) ? currrentNavH : 44.0)
 #define topH (CGFloat)((iPhone >= 7) ? barH : 0)
 #define viewW Screen_Width
-#define viewH Screen_Height-topH-navH
+#define viewH Screen_Height-barH-navH
 
 #define iPhone6S_Width 414.0f
 #define iPhone6S_Height 736.0f
@@ -276,6 +272,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid);
 
 #pragma mark - ---------------设置动画---------------------------------
 + (void)setAnimationWith:(UIView *)View rect:(CGRect)rect;
++ (void)animateWithDur:(NSTimeInterval)duration animations:(void (^)(void))animations completion:(void (^)(BOOL finished))completion;
 + (NSArray *)getAnimationData:(BOOL)isBig;
 + (void)exChangeOut:(UIView *)changeOutView dur:(CFTimeInterval)dur;// 特殊动画效果
 + (void)exChangeOut:(UIView *)changeOutView dur:(CFTimeInterval)dur values:(NSArray *)listValue;
@@ -442,6 +439,8 @@ void hiddenNavBar(UIViewController *VC,BOOL hidden,BOOL animaion);
 
 #pragma mark - ----------UIViewController-----------------
 + (void)UIControllerEdgeNone:(UIViewController *)VC;
+#pragma mark 打印调试信息
++ (void)printDebugMsg:(NSString *)msg;
 
 #pragma mark - ----------其它------------------------
 + (void)duration:(NSTimeInterval)dur block:(dispatch_block_t)block;
@@ -462,8 +461,16 @@ id getUserData(NSString *key);
 + (char *)parseDomain:(NSString *)domain;
 + (NSString *)parserDomain:(NSString *)domain;
 
+//发送本地通知
++ (void)sendLocalNotice;
+
 #pragma mark APP核对
 + (NSArray *)checkHasOwnApp;
+
+//获取该目录路径下全部文件名
++ (NSArray *)getAllItemsInDirectory:(NSString *)path;
+//删除该目录路径下全部文件
++ (BOOL)deleteAllItemsInDirectory:(NSString *)path;
 
 #pragma mark - ----------过滤HTML------------------------
 + (NSString *)removeHTML:(NSString *)html;

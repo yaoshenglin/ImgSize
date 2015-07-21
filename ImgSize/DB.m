@@ -796,8 +796,8 @@ int bindBlob(sqlite3_stmt *stmt,int loc,NSData *data)
 
 + (void)printAllTable
 {
-    NSString *k_host = @"http://192.168.11.169:8088";
-    NSString *DBFile = [DB getDBFileNameByHost:k_host];
+    NSString *host = @"http://192.168.11.169:8088";
+    NSString *DBFile = [DB getDBFileNameByHost:host];
     [DB open:DBFile];//
     NSArray *listTable = [DB GetAllTable];
     for (NSString *table in listTable) {

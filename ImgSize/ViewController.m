@@ -14,6 +14,8 @@
 #import "AddressBook.h"
 #import "Toast+UIView.h"
 #import "Brands.h"
+#import "HTTPRequest.h"
+#import "BackRequest.h"
 
 static NSString *const JDButtonName = @"JDButtonName";
 static NSString *const JDButtonInfo = @"JDButtonInfo";
@@ -118,8 +120,27 @@ static NSString *const SBStyle2 = @"SBStyle2";
         [alert show];
     }
     if (button.tag == 3) {
+        NSString *urlString = @"http://dldir1.qq.com/qqfile/qq/QQ2013/QQ2013SP5/9050/QQ2013SP5.exe";
+        [HTTPRequest run:urlString body:nil delegate:self];
         
+//        BackRequest *backRequest = [[BackRequest alloc] init];
+//        [backRequest backgroundTask];
     }
+}
+
+- (void)wsOK:(HTTPRequest *)iWS
+{
+    if ([iWS.method isEqualToString:@"fileDownload"]) {
+        NSLog(@"下载成功");
+        NSData *imageData = iWS.responseData;
+        NSString *path = @"/Users/Yin-Mac/Desktop/Chaches/test1.jpg";
+        [imageData writeToFile:path atomically:YES];
+    }
+}
+
+- (void)wsFailed:(HTTPRequest *)iWS
+{
+    NSLog(@"请求失败");
 }
 
 - (void)clearCacheSuccess

@@ -59,6 +59,7 @@
 		E2727A7B1A6A59EA00CC57D6 /* TentacleView.m in Sources */ = {isa = PBXBuildFile; fileRef = E2727A761A6A59EA00CC57D6 /* TentacleView.m */; };
 		E2866C971AAEE5B400D8B6D3 /* UdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E2866C961AAEE5B400D8B6D3 /* UdpSocket.m */; };
 		E28EBFA319FA00ED007753E5 /* MyDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = E28EBFA219FA00ED007753E5 /* MyDrawView.m */; };
+		E290A8351B5D138E00D43DDA /* DownloadService.m in Sources */ = {isa = PBXBuildFile; fileRef = E290A8341B5D138E00D43DDA /* DownloadService.m */; };
 		E295DC1A1B0194FD0012DE19 /* Access.m in Sources */ = {isa = PBXBuildFile; fileRef = E295DC191B0194FD0012DE19 /* Access.m */; };
 		E2A1FFFA1B4272FE00E7BA97 /* 配置iface信号发射@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2A1FFF91B4272FE00E7BA97 /* 配置iface信号发射@2x.png */; };
 		E2A455B01AC8E9B200AC7293 /* AsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E2A455AF1AC8E9B200AC7293 /* AsyncUdpSocket.m */; };
@@ -77,6 +78,11 @@
 		E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */; };
 		E2B3B8C11B1D45D6004ED953 /* msg2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8C01B1D45D6004ED953 /* msg2@2x.png */; };
 		E2BCF2861B46225B00485CC0 /* Brands.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BCF2851B46225B00485CC0 /* Brands.m */; };
+		E2BDE58B1B5392770098CF42 /* BackRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE58A1B5392770098CF42 /* BackRequest.m */; };
+		E2BDE58E1B5394B80098CF42 /* HTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE58D1B5394B80098CF42 /* HTTPRequest.m */; };
+		E2BDE5911B539C9D0098CF42 /* FileDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE5901B539C9D0098CF42 /* FileDownloader.m */; };
+		E2BDE5941B539D710098CF42 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE5931B539D710098CF42 /* GDataXMLNode.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		E2BDE5961B539E320098CF42 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BDE5951B539E320098CF42 /* libxml2.2.dylib */; };
 		E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */; };
 /* End PBXBuildFile section */
 
@@ -174,6 +180,8 @@
 		E2866C961AAEE5B400D8B6D3 /* UdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UdpSocket.m; sourceTree = "<group>"; };
 		E28EBFA119FA00ED007753E5 /* MyDrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyDrawView.h; sourceTree = "<group>"; };
 		E28EBFA219FA00ED007753E5 /* MyDrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyDrawView.m; sourceTree = "<group>"; };
+		E290A8331B5D138E00D43DDA /* DownloadService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadService.h; sourceTree = "<group>"; };
+		E290A8341B5D138E00D43DDA /* DownloadService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadService.m; sourceTree = "<group>"; };
 		E295DC181B0194FD0012DE19 /* Access.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Access.h; sourceTree = "<group>"; };
 		E295DC191B0194FD0012DE19 /* Access.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Access.m; sourceTree = "<group>"; };
 		E295DC1B1B0195230012DE19 /* EnumTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumTypes.h; sourceTree = "<group>"; };
@@ -197,6 +205,15 @@
 		E2BCF2841B46225B00485CC0 /* Brands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Brands.h; sourceTree = "<group>"; };
 		E2BCF2851B46225B00485CC0 /* Brands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Brands.m; sourceTree = "<group>"; };
 		E2BCF2871B46227E00485CC0 /* EnumInfraredType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumInfraredType.h; sourceTree = "<group>"; };
+		E2BDE5891B5392770098CF42 /* BackRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackRequest.h; sourceTree = "<group>"; };
+		E2BDE58A1B5392770098CF42 /* BackRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackRequest.m; sourceTree = "<group>"; };
+		E2BDE58C1B5394B80098CF42 /* HTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPRequest.h; sourceTree = "<group>"; };
+		E2BDE58D1B5394B80098CF42 /* HTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPRequest.m; sourceTree = "<group>"; };
+		E2BDE58F1B539C9D0098CF42 /* FileDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileDownloader.h; sourceTree = "<group>"; };
+		E2BDE5901B539C9D0098CF42 /* FileDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileDownloader.m; sourceTree = "<group>"; };
+		E2BDE5921B539D710098CF42 /* GDataXMLNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataXMLNode.h; sourceTree = "<group>"; };
+		E2BDE5931B539D710098CF42 /* GDataXMLNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataXMLNode.m; sourceTree = "<group>"; };
+		E2BDE5951B539E320098CF42 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = usr/lib/libxml2.2.dylib; sourceTree = SDKROOT; };
 		E2BFE72C1B2FD59E00B5F622 /* Toast+UIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Toast+UIView.h"; sourceTree = "<group>"; };
 		E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		E2E7E5EC1A27008200E6A108 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -207,6 +224,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2BDE5961B539E320098CF42 /* libxml2.2.dylib in Frameworks */,
 				E263E34F1AC92F3800785EE4 /* SystemConfiguration.framework in Frameworks */,
 				E2A455B21AC8E9EF00AC7293 /* CFNetwork.framework in Frameworks */,
 				E2727A6A1A6A59C000CC57D6 /* Security.framework in Frameworks */,
@@ -254,6 +272,7 @@
 		E21EE5E619270DBF0051408C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E2BDE5951B539E320098CF42 /* libxml2.2.dylib */,
 				E263E34E1AC92F3800785EE4 /* SystemConfiguration.framework */,
 				E2A455B11AC8E9EF00AC7293 /* CFNetwork.framework */,
 				E2E7E5EC1A27008200E6A108 /* Security.framework */,
@@ -342,6 +361,8 @@
 				E218EBB61947E73A002160DC /* ChatBottomView.m */,
 				E270DD2219ADE367009543CE /* myKeyboardType.h */,
 				E270DD2319ADE367009543CE /* myKeyboardType.m */,
+				E2BDE5921B539D710098CF42 /* GDataXMLNode.h */,
+				E2BDE5931B539D710098CF42 /* GDataXMLNode.m */,
 				E22C944019CC351F00D9EAC1 /* AddressBook.h */,
 				E22C944119CC351F00D9EAC1 /* AddressBook.m */,
 				E218EBC61948101C002160DC /* Tools.h */,
@@ -358,6 +379,12 @@
 				E271E8901B04783800D915BF /* AsyncSocket.m */,
 				E295DC1B1B0195230012DE19 /* EnumTypes.h */,
 				E2BCF2871B46227E00485CC0 /* EnumInfraredType.h */,
+				E2BDE5891B5392770098CF42 /* BackRequest.h */,
+				E2BDE58A1B5392770098CF42 /* BackRequest.m */,
+				E2BDE58C1B5394B80098CF42 /* HTTPRequest.h */,
+				E2BDE58D1B5394B80098CF42 /* HTTPRequest.m */,
+				E2BDE58F1B539C9D0098CF42 /* FileDownloader.h */,
+				E2BDE5901B539C9D0098CF42 /* FileDownloader.m */,
 			);
 			name = Tool;
 			sourceTree = "<group>";
@@ -454,6 +481,8 @@
 			children = (
 				E2BCF2841B46225B00485CC0 /* Brands.h */,
 				E2BCF2851B46225B00485CC0 /* Brands.m */,
+				E290A8331B5D138E00D43DDA /* DownloadService.h */,
+				E290A8341B5D138E00D43DDA /* DownloadService.m */,
 			);
 			path = class;
 			sourceTree = "<group>";
@@ -516,6 +545,11 @@
 				TargetAttributes = {
 					E21EE5E319270DBF0051408C = {
 						DevelopmentTeam = DM47ELF9D6;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					E21EE60419270DBF0051408C = {
 						TestTargetID = E21EE5E319270DBF0051408C;
@@ -601,11 +635,13 @@
 				E21EE62119270E240051408C /* MBProgressHUD.m in Sources */,
 				E2BCF2861B46225B00485CC0 /* Brands.m in Sources */,
 				E216D3C41942F76200A81FC6 /* EmojiView.m in Sources */,
+				E2BDE5941B539D710098CF42 /* GDataXMLNode.m in Sources */,
 				E21A88351946A9BD00BF3164 /* iButton.m in Sources */,
 				E2727A791A6A59EA00CC57D6 /* GesturePasswordView.m in Sources */,
 				E271E8911B04783800D915BF /* AsyncSocket.m in Sources */,
 				E218EBC81948101C002160DC /* Tools.m in Sources */,
 				E25B076A19A491B1001EA090 /* JDStatusBarNotification.m in Sources */,
+				E2BDE5911B539C9D0098CF42 /* FileDownloader.m in Sources */,
 				E21EE5F819270DBF0051408C /* AppDelegate.m in Sources */,
 				E2727A7A1A6A59EA00CC57D6 /* KeychainItemWrapper.m in Sources */,
 				E23410A4195BAA560086AE54 /* PhotoPreView.m in Sources */,
@@ -617,9 +653,12 @@
 				E228DFD9196F7FF200C882E0 /* Test_ViewController.m in Sources */,
 				E22C944219CC351F00D9EAC1 /* AddressBook.m in Sources */,
 				E21EE5F419270DBF0051408C /* main.m in Sources */,
+				E290A8351B5D138E00D43DDA /* DownloadService.m in Sources */,
 				E25B076C19A491B1001EA090 /* JDStatusBarView.m in Sources */,
+				E2BDE58B1B5392770098CF42 /* BackRequest.m in Sources */,
 				E270DD2419ADE367009543CE /* myKeyboardType.m in Sources */,
 				E218EBB71947E73A002160DC /* ChatBottomView.m in Sources */,
+				E2BDE58E1B5394B80098CF42 /* HTTPRequest.m in Sources */,
 				E2727A781A6A59EA00CC57D6 /* GesturePasswordController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -749,6 +788,11 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer: yong yin (PCML72KPNS)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/include/libxml2,
+				);
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -772,6 +816,11 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer: yong yin (PCML72KPNS)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/include/libxml2,
+				);
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

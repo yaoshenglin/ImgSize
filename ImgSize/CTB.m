@@ -726,8 +726,10 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     tableView.separatorColor = [UIColor clearColor];
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
-    //tableView.sectionIndexColor = MasterColor;//索引文字颜色
-    tableView.sectionIndexBackgroundColor = [UIColor clearColor];//索引栏背景色
+    tableView.sectionIndexColor = colorWithHex(@"0x29BB9C");//索引文字颜色
+    if (iPhone >= 7) {
+        tableView.sectionIndexBackgroundColor = [UIColor clearColor];//索引栏背景色
+    }
     
     return tableView;
 }
@@ -1265,6 +1267,13 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
                      completion:^(BOOL finished) {
                          //动画完成,可为空
                      }];
+}
+
++ (void)animateWithDur:(NSTimeInterval)duration animations:(void (^)(void))animations completion:(void (^)(BOOL finished))completion
+{
+    [UIView animateWithDuration:0.3
+                     animations:animations
+                     completion:completion];
 }
 
 + (NSArray *)getAnimationData:(BOOL)isBig
@@ -2519,7 +2528,7 @@ BOOL containString(NSString *string,NSString *aString)
     //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
     CGFloat w = tableView.frame.size.width;
     CGFloat h = cell.contentView.frame.size.height;
-    __weak id delegate = dicData[@"delegate"];
+    id delegate = dicData[@"delegate"];
     if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
         h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
     }else{
@@ -2554,7 +2563,7 @@ BOOL containString(NSString *string,NSString *aString)
     //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
     CGFloat w = tableView.frame.size.width;
     CGFloat h = cell.contentView.frame.size.height;
-    __weak id delegate = dicData[@"delegate"];
+    id delegate = dicData[@"delegate"];
     if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
         h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
     }else{
@@ -2774,15 +2783,17 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
     }
 }
 
+#pragma mark 打印调试信息
++ (void)printDebugMsg:(NSString *)msg
+{
+#if DEBUG
+    NSLog(@"%@",msg);
+#endif
+}
+
 #pragma mark - ======其它=======================
 + (void)duration:(NSTimeInterval)dur block:(dispatch_block_t)block
 {
-    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    //
-    //    [NSThread sleepForTimeInterval:dur];
-    //    dispatch_async(dispatch_get_main_queue(), block);
-    //});
-    
     dispatch_queue_t queue = dispatch_get_main_queue();
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(dur * NSEC_PER_SEC)), queue, block);
 }
@@ -2924,6 +2935,52 @@ id getUserData(NSString *key)
     return result;
 }
 
+//发送本地通知
++ (void)sendLocalNotice
+{
+    //chuagjian一个本地推送
+    UILocalNotification *noti = [[UILocalNotification alloc] init];
+    if (noti) {
+        //设置推送时间
+        noti.fireDate = [NSDate date];
+        //设置时区
+        noti.timeZone = [NSTimeZone defaultTimeZone];
+        //设置重复间隔
+        noti.repeatInterval = 0;//循环次数，kCFCalendarUnitWeekday一周一次
+        //推送声音
+        noti.soundName = UILocalNotificationDefaultSoundName;
+        //内容
+        NSString *content = [NSString stringWithFormat:@"时间:%@",[CTB getSystemTime:nil format:@"yyyy-MM-dd HH:mm"]];
+        noti.alertBody = content;
+        noti.hasAction = YES;
+        noti.alertAction = @"测试你的通知能力";
+        if (iPhone >= 8) noti.category = @"ACTIONABLE";
+        //显示在icon上的红色圈中的数子
+        noti.applicationIconBadgeNumber = 1;
+        //设置userinfo 方便在之后需要撤销的时候使用
+        NSDictionary *userInfo = @{@"Code":@"816",
+                                   @"aps":@{@"alert" : content,
+                                            @"badge" : @"1",
+                                            @"content-available":@(1),//可后台执行
+                                            @"category" : @"ACTIONABLE",
+                                            @"sound" : @"ping.caf"}};
+        noti.userInfo = userInfo;
+        //添加推送到uiapplication
+        UIApplication *app = [UIApplication sharedApplication];
+        BOOL isRegisteredNotification = NO;
+        if (iPhone < 8) {
+            UIRemoteNotificationType type = [app enabledRemoteNotificationTypes];
+            isRegisteredNotification = type != UIRemoteNotificationTypeNone;
+        }else{
+            isRegisteredNotification = [app isRegisteredForRemoteNotifications];
+        }
+        if (isRegisteredNotification) {
+            //只有注册了通知才能使用通知
+            [app scheduleLocalNotification:noti];
+        }
+    }
+}
+
 #pragma mark ==========APP核对==========================
 + (NSArray *)checkHasOwnApp
 {
@@ -2947,6 +3004,36 @@ id getUserData(NSString *key)
     //[appListArr addObject:@"显示路线"];
     
     return appListArr;
+}
+
+//获取该目录路径下全部文件名
++ (NSArray *)getAllItemsInDirectory:(NSString *)path
+{
+    NSFileManager *manager = [NSFileManager defaultManager];
+    NSDirectoryEnumerator *direnum = [manager enumeratorAtPath:path];
+    NSArray *listAllItems = [direnum allObjects];
+    return listAllItems;
+}
+
+//删除该目录路径下全部文件
++ (BOOL)deleteAllItemsInDirectory:(NSString *)path
+{
+    NSFileManager *manager = [NSFileManager defaultManager];
+    NSArray *listAllItems = [self.class getAllItemsInDirectory:path];
+    for (NSString *items in listAllItems) {
+        path = [path stringByAppendingPathComponent:items];
+        NSError *error = nil;
+        if (![manager removeItemAtPath:path error:&error]) {
+            if (error) {
+                NSLog(@"删除文件, %@",error.localizedDescription);
+            }else{
+                NSLog(@"删除文件失败");
+            }
+        }else{
+            return YES;
+        }
+    }
+    return NO;
 }
 
 + (NSString *)removeHTML:(NSString *)html

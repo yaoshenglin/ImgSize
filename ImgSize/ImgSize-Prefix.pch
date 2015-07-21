@@ -14,4 +14,9 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import "AppDelegate.h"
+
+    #define k_action @"api"                         //默认动作根目录
+    #define k_host @"http://121.201.17.130:8100"       //http://121.201.17.130:8100
+    #define k_res_host @"http://121.201.17.130:8100"
+    //#define k_res_host @"http://res.weicontrol.cn"   //http://res.weicontrol.cn
 #endif
