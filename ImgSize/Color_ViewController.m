@@ -82,7 +82,8 @@
     btnConfirm.frame = GetRect(20, GetVMaxY(btnSwitch)+10, Screen_Width-40, 38);
     [btnConfirm setNormalBackgroundImage:[UIImage imageNamed:@"按钮-选中效果"]];
     
-    [CTB setRadius:3.0 View:btnHostMac,btnSelect,btnConfirm, nil];
+    [CTB setRadius:3.0 View:btnHostMac,btnSwitch,btnConfirm, nil];
+    [CTB setRadius:1.0 View:btnSelect, nil];
     
     imgQRCodeView = [[UIImageView alloc] initWithFrame:GetRect(Screen_Width/2-100, GetVMaxY(btnConfirm)+40, 200, 200)];
     [self.view addSubview:imgQRCodeView];
