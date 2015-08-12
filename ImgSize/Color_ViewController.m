@@ -48,7 +48,7 @@
     txtAccount.frame = GetRect(x, 15, Screen_Width-x*2-80, 44);
     txtAccount.layer.cornerRadius = 3;
     txtAccount.returnKeyType = UIReturnKeyNext;
-    txtAccount.keyboardType = UIKeyboardTypeNumberPad;
+    //txtAccount.keyboardType = UIKeyboardTypeNumberPad;
     UILabel *lblPhoneLeftView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 68, GetVHeight(txtAccount))];
     txtAccount.leftView = lblPhoneLeftView;
     txtAccount.leftViewMode = UITextFieldViewModeAlways;

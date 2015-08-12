@@ -123,8 +123,8 @@ static NSString *const SBStyle2 = @"SBStyle2";
         NSString *urlString = @"http://dldir1.qq.com/qqfile/qq/QQ2013/QQ2013SP5/9050/QQ2013SP5.exe";
         [HTTPRequest run:urlString body:nil delegate:self];
         
-//        BackRequest *backRequest = [[BackRequest alloc] init];
-//        [backRequest backgroundTask];
+        //BackRequest *backRequest = [[BackRequest alloc] init];
+        //[backRequest backgroundTask];
     }
 }
 
