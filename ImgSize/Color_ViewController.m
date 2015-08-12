@@ -8,22 +8,20 @@
 
 #import "Color_ViewController.h"
 #import "CTB.h"
+#import "Tools.h"
+#import "QRCodeGenerator.h"
 
 @interface Color_ViewController ()<UITextFieldDelegate>
 {
-    UIView *baseView;
-    UILabel *lblWhite;
-    UILabel *lblAlpha;
-    UITextField *txtHexValue;
+    UIButton *btnSelect;
+    UILabel *lblSelect;
+    UITextField *txtAccount;
     UIScrollView *iScrollView;
+    UIImageView *imgQRCodeView;
     
-    UILabel *lblR;
-    UILabel *lblG;
-    UILabel *lblB;
-    UILabel *lblA;
-    
-    CGFloat white;
-    CGFloat alpha;
+    BOOL isSelect;
+    NSInteger tag;
+    NSMutableArray *listBtn;
 }
 
 @end
@@ -39,57 +37,56 @@
 
 - (void)initCapacity
 {
-    CGFloat y = 20;
-    white = alpha = 0.5;
-    baseView = [[UIView alloc] initWithFrame:CGRectMake(Screen_Width/2-40, 140+y, 80, 80)];
-    baseView.clipsToBounds = YES;
-    baseView.backgroundColor = [UIColor colorWithWhite:white alpha:alpha];
-    baseView.layer.cornerRadius = baseView.frame.size.width/2;
-    [self.view addSubview:baseView];
+    tag = 1;
+    listBtn = [@[] mutableCopy];
+    //self.view.backgroundColor = [UIColor blackColor];
+    iScrollView = [[UIScrollView alloc] initWithFrame:GetRect(0, 20, Screen_Width, Screen_Height-49-20)];
+    [self.view addSubview:iScrollView];
     
-    UISlider *colorSlider = [[UISlider alloc] initWithFrame:CGRectMake(20, 20+y, Screen_Width-40, 20)];
-    colorSlider.tag = 1;
-    colorSlider.value = white;
-    [colorSlider addTarget:self action:select(switchEvents:) forControlEvents:UIControlEventValueChanged];
-    colorSlider.center = CGPointMake(Screen_Width/2, 30+y);
-    [self.view addSubview:colorSlider];
+    CGFloat x = 8;
+    txtAccount = [CTB textFieldTag:1 holderTxt:@"请输入您的设备ID" V:iScrollView delegate:self];
+    txtAccount.frame = GetRect(x, 15, Screen_Width-x*2-80, 44);
+    txtAccount.layer.cornerRadius = 3;
+    txtAccount.returnKeyType = UIReturnKeyNext;
+    txtAccount.keyboardType = UIKeyboardTypeNumberPad;
+    UILabel *lblPhoneLeftView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 68, GetVHeight(txtAccount))];
+    txtAccount.leftView = lblPhoneLeftView;
+    txtAccount.leftViewMode = UITextFieldViewModeAlways;
+    lblPhoneLeftView.text = @"设备ID :";
+    lblPhoneLeftView.textAlignment = NSTextAlignmentCenter;
+    lblPhoneLeftView.textColor = [UIColor blackColor];
+    [CTB setBorderWidth:0.8 Color:[CTB colorWithHexString:@"#DADADA"] View:txtAccount, nil];
     
-    UISlider *alphaSlider = [[UISlider alloc] initWithFrame:CGRectMake(20, 40+y, Screen_Width-40, 20)];
-    alphaSlider.tag = 2;
-    alphaSlider.value = alpha;
-    [alphaSlider addTarget:self action:select(switchEvents:) forControlEvents:UIControlEventValueChanged];
-    alphaSlider.center = CGPointMake(Screen_Width/2, 80+y);
-    [self.view addSubview:alphaSlider];
+    //选择按钮
+    isSelect = YES;
+    btnSelect = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:3 title:@"" img:@"单选_选中"];
+    btnSelect.showsTouchWhenHighlighted = NO;
+    btnSelect.frame = CGRectMake(GetVMaxX(txtAccount)+10, 0+15, 20, 20);
+    btnSelect.center = GetPoint(btnSelect.center.x, txtAccount.center.y);
     
-    lblWhite = [CTB labelTag:1 toView:self.view text:@"white:" wordSize:15 alignment:NSTextAlignmentLeft];
-    lblWhite.frame = GetRect(20, GetVMaxY(alphaSlider)+20, Screen_Width/2-20, 20);
+    lblSelect = [CTB labelTag:0 toView:iScrollView text:@"加密" wordSize:16];
+    lblSelect.frame = CGRectMake(GetVMaxX(btnSelect), GetVMinY(btnSelect), 50, 20);
     
-    lblAlpha = [CTB labelTag:1 toView:self.view text:@"alpha:" wordSize:15 alignment:NSTextAlignmentLeft];
-    lblAlpha.frame = GetRect(Screen_Width/2, GetVMaxY(alphaSlider)+20, Screen_Width/2-20, 20);
+    UIButton *btnHostMac = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:1 title:@"主机" img:@""];
+    btnHostMac.frame = GetRect(20, GetVMaxY(txtAccount)+10, Screen_Width/2-40, 30);
+    [btnHostMac setNormalBackgroundImage:[UIImage imageNamed:@"按钮-选中效果"]];
+    [btnHostMac setNormalTitleColor:[UIColor whiteColor]];
     
-    [self switchEvents:colorSlider];
-    [self switchEvents:alphaSlider];
+    UIButton *btnSwitch = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:2 title:@"开关" img:@""];
+    btnSwitch.frame = GetRect(Screen_Width/2+20, GetVMinY(btnHostMac), Screen_Width/2-40, 30);
+    [btnSwitch setNormalBackgroundImage:[UIImage imageNamed:@"选中背景图"]];
+    listBtn.array = @[btnHostMac,btnSwitch];
     
-    txtHexValue = [CTB textFieldTag:1 holderTxt:@"输入颜色二进制值" V:self.view delegate:self];
-    txtHexValue.font = [UIFont systemFontOfSize:13];
-    txtHexValue.layer.cornerRadius = 5;
-    txtHexValue.frame = GetRect(50, GetVMaxY(baseView)+30, 130, 30);
-    UIButton *btnUpdate = [CTB buttonType:UIButtonTypeCustom delegate:self to:self.view tag:1 title:@"Set" img:@""];
-    btnUpdate.layer.cornerRadius = 5;
-    btnUpdate.frame = GetRect(GetVMaxX(txtHexValue)+5, GetVMinY(txtHexValue), 50, 30);
-    [CTB setBorderWidth:0.5 View:txtHexValue,btnUpdate, nil];
-    [CTB setLeftViewWithWidth:5 textField:txtHexValue, nil];
+    UIButton *btnConfirm = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:4 title:@"生成二维码" img:@""];
+    [btnConfirm setNormalTitleColor:[UIColor whiteColor]];
+    btnConfirm.frame = GetRect(20, GetVMaxY(btnSwitch)+10, Screen_Width-40, 38);
+    [btnConfirm setNormalBackgroundImage:[UIImage imageNamed:@"按钮-选中效果"]];
     
-    CGFloat x = Screen_Width/3;
-    lblR = [CTB labelTag:1 toView:self.view text:@"R:0" wordSize:15 alignment:NSTextAlignmentLeft];
-    lblR.frame = GetRect(10, GetVMaxY(txtHexValue)+5, x-20, 20);
-    lblG = [CTB labelTag:1 toView:self.view text:@"G:0" wordSize:15 alignment:NSTextAlignmentLeft];
-    lblG.frame = GetRect(10+x, GetVMaxY(txtHexValue)+5, x-20, 20);
-    lblB = [CTB labelTag:1 toView:self.view text:@"B:0" wordSize:15 alignment:NSTextAlignmentLeft];
-    lblB.frame = GetRect(10+x*2, GetVMaxY(txtHexValue)+5, x-20, 20);
+    [CTB setRadius:3.0 View:btnHostMac,btnSelect,btnConfirm, nil];
     
-    lblA = [CTB labelTag:1 toView:self.view text:@"alpha:0" wordSize:15 alignment:NSTextAlignmentLeft];
-    lblA.frame = GetRect(20, GetVMaxY(lblB)+5, x*2, 20);
+    imgQRCodeView = [[UIImageView alloc] initWithFrame:GetRect(Screen_Width/2-100, GetVMaxY(btnConfirm)+40, 200, 200)];
+    [self.view addSubview:imgQRCodeView];
+    [CTB setBorderWidth:0.8 Color:[CTB colorWithHexString:@"#DADADA"] View:imgQRCodeView, nil];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -98,51 +95,59 @@
     return YES;
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    [txtHexValue resignFirstResponder];
-}
-
-- (void)switchEvents:(UISlider *)theSlider
-{
-    [txtHexValue resignFirstResponder];
-    
-    if (theSlider.tag == 1) {
-        white = theSlider.value;
-        lblWhite.text = [NSString stringWithFormat:@"white:%.6f",white];
-    }
-    else if (theSlider.tag == 2) {
-        alpha = theSlider.value;
-        lblAlpha.text = [NSString stringWithFormat:@"alpha:%.6f",alpha];
-    }
-    
-    baseView.backgroundColor = [UIColor colorWithWhite:white alpha:alpha];
-}
-
 - (void)ButtonEvents:(UIButton *)button
 {
-    [txtHexValue resignFirstResponder];
+    [txtAccount resignFirstResponder];
     
-    if (button.tag == 1) {
-        NSString *colorString = txtHexValue.text;
-        if (colorString.length > 0) {
-            UIColor *color = [CTB colorWithHexString:colorString];
-            const CGFloat *cs = CGColorGetComponents(color.CGColor);
-            size_t index = CGColorGetNumberOfComponents(color.CGColor);
-            CGFloat r,g,b,a;
-            if (index == 4) {
-                baseView.backgroundColor = color;
-                r = cs[0],g = cs[1],b = cs[2],a = cs[3];
+    if (button.tag == 1|| button.tag == 2) {
+        tag = button.tag;
+        for (UIButton *btn in listBtn) {
+            UIImage *image;
+            if (btn == button) {
+                image = [UIImage imageNamed:@"按钮-选中效果"];
+                [btn setNormalTitleColor:[UIColor whiteColor]];
             }else{
-                r = g = b = 0;
-                baseView.backgroundColor = color;
+                image = [UIImage imageNamed:@"选中背景图"];
+                [btn setNormalTitleColor:[UIColor blackColor]];
             }
-            
-            lblR.text = [NSString stringWithFormat:@"R:%.3f",r];
-            lblG.text = [NSString stringWithFormat:@"G:%.3f",g];
-            lblB.text = [NSString stringWithFormat:@"B:%.3f",b];
-            lblA.text = [NSString stringWithFormat:@"A:%.3f",a];
+            [btn setNormalBackgroundImage:image];
         }
+    }
+    else if (button.tag == 3) {
+        UIImage *image;
+        if (isSelect) {
+            isSelect = NO;
+            image = [UIImage imageNamed:@"单选_未选中"];
+        }else{
+            isSelect = YES;
+            image = [UIImage imageNamed:@"单选_选中"];
+        }
+        
+        [button setNormalBackgroundImage:image];
+    }
+    else if (button.tag == 4) {
+        NSString *host_mac = txtAccount.text;
+        if (host_mac.length <= 0) {
+            [CTB showMsg:@"请输入设备ID"];
+            return;
+        }
+        
+        NSString *value = @"";
+        if (tag == 1) {
+            //主机
+            value = [NSString format:@"device:host;content:%@;ver:1.0",host_mac];
+        }
+        else if (tag == 2) {
+            //开关
+            value = [NSString format:@"device:switch;id:%@",host_mac];
+        }
+        
+        if (isSelect) {
+            value = [Tools encryptFrom:value];
+        }
+        
+        UIImage *image = [QRCodeGenerator qrImageForString:value imageSize:GetVWidth(imgQRCodeView)];
+        imgQRCodeView.image = image;
     }
 }
 

@@ -11,6 +11,7 @@
 #include <sys/xattr.h>
 //#import <SystemConfiguration/SystemConfiguration.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
+#import "StringEncryption.h"
 
 @implementation Tools
 
@@ -59,6 +60,51 @@
 	NSString *filePath = [Tools getFilePath:fileName];
 	NSFileManager* fileManager = [NSFileManager defaultManager];
 	return [fileManager fileExistsAtPath:filePath];
+}
+
+#pragma mark - --------解密字符串
++ (NSString *)decryptString:(NSString *)str
+{
+    return [StringEncryption decryptString:str];
+}
+
++ (NSString *)decryptString:(NSString *)str encoding:(NSStringEncoding)encoding
+{
+    return [StringEncryption decryptString:str encoding:encoding];
+}
+
++ (NSString *)decryptFrom:(NSString *)str
+{
+    NSString *Separate = @"/App/";
+    NSArray *list = [str componentsSeparatedByString:Separate];
+    if ([list count] == 2) {
+        NSString *str = [list objectAtIndex:1];
+        
+        str = [str stringByReplacingOccurrencesOfString:@"~" withString:@"+"];
+        str = [str stringByReplacingOccurrencesOfString:@"!" withString:@"/"];
+        str = [str stringByReplacingOccurrencesOfString:@"|" withString:@"/"];
+        NSString *content = [Tools decryptString:str];
+        if (content.length > 0) {
+            return content;
+        }
+    }
+    
+    return str;
+}
+
+#pragma mark 加密字符串
++ (NSString *)encryptString:(NSString *)str
+{
+    return [StringEncryption encryptString:str];
+}
+
++ (NSString *)encryptFrom:(NSString *)str
+{
+    NSString *string = [Tools encryptString:str];
+    NSString *Separate = @"/App/";
+    string = [NSString format:@"%@%@%@",k_host,Separate,string];
+    
+    return string;
 }
 
 #pragma mark 格式化手机号码（去除手机号码前缀 +86及中间空格）

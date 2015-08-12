@@ -124,6 +124,7 @@
     NSString *control = [Tools makeControl:@"01FE00" dataLen:2 value:value];
     NSData *buffer = [Tools makeDoorCommandWith:SN pwd:PWD msg:msg control:control];
     
+    udpSocket.port = 8101;
     [udpSocket sendData:buffer];
     [udpSocket receiveWithTimeout:20.0 tag:0];
 }
@@ -138,6 +139,7 @@
     NSData *data = [[NSString stringWithFormat:@"A6%@00000000",host_mac] dataByHexString];
     data = [Tools replaceCRCForSwitch:data];
     
+    udpSocket.port = 8003;
     [udpSocket sendData:data];
     [udpSocket receiveWithTimeout:20.0 tag:0];
 }

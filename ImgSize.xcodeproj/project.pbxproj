@@ -43,6 +43,33 @@
 		E22C944719CC35ED00D9EAC1 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E22C944619CC35ED00D9EAC1 /* libsqlite3.dylib */; };
 		E23410A4195BAA560086AE54 /* PhotoPreView.m in Sources */ = {isa = PBXBuildFile; fileRef = E23410A3195BAA560086AE54 /* PhotoPreView.m */; };
 		E23410A6195BEFA00086AE54 /* 服务条款.txt in Resources */ = {isa = PBXBuildFile; fileRef = E23410A5195BEFA00086AE54 /* 服务条款.txt */; };
+		E24D35B71B7B1FF500991739 /* bitstream.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35A91B7B1FF500991739 /* bitstream.c */; };
+		E24D35B81B7B1FF500991739 /* mask.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35AB1B7B1FF500991739 /* mask.c */; };
+		E24D35B91B7B1FF500991739 /* qrencode.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35AD1B7B1FF500991739 /* qrencode.c */; };
+		E24D35BA1B7B1FF500991739 /* qrinput.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35AF1B7B1FF500991739 /* qrinput.c */; };
+		E24D35BB1B7B1FF500991739 /* qrspec.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35B11B7B1FF500991739 /* qrspec.c */; };
+		E24D35BC1B7B1FF500991739 /* rscode.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35B31B7B1FF500991739 /* rscode.c */; };
+		E24D35BD1B7B1FF500991739 /* split.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35B51B7B1FF500991739 /* split.c */; };
+		E24D35E31B7B231100991739 /* IQNSArray+Sort.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35C11B7B231100991739 /* IQNSArray+Sort.m */; };
+		E24D35E41B7B231100991739 /* IQUITextFieldView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35C31B7B231100991739 /* IQUITextFieldView+Additions.m */; };
+		E24D35E51B7B231100991739 /* IQUIView+Hierarchy.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35C51B7B231100991739 /* IQUIView+Hierarchy.m */; };
+		E24D35E61B7B231100991739 /* IQUIViewController+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35C71B7B231100991739 /* IQUIViewController+Additions.m */; };
+		E24D35E71B7B231100991739 /* IQUIWindow+Hierarchy.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35C91B7B231100991739 /* IQUIWindow+Hierarchy.m */; };
+		E24D35E81B7B231100991739 /* IQKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35CE1B7B231100991739 /* IQKeyboardManager.m */; };
+		E24D35E91B7B231100991739 /* IQKeyboardReturnKeyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35D01B7B231100991739 /* IQKeyboardReturnKeyHandler.m */; };
+		E24D35EA1B7B231100991739 /* IQSegmentedNextPrevious.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35D31B7B231100991739 /* IQSegmentedNextPrevious.m */; };
+		E24D35EB1B7B231100991739 /* IQTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35D61B7B231100991739 /* IQTextView.m */; };
+		E24D35EC1B7B231100991739 /* IQBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35D91B7B231100991739 /* IQBarButtonItem.m */; };
+		E24D35ED1B7B231100991739 /* IQTitleBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35DB1B7B231100991739 /* IQTitleBarButtonItem.m */; };
+		E24D35EE1B7B231100991739 /* IQToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35DD1B7B231100991739 /* IQToolbar.m */; };
+		E24D35EF1B7B231100991739 /* IQUIView+IQKeyboardToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35DF1B7B231100991739 /* IQUIView+IQKeyboardToolbar.m */; };
+		E24D35F01B7B231100991739 /* IQKeyboardManager.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E24D35E21B7B231100991739 /* IQKeyboardManager.bundle */; };
+		E24D35F21B7B252400991739 /* 按钮-选中效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E24D35F11B7B252400991739 /* 按钮-选中效果@2x.png */; };
+		E24D35F51B7B26A200991739 /* 单选_未选中@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E24D35F31B7B26A200991739 /* 单选_未选中@2x.png */; };
+		E24D35F61B7B26A200991739 /* 单选_选中@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E24D35F41B7B26A200991739 /* 单选_选中@2x.png */; };
+		E24D35F91B7B2BD900991739 /* StringEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35F81B7B2BD900991739 /* StringEncryption.m */; };
+		E24D35FC1B7B2C8700991739 /* QRCodeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35FB1B7B2C8700991739 /* QRCodeGenerator.m */; };
+		E24D35FF1B7B2DFC00991739 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35FE1B7B2DFC00991739 /* NSData+Base64.m */; };
 		E25B076A19A491B1001EA090 /* JDStatusBarNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076519A491B1001EA090 /* JDStatusBarNotification.m */; };
 		E25B076B19A491B1001EA090 /* JDStatusBarStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076719A491B1001EA090 /* JDStatusBarStyle.m */; };
 		E25B076C19A491B1001EA090 /* JDStatusBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076919A491B1001EA090 /* JDStatusBarView.m */; };
@@ -72,7 +99,7 @@
 		E2B3B8B91B1D4590004ED953 /* 发送@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8AE1B1D4590004ED953 /* 发送@2x.png */; };
 		E2B3B8BA1B1D4590004ED953 /* 微菜单超大-@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8AF1B1D4590004ED953 /* 微菜单超大-@2x.png */; };
 		E2B3B8BB1B1D4590004ED953 /* 信生活大-@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B01B1D4590004ED953 /* 信生活大-@2x.png */; };
-		E2B3B8BC1B1D4590004ED953 /* 选中背景图.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B11B1D4590004ED953 /* 选中背景图.png */; };
+		E2B3B8BC1B1D4590004ED953 /* 选中背景图@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B11B1D4590004ED953 /* 选中背景图@2x.png */; };
 		E2B3B8BD1B1D4590004ED953 /* 叶子大@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */; };
 		E2B3B8BE1B1D4590004ED953 /* 语音-红@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */; };
 		E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */; };
@@ -150,6 +177,59 @@
 		E23410A2195BAA560086AE54 /* PhotoPreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoPreView.h; sourceTree = "<group>"; };
 		E23410A3195BAA560086AE54 /* PhotoPreView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoPreView.m; sourceTree = "<group>"; };
 		E23410A5195BEFA00086AE54 /* 服务条款.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "服务条款.txt"; sourceTree = "<group>"; };
+		E24D35A91B7B1FF500991739 /* bitstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitstream.c; sourceTree = "<group>"; };
+		E24D35AA1B7B1FF500991739 /* bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstream.h; sourceTree = "<group>"; };
+		E24D35AB1B7B1FF500991739 /* mask.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mask.c; sourceTree = "<group>"; };
+		E24D35AC1B7B1FF500991739 /* mask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mask.h; sourceTree = "<group>"; };
+		E24D35AD1B7B1FF500991739 /* qrencode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qrencode.c; sourceTree = "<group>"; };
+		E24D35AE1B7B1FF500991739 /* qrencode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrencode.h; sourceTree = "<group>"; };
+		E24D35AF1B7B1FF500991739 /* qrinput.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qrinput.c; sourceTree = "<group>"; };
+		E24D35B01B7B1FF500991739 /* qrinput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrinput.h; sourceTree = "<group>"; };
+		E24D35B11B7B1FF500991739 /* qrspec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qrspec.c; sourceTree = "<group>"; };
+		E24D35B21B7B1FF500991739 /* qrspec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrspec.h; sourceTree = "<group>"; };
+		E24D35B31B7B1FF500991739 /* rscode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rscode.c; sourceTree = "<group>"; };
+		E24D35B41B7B1FF500991739 /* rscode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rscode.h; sourceTree = "<group>"; };
+		E24D35B51B7B1FF500991739 /* split.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = split.c; sourceTree = "<group>"; };
+		E24D35B61B7B1FF500991739 /* split.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = split.h; sourceTree = "<group>"; };
+		E24D35C01B7B231100991739 /* IQNSArray+Sort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IQNSArray+Sort.h"; sourceTree = "<group>"; };
+		E24D35C11B7B231100991739 /* IQNSArray+Sort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IQNSArray+Sort.m"; sourceTree = "<group>"; };
+		E24D35C21B7B231100991739 /* IQUITextFieldView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IQUITextFieldView+Additions.h"; sourceTree = "<group>"; };
+		E24D35C31B7B231100991739 /* IQUITextFieldView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IQUITextFieldView+Additions.m"; sourceTree = "<group>"; };
+		E24D35C41B7B231100991739 /* IQUIView+Hierarchy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IQUIView+Hierarchy.h"; sourceTree = "<group>"; };
+		E24D35C51B7B231100991739 /* IQUIView+Hierarchy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IQUIView+Hierarchy.m"; sourceTree = "<group>"; };
+		E24D35C61B7B231100991739 /* IQUIViewController+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IQUIViewController+Additions.h"; sourceTree = "<group>"; };
+		E24D35C71B7B231100991739 /* IQUIViewController+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IQUIViewController+Additions.m"; sourceTree = "<group>"; };
+		E24D35C81B7B231100991739 /* IQUIWindow+Hierarchy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IQUIWindow+Hierarchy.h"; sourceTree = "<group>"; };
+		E24D35C91B7B231100991739 /* IQUIWindow+Hierarchy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IQUIWindow+Hierarchy.m"; sourceTree = "<group>"; };
+		E24D35CB1B7B231100991739 /* IQKeyboardManagerConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQKeyboardManagerConstants.h; sourceTree = "<group>"; };
+		E24D35CC1B7B231100991739 /* IQKeyboardManagerConstantsInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQKeyboardManagerConstantsInternal.h; sourceTree = "<group>"; };
+		E24D35CD1B7B231100991739 /* IQKeyboardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQKeyboardManager.h; sourceTree = "<group>"; };
+		E24D35CE1B7B231100991739 /* IQKeyboardManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQKeyboardManager.m; sourceTree = "<group>"; };
+		E24D35CF1B7B231100991739 /* IQKeyboardReturnKeyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQKeyboardReturnKeyHandler.h; sourceTree = "<group>"; };
+		E24D35D01B7B231100991739 /* IQKeyboardReturnKeyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQKeyboardReturnKeyHandler.m; sourceTree = "<group>"; };
+		E24D35D21B7B231100991739 /* IQSegmentedNextPrevious.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQSegmentedNextPrevious.h; sourceTree = "<group>"; };
+		E24D35D31B7B231100991739 /* IQSegmentedNextPrevious.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQSegmentedNextPrevious.m; sourceTree = "<group>"; };
+		E24D35D51B7B231100991739 /* IQTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQTextView.h; sourceTree = "<group>"; };
+		E24D35D61B7B231100991739 /* IQTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQTextView.m; sourceTree = "<group>"; };
+		E24D35D81B7B231100991739 /* IQBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQBarButtonItem.h; sourceTree = "<group>"; };
+		E24D35D91B7B231100991739 /* IQBarButtonItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQBarButtonItem.m; sourceTree = "<group>"; };
+		E24D35DA1B7B231100991739 /* IQTitleBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQTitleBarButtonItem.h; sourceTree = "<group>"; };
+		E24D35DB1B7B231100991739 /* IQTitleBarButtonItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQTitleBarButtonItem.m; sourceTree = "<group>"; };
+		E24D35DC1B7B231100991739 /* IQToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQToolbar.h; sourceTree = "<group>"; };
+		E24D35DD1B7B231100991739 /* IQToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQToolbar.m; sourceTree = "<group>"; };
+		E24D35DE1B7B231100991739 /* IQUIView+IQKeyboardToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IQUIView+IQKeyboardToolbar.h"; sourceTree = "<group>"; };
+		E24D35DF1B7B231100991739 /* IQUIView+IQKeyboardToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IQUIView+IQKeyboardToolbar.m"; sourceTree = "<group>"; };
+		E24D35E01B7B231100991739 /* KeyboardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardManager.h; sourceTree = "<group>"; };
+		E24D35E21B7B231100991739 /* IQKeyboardManager.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IQKeyboardManager.bundle; sourceTree = "<group>"; };
+		E24D35F11B7B252400991739 /* 按钮-选中效果@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "按钮-选中效果@2x.png"; sourceTree = "<group>"; };
+		E24D35F31B7B26A200991739 /* 单选_未选中@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "单选_未选中@2x.png"; sourceTree = "<group>"; };
+		E24D35F41B7B26A200991739 /* 单选_选中@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "单选_选中@2x.png"; sourceTree = "<group>"; };
+		E24D35F71B7B2BD900991739 /* StringEncryption.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringEncryption.h; sourceTree = "<group>"; };
+		E24D35F81B7B2BD900991739 /* StringEncryption.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StringEncryption.m; sourceTree = "<group>"; };
+		E24D35FA1B7B2C8700991739 /* QRCodeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeGenerator.h; sourceTree = "<group>"; };
+		E24D35FB1B7B2C8700991739 /* QRCodeGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeGenerator.m; sourceTree = "<group>"; };
+		E24D35FD1B7B2DFC00991739 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
+		E24D35FE1B7B2DFC00991739 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
 		E25B076419A491B1001EA090 /* JDStatusBarNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JDStatusBarNotification.h; sourceTree = "<group>"; };
 		E25B076519A491B1001EA090 /* JDStatusBarNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JDStatusBarNotification.m; sourceTree = "<group>"; };
 		E25B076619A491B1001EA090 /* JDStatusBarStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JDStatusBarStyle.h; sourceTree = "<group>"; };
@@ -197,7 +277,7 @@
 		E2B3B8AE1B1D4590004ED953 /* 发送@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "发送@2x.png"; sourceTree = "<group>"; };
 		E2B3B8AF1B1D4590004ED953 /* 微菜单超大-@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "微菜单超大-@2x.png"; sourceTree = "<group>"; };
 		E2B3B8B01B1D4590004ED953 /* 信生活大-@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "信生活大-@2x.png"; sourceTree = "<group>"; };
-		E2B3B8B11B1D4590004ED953 /* 选中背景图.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "选中背景图.png"; sourceTree = "<group>"; };
+		E2B3B8B11B1D4590004ED953 /* 选中背景图@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "选中背景图@2x.png"; sourceTree = "<group>"; };
 		E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "叶子大@2x.png"; sourceTree = "<group>"; };
 		E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "语音-红@2x.png"; sourceTree = "<group>"; };
 		E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "语音-绿@2x.png"; sourceTree = "<group>"; };
@@ -349,6 +429,8 @@
 		E21EE62419270FAE0051408C /* Tool */ = {
 			isa = PBXGroup;
 			children = (
+				E24D35BE1B7B231100991739 /* IQKeyBoardManager */,
+				E24D35A81B7B1FF500991739 /* libqrencode */,
 				E22C944319CC354B00D9EAC1 /* DB.h */,
 				E22C944419CC354B00D9EAC1 /* DB.m */,
 				E21EE61C19270E240051408C /* CTB.h */,
@@ -357,12 +439,18 @@
 				E21EE61F19270E240051408C /* MBProgressHUD.m */,
 				E21A88331946A9BD00BF3164 /* iButton.h */,
 				E21A88341946A9BD00BF3164 /* iButton.m */,
+				E24D35FD1B7B2DFC00991739 /* NSData+Base64.h */,
+				E24D35FE1B7B2DFC00991739 /* NSData+Base64.m */,
 				E218EBB51947E73A002160DC /* ChatBottomView.h */,
 				E218EBB61947E73A002160DC /* ChatBottomView.m */,
 				E270DD2219ADE367009543CE /* myKeyboardType.h */,
 				E270DD2319ADE367009543CE /* myKeyboardType.m */,
 				E2BDE5921B539D710098CF42 /* GDataXMLNode.h */,
 				E2BDE5931B539D710098CF42 /* GDataXMLNode.m */,
+				E24D35F71B7B2BD900991739 /* StringEncryption.h */,
+				E24D35F81B7B2BD900991739 /* StringEncryption.m */,
+				E24D35FA1B7B2C8700991739 /* QRCodeGenerator.h */,
+				E24D35FB1B7B2C8700991739 /* QRCodeGenerator.m */,
 				E22C944019CC351F00D9EAC1 /* AddressBook.h */,
 				E22C944119CC351F00D9EAC1 /* AddressBook.m */,
 				E218EBC61948101C002160DC /* Tools.h */,
@@ -401,6 +489,112 @@
 				E2231D5519496404003ADE6F /* voice_note_stop.wav */,
 			);
 			path = Resource;
+			sourceTree = "<group>";
+		};
+		E24D35A81B7B1FF500991739 /* libqrencode */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35A91B7B1FF500991739 /* bitstream.c */,
+				E24D35AA1B7B1FF500991739 /* bitstream.h */,
+				E24D35AB1B7B1FF500991739 /* mask.c */,
+				E24D35AC1B7B1FF500991739 /* mask.h */,
+				E24D35AD1B7B1FF500991739 /* qrencode.c */,
+				E24D35AE1B7B1FF500991739 /* qrencode.h */,
+				E24D35AF1B7B1FF500991739 /* qrinput.c */,
+				E24D35B01B7B1FF500991739 /* qrinput.h */,
+				E24D35B11B7B1FF500991739 /* qrspec.c */,
+				E24D35B21B7B1FF500991739 /* qrspec.h */,
+				E24D35B31B7B1FF500991739 /* rscode.c */,
+				E24D35B41B7B1FF500991739 /* rscode.h */,
+				E24D35B51B7B1FF500991739 /* split.c */,
+				E24D35B61B7B1FF500991739 /* split.h */,
+			);
+			path = libqrencode;
+			sourceTree = "<group>";
+		};
+		E24D35BE1B7B231100991739 /* IQKeyBoardManager */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35BF1B7B231100991739 /* Categories */,
+				E24D35CA1B7B231100991739 /* Constants */,
+				E24D35CD1B7B231100991739 /* IQKeyboardManager.h */,
+				E24D35CE1B7B231100991739 /* IQKeyboardManager.m */,
+				E24D35CF1B7B231100991739 /* IQKeyboardReturnKeyHandler.h */,
+				E24D35D01B7B231100991739 /* IQKeyboardReturnKeyHandler.m */,
+				E24D35D11B7B231100991739 /* IQSegmentedNextPrevious */,
+				E24D35D41B7B231100991739 /* IQTextView */,
+				E24D35D71B7B231100991739 /* IQToolbar */,
+				E24D35E01B7B231100991739 /* KeyboardManager.h */,
+				E24D35E11B7B231100991739 /* Resources */,
+			);
+			path = IQKeyBoardManager;
+			sourceTree = "<group>";
+		};
+		E24D35BF1B7B231100991739 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35C01B7B231100991739 /* IQNSArray+Sort.h */,
+				E24D35C11B7B231100991739 /* IQNSArray+Sort.m */,
+				E24D35C21B7B231100991739 /* IQUITextFieldView+Additions.h */,
+				E24D35C31B7B231100991739 /* IQUITextFieldView+Additions.m */,
+				E24D35C41B7B231100991739 /* IQUIView+Hierarchy.h */,
+				E24D35C51B7B231100991739 /* IQUIView+Hierarchy.m */,
+				E24D35C61B7B231100991739 /* IQUIViewController+Additions.h */,
+				E24D35C71B7B231100991739 /* IQUIViewController+Additions.m */,
+				E24D35C81B7B231100991739 /* IQUIWindow+Hierarchy.h */,
+				E24D35C91B7B231100991739 /* IQUIWindow+Hierarchy.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+		E24D35CA1B7B231100991739 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35CB1B7B231100991739 /* IQKeyboardManagerConstants.h */,
+				E24D35CC1B7B231100991739 /* IQKeyboardManagerConstantsInternal.h */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		E24D35D11B7B231100991739 /* IQSegmentedNextPrevious */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35D21B7B231100991739 /* IQSegmentedNextPrevious.h */,
+				E24D35D31B7B231100991739 /* IQSegmentedNextPrevious.m */,
+			);
+			path = IQSegmentedNextPrevious;
+			sourceTree = "<group>";
+		};
+		E24D35D41B7B231100991739 /* IQTextView */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35D51B7B231100991739 /* IQTextView.h */,
+				E24D35D61B7B231100991739 /* IQTextView.m */,
+			);
+			path = IQTextView;
+			sourceTree = "<group>";
+		};
+		E24D35D71B7B231100991739 /* IQToolbar */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35D81B7B231100991739 /* IQBarButtonItem.h */,
+				E24D35D91B7B231100991739 /* IQBarButtonItem.m */,
+				E24D35DA1B7B231100991739 /* IQTitleBarButtonItem.h */,
+				E24D35DB1B7B231100991739 /* IQTitleBarButtonItem.m */,
+				E24D35DC1B7B231100991739 /* IQToolbar.h */,
+				E24D35DD1B7B231100991739 /* IQToolbar.m */,
+				E24D35DE1B7B231100991739 /* IQUIView+IQKeyboardToolbar.h */,
+				E24D35DF1B7B231100991739 /* IQUIView+IQKeyboardToolbar.m */,
+			);
+			path = IQToolbar;
+			sourceTree = "<group>";
+		};
+		E24D35E11B7B231100991739 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E24D35E21B7B231100991739 /* IQKeyboardManager.bundle */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		E25B076319A491B1001EA090 /* JDStatusBarNotification */ = {
@@ -467,7 +661,10 @@
 				E2B3B8AE1B1D4590004ED953 /* 发送@2x.png */,
 				E2B3B8AF1B1D4590004ED953 /* 微菜单超大-@2x.png */,
 				E2B3B8B01B1D4590004ED953 /* 信生活大-@2x.png */,
-				E2B3B8B11B1D4590004ED953 /* 选中背景图.png */,
+				E24D35F31B7B26A200991739 /* 单选_未选中@2x.png */,
+				E24D35F41B7B26A200991739 /* 单选_选中@2x.png */,
+				E2B3B8B11B1D4590004ED953 /* 选中背景图@2x.png */,
+				E24D35F11B7B252400991739 /* 按钮-选中效果@2x.png */,
 				E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */,
 				E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */,
 				E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */,
@@ -585,17 +782,21 @@
 				E2B3B8C11B1D45D6004ED953 /* msg2@2x.png in Resources */,
 				E2231D5919496404003ADE6F /* voice_note_error.wav in Resources */,
 				E2B3B8BA1B1D4590004ED953 /* 微菜单超大-@2x.png in Resources */,
+				E24D35F01B7B231100991739 /* IQKeyboardManager.bundle in Resources */,
 				E2231D5A19496404003ADE6F /* voice_note_start.wav in Resources */,
+				E24D35F51B7B26A200991739 /* 单选_未选中@2x.png in Resources */,
 				E2B3B8B51B1D4590004ED953 /* 底部表情@2x.png in Resources */,
 				E2A1FFFA1B4272FE00E7BA97 /* 配置iface信号发射@2x.png in Resources */,
 				E2231D5B19496404003ADE6F /* voice_note_stop.wav in Resources */,
 				E2231D5819496404003ADE6F /* n106.wav in Resources */,
+				E24D35F61B7B26A200991739 /* 单选_选中@2x.png in Resources */,
 				E2B3B8BD1B1D4590004ED953 /* 叶子大@2x.png in Resources */,
 				E2B3B8A91B1D456C004ED953 /* msg1@2x.png in Resources */,
-				E2B3B8BC1B1D4590004ED953 /* 选中背景图.png in Resources */,
+				E2B3B8BC1B1D4590004ED953 /* 选中背景图@2x.png in Resources */,
 				E2B3B8B91B1D4590004ED953 /* 发送@2x.png in Resources */,
 				E23410A6195BEFA00086AE54 /* 服务条款.txt in Resources */,
 				E2B3B8BE1B1D4590004ED953 /* 语音-红@2x.png in Resources */,
+				E24D35F21B7B252400991739 /* 按钮-选中效果@2x.png in Resources */,
 				E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */,
 				E21EE60019270DBF0051408C /* Images.xcassets in Resources */,
 				E2231D5719496404003ADE6F /* n105.wav in Resources */,
@@ -622,9 +823,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E24D35E81B7B231100991739 /* IQKeyboardManager.m in Sources */,
 				E2727A771A6A59EA00CC57D6 /* GesturePasswordButton.m in Sources */,
 				E216DD43192B398D00B17105 /* Third_ViewController.m in Sources */,
+				E24D35FF1B7B2DFC00991739 /* NSData+Base64.m in Sources */,
 				E26D172E1ACCDEB0007623F3 /* iTcpSocket.m in Sources */,
+				E24D35EA1B7B231100991739 /* IQSegmentedNextPrevious.m in Sources */,
+				E24D35FC1B7B2C8700991739 /* QRCodeGenerator.m in Sources */,
+				E24D35BD1B7B1FF500991739 /* split.c in Sources */,
+				E24D35E31B7B231100991739 /* IQNSArray+Sort.m in Sources */,
+				E24D35EB1B7B231100991739 /* IQTextView.m in Sources */,
 				E21EE5FE19270DBF0051408C /* ViewController.m in Sources */,
 				E28EBFA319FA00ED007753E5 /* MyDrawView.m in Sources */,
 				E264915C1A651ED8009910C5 /* Color_ViewController.m in Sources */,
@@ -634,28 +842,44 @@
 				E216DD40192B352A00B17105 /* Second_ViewController.m in Sources */,
 				E21EE62119270E240051408C /* MBProgressHUD.m in Sources */,
 				E2BCF2861B46225B00485CC0 /* Brands.m in Sources */,
+				E24D35EF1B7B231100991739 /* IQUIView+IQKeyboardToolbar.m in Sources */,
 				E216D3C41942F76200A81FC6 /* EmojiView.m in Sources */,
+				E24D35E41B7B231100991739 /* IQUITextFieldView+Additions.m in Sources */,
 				E2BDE5941B539D710098CF42 /* GDataXMLNode.m in Sources */,
+				E24D35E71B7B231100991739 /* IQUIWindow+Hierarchy.m in Sources */,
 				E21A88351946A9BD00BF3164 /* iButton.m in Sources */,
+				E24D35BB1B7B1FF500991739 /* qrspec.c in Sources */,
 				E2727A791A6A59EA00CC57D6 /* GesturePasswordView.m in Sources */,
 				E271E8911B04783800D915BF /* AsyncSocket.m in Sources */,
 				E218EBC81948101C002160DC /* Tools.m in Sources */,
 				E25B076A19A491B1001EA090 /* JDStatusBarNotification.m in Sources */,
 				E2BDE5911B539C9D0098CF42 /* FileDownloader.m in Sources */,
 				E21EE5F819270DBF0051408C /* AppDelegate.m in Sources */,
+				E24D35ED1B7B231100991739 /* IQTitleBarButtonItem.m in Sources */,
 				E2727A7A1A6A59EA00CC57D6 /* KeychainItemWrapper.m in Sources */,
 				E23410A4195BAA560086AE54 /* PhotoPreView.m in Sources */,
+				E24D35EE1B7B231100991739 /* IQToolbar.m in Sources */,
 				E295DC1A1B0194FD0012DE19 /* Access.m in Sources */,
+				E24D35E51B7B231100991739 /* IQUIView+Hierarchy.m in Sources */,
+				E24D35BC1B7B1FF500991739 /* rscode.c in Sources */,
+				E24D35E61B7B231100991739 /* IQUIViewController+Additions.m in Sources */,
+				E24D35E91B7B231100991739 /* IQKeyboardReturnKeyHandler.m in Sources */,
 				E22C944519CC354B00D9EAC1 /* DB.m in Sources */,
 				E2A455B01AC8E9B200AC7293 /* AsyncUdpSocket.m in Sources */,
+				E24D35B91B7B1FF500991739 /* qrencode.c in Sources */,
 				E2727A7B1A6A59EA00CC57D6 /* TentacleView.m in Sources */,
 				E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */,
+				E24D35BA1B7B1FF500991739 /* qrinput.c in Sources */,
 				E228DFD9196F7FF200C882E0 /* Test_ViewController.m in Sources */,
 				E22C944219CC351F00D9EAC1 /* AddressBook.m in Sources */,
 				E21EE5F419270DBF0051408C /* main.m in Sources */,
+				E24D35F91B7B2BD900991739 /* StringEncryption.m in Sources */,
+				E24D35B71B7B1FF500991739 /* bitstream.c in Sources */,
+				E24D35EC1B7B231100991739 /* IQBarButtonItem.m in Sources */,
 				E290A8351B5D138E00D43DDA /* DownloadService.m in Sources */,
 				E25B076C19A491B1001EA090 /* JDStatusBarView.m in Sources */,
 				E2BDE58B1B5392770098CF42 /* BackRequest.m in Sources */,
+				E24D35B81B7B1FF500991739 /* mask.c in Sources */,
 				E270DD2419ADE367009543CE /* myKeyboardType.m in Sources */,
 				E218EBB71947E73A002160DC /* ChatBottomView.m in Sources */,
 				E2BDE58E1B5394B80098CF42 /* HTTPRequest.m in Sources */,

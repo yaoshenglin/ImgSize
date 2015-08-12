@@ -14,6 +14,15 @@
 #pragma mark 通过文件名删除文件
 + (void)deleteFile:(NSString *)fileName;
 
+#pragma mark - --------解密字符串
++ (NSString *)decryptString:(NSString *)str;
++ (NSString *)decryptString:(NSString *)str encoding:(NSStringEncoding)encoding;
++ (NSString *)decryptFrom:(NSString *)str;
+
+#pragma mark 加密字符串
++ (NSString *)encryptString:(NSString *)str;
++ (NSString *)encryptFrom:(NSString *)str;
+
 #pragma mark 格式化手机号码（去除手机号码前缀 +86及中间空格）
 +(NSString *) formatMobileForStorage:(NSString *) mobile;
 
