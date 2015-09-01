@@ -132,13 +132,13 @@
 - (void)setProgress:(CGFloat)progress
 {
     NSTimeInterval space = [[NSDate date] timeIntervalSinceDate:sendDate];
-    sendDate = [NSDate date];
     if (space < 0.02 && progress != 1.0) {
         NSString *msg = @"----------接收进度没有更新--------------------";
         [CTB printDebugMsg:msg];
         return;
     }
     
+    sendDate = [NSDate date];
     currentRate = progress;
     //NSLog(@"progress = %f",progress);
     id obj = delegate;

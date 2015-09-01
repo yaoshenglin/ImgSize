@@ -98,12 +98,12 @@ didReceiveResponse:(NSURLResponse *)response
     CGFloat totalLen = contentLength * 1.0;
     CGFloat rate = activeDownload.length / totalLen;
     NSTimeInterval space = [[NSDate date] timeIntervalSinceDate:receiveDate];
-    receiveDate = [NSDate date];
     if (space < 0.02 && rate != 1) {
         NSLog(@"----------接收进度没有更新--------------------");
         return;
     }
     
+    receiveDate = [NSDate date];
     NSLog(@"下载进度 : %.2f%%",rate/0.01);
 }
 

@@ -16,6 +16,11 @@
 #import "Brands.h"
 #import "HTTPRequest.h"
 #import "BackRequest.h"
+#import <CoreTelephony/CTCall.h>
+#import <CoreTelephony/CTSubscriber.h>
+
+
+extern NSString *CTSettingCopyMyPhoneNumber(void);
 
 static NSString *const JDButtonName = @"JDButtonName";
 static NSString *const JDButtonInfo = @"JDButtonInfo";
@@ -120,11 +125,16 @@ static NSString *const SBStyle2 = @"SBStyle2";
         [alert show];
     }
     if (button.tag == 3) {
-        NSString *urlString = @"http://dldir1.qq.com/qqfile/qq/QQ2013/QQ2013SP5/9050/QQ2013SP5.exe";
-        [HTTPRequest run:urlString body:nil delegate:self];
+        //NSString *urlString = @"http://dldir1.qq.com/qqfile/qq/QQ2013/QQ2013SP5/9050/QQ2013SP5.exe";
+        //HTTPRequest *request = [[HTTPRequest alloc] initWithDelegate:self];
+        //[request run:urlString body:nil];
+        //[request start];
         
         //BackRequest *backRequest = [[BackRequest alloc] init];
         //[backRequest backgroundTask];
+        
+        NSString *result = CTSettingCopyMyPhoneNumber();
+        NSLog(@"result = %@",result);
     }
 }
 
@@ -134,6 +144,11 @@ static NSString *const SBStyle2 = @"SBStyle2";
         NSLog(@"下载成功");
         NSData *imageData = iWS.responseData;
         NSString *path = @"/Users/Yin-Mac/Desktop/Chaches/test1.jpg";
+        if ([NSFileManager fileExistsAtPath:path]) {
+            if (![NSFileManager removeItemAtPath:path]) {
+                NSLog(@"删除文件失败");
+            }
+        }
         [imageData writeToFile:path atomically:YES];
     }
 }

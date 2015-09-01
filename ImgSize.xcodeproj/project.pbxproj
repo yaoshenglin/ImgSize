@@ -31,6 +31,8 @@
 		E21EE61319270DBF0051408C /* ImgSizeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E21EE61219270DBF0051408C /* ImgSizeTests.m */; };
 		E21EE62019270E240051408C /* CTB.m in Sources */ = {isa = PBXBuildFile; fileRef = E21EE61D19270E240051408C /* CTB.m */; };
 		E21EE62119270E240051408C /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = E21EE61F19270E240051408C /* MBProgressHUD.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		E22073611B959EB900DBB8D4 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E22073601B959EB900DBB8D4 /* CoreTelephony.framework */; };
+		E22073631B95B7CA00DBB8D4 /* ContentType.plist in Resources */ = {isa = PBXBuildFile; fileRef = E22073621B95B7CA00DBB8D4 /* ContentType.plist */; };
 		E2231D5619496404003ADE6F /* c101.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2231D5019496404003ADE6F /* c101.wav */; };
 		E2231D5719496404003ADE6F /* n105.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2231D5119496404003ADE6F /* n105.wav */; };
 		E2231D5819496404003ADE6F /* n106.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2231D5219496404003ADE6F /* n106.wav */; };
@@ -161,6 +163,8 @@
 		E21EE61D19270E240051408C /* CTB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CTB.m; sourceTree = "<group>"; };
 		E21EE61E19270E240051408C /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		E21EE61F19270E240051408C /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		E22073601B959EB900DBB8D4 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		E22073621B95B7CA00DBB8D4 /* ContentType.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ContentType.plist; sourceTree = "<group>"; };
 		E2231D5019496404003ADE6F /* c101.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = c101.wav; sourceTree = "<group>"; };
 		E2231D5119496404003ADE6F /* n105.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = n105.wav; sourceTree = "<group>"; };
 		E2231D5219496404003ADE6F /* n106.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = n106.wav; sourceTree = "<group>"; };
@@ -304,6 +308,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E22073611B959EB900DBB8D4 /* CoreTelephony.framework in Frameworks */,
 				E2BDE5961B539E320098CF42 /* libxml2.2.dylib in Frameworks */,
 				E263E34F1AC92F3800785EE4 /* SystemConfiguration.framework in Frameworks */,
 				E2A455B21AC8E9EF00AC7293 /* CFNetwork.framework in Frameworks */,
@@ -352,6 +357,7 @@
 		E21EE5E619270DBF0051408C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E22073601B959EB900DBB8D4 /* CoreTelephony.framework */,
 				E2BDE5951B539E320098CF42 /* libxml2.2.dylib */,
 				E263E34E1AC92F3800785EE4 /* SystemConfiguration.framework */,
 				E2A455B11AC8E9EF00AC7293 /* CFNetwork.framework */,
@@ -402,6 +408,7 @@
 				E21EE5EF19270DBF0051408C /* ImgSize-Info.plist */,
 				E21EE5F019270DBF0051408C /* InfoPlist.strings */,
 				E21EE5F319270DBF0051408C /* main.m */,
+				E22073621B95B7CA00DBB8D4 /* ContentType.plist */,
 				E21EE5F519270DBF0051408C /* ImgSize-Prefix.pch */,
 				E21EE5FF19270DBF0051408C /* Images.xcassets */,
 			);
@@ -796,6 +803,7 @@
 				E2B3B8B91B1D4590004ED953 /* 发送@2x.png in Resources */,
 				E23410A6195BEFA00086AE54 /* 服务条款.txt in Resources */,
 				E2B3B8BE1B1D4590004ED953 /* 语音-红@2x.png in Resources */,
+				E22073631B95B7CA00DBB8D4 /* ContentType.plist in Resources */,
 				E24D35F21B7B252400991739 /* 按钮-选中效果@2x.png in Resources */,
 				E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */,
 				E21EE60019270DBF0051408C /* Images.xcassets in Resources */,

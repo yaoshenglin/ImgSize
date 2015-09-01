@@ -7,7 +7,7 @@
 //
 
 #import "HTTPRequest.h"
-//#import "GDataXMLNode.h"
+#import "GDataXMLNode.h"
 
 @interface HTTPRequest ()<NSURLConnectionDataDelegate>
 {
@@ -22,10 +22,35 @@
 
 @synthesize request;
 
++ (NSString *)initUrl:(NSString *)method
+{
+    method = method ?: @"";
+    NSString *urlString = [NSString stringWithFormat:@"%@/%@/%@",k_host,k_action,method];
+    return urlString;
+}
+
++ (id)requestWithDelegate:(id)delegate
+{
+    return [[HTTPRequest alloc] initWithDelegate:delegate];
+}
+
 - (instancetype)init
 {
     if ((self=[super init])) {
         _timeOut = 30.0f;
+        _isShowErrmsg = YES;
+        activeDownload = [NSMutableData data];
+    }
+    
+    return self;
+}
+
+- (id)initWithDelegate:(id)delegate
+{
+    if ((self=[super init])) {
+        _timeOut = 30.0f;
+        _isShowErrmsg = YES;
+        _delegate = delegate;
         activeDownload = [NSMutableData data];
     }
     
@@ -65,37 +90,116 @@
     _responseStatusMessage = responseStatusMessage;
 }
 
+- (void)setHTTPMethod:(NSString *)HTTPMethod
+{
+    _HTTPMethod = HTTPMethod;
+    request.HTTPMethod = HTTPMethod;//设置为 POST
+}
+
 #pragma mark - --------发送请求------------------------
 - (void)run:(NSString *)method body:(NSDictionary *)body delegate:(id)thedelegate
 {
+    _delegate = thedelegate;
+    [self run:method body:body];
+}
+
+- (void)run:(NSString *)method body:(NSDictionary *)body token:(NSString *)token
+{
+    [self run:method body:body];
+    [self setValue:token forHeader:@"token"];
+}
+
+- (void)run:(NSString *)method body:(NSDictionary *)body
+{
     NSError *error;
-    NSString *urlString = [NSString stringWithFormat:@"%@/%@/%@",k_host,k_action,method];
+    NSString *urlString = [HTTPRequest initUrl:method];
     if (!_urlString) {
         _urlString = urlString;
-        if ([method hasPrefix:@"http:"] || [method hasPrefix:@"https:"])
+        if ([method hasPrefix:@"http:"] || [method hasPrefix:@"https:"]) {
             _urlString = method;
-    }
-    currentDelegate = thedelegate;
-    NSRange range = [method rangeOfString:@"/"];
-    if (range.location != NSNotFound) {
-        NSArray *arr = [method componentsSeparatedByString:@"/"];
-        _method = [arr firstObject];
+        }
+        
+        NSRange range = [method rangeOfString:@"/"];
+        if (range.location != NSNotFound) {
+            NSArray *arr = [method componentsSeparatedByString:@"/"];
+            _method = [arr firstObject];
+        }else{
+            _method = method;
+        }
     }else{
         _method = method;
     }
     
     NSURL *url = [NSURL URLWithString:_urlString];
-    request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:_timeOut];
+    //NSURLRequestUseProtocolCachePolicy
+    request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:_timeOut];//超时时间
+    //request.userAgentString = [self makeUserAgentForRequest:nil];
+    
+    NSURLCache *urlCache = [NSURLCache sharedURLCache];
+    /* 设置缓存的大小为0M*/
+    [urlCache setMemoryCapacity:0];//1M = 1*1024*1024
+    //从请求中获取缓存输出
+    NSCachedURLResponse *response = [urlCache cachedResponseForRequest:request];
+    //判断是否有缓存
+    if (response != nil) {
+        NSLog(@"如果有缓存输出，从缓存中获取数据");
+        [request setCachePolicy:NSURLRequestReturnCacheDataDontLoad];
+    }
+    
     if ([NSJSONSerialization isValidJSONObject:body]) {
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:body options:NSJSONWritingPrettyPrinted error: &error];//利用系统自带 JSON 工具封装 JSON 数据
+        //利用系统自带 JSON 工具封装 JSON 数据
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:body options:NSJSONWritingPrettyPrinted error: &error];
         _totalLength = jsonData.length;
         request.HTTPMethod = @"POST";//设置为 POST
         request.HTTPBody = jsonData;//把刚才封装的 JSON 数据塞进去
         [self setValue:@"application/json" forHeader:@"Accept"];
         [self setValue:@"application/json" forHeader:@"Content-Type"];
         [self setValue:@(_totalLength).stringValue forHeader:@"Content-length"];
+        if ([k_action isEqualToString:@"api_V2"]) {
+            NSString *token = [body objectForKey:@"token"];
+            if (token) {
+                [self setValue:token forHeader:@"token"];
+            }
+        }
+        
+        // 设置请求头文件
+        //NSString *rangeValue = [NSString stringWithFormat:@"bytes=%d-", 1];
+        //[self addValue:rangeValue forHeader:@"Range"];
     }
 }
+
+//#pragma mark 生成User-Agent参数
+//- (NSString *)makeUserAgentForRequest:(NSString *)deviceToken
+//{
+//    NSString *userAgent=nil;
+//
+//    NSBundle *bundle = [NSBundle mainBundle];
+//
+//    NSString *appName = @"vCaidan:";
+//    NSString *appVersion = nil;
+//    NSString *marketingVersionNumber = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+//    NSString *developmentVersionNumber = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+//    if (marketingVersionNumber && developmentVersionNumber) {
+//        if ([marketingVersionNumber isEqualToString:developmentVersionNumber]) {
+//            appVersion = marketingVersionNumber;
+//        } else {
+//            appVersion = [NSString stringWithFormat:@"%@ ver:%@",marketingVersionNumber,developmentVersionNumber];
+//        }
+//    } else {
+//        appVersion = (marketingVersionNumber ? marketingVersionNumber : developmentVersionNumber);
+//    }
+//
+//    UIDevice *device = [UIDevice currentDevice];
+//    NSString *deviceName = [device model];
+//    NSString *OSName = [device systemName];
+//    NSString *OSVersion = [device systemVersion];
+//
+//
+//    userAgent = [NSString stringWithFormat:@"%@%@ deviceToken:%@ (%@; %@ %@)", appName, appVersion, deviceToken, deviceName, OSName, OSVersion];
+//
+//
+//    return userAgent;
+//}
 
 - (void)setValue:(NSString *)value forHeader:(NSString *)field
 {
@@ -109,7 +213,7 @@
 
 - (void)start
 {
-    connect = [[NSURLConnection alloc] initWithRequest: request delegate:self];
+    connect = [NSURLConnection connectionWithRequest:request delegate:self];
     [connect start];
 }
 
@@ -125,17 +229,18 @@
     CGFloat totalData = totalBytesExpectedToWrite * 1.0;
     CGFloat rate = totalBytesWritten / totalData;
     NSTimeInterval space = [[NSDate date] timeIntervalSinceDate:sendDate];
-    sendDate = [NSDate date];
     if (space < 0.02 && rate != 1) {
-        NSString *msg = @"----------发送进度没有更新--------------------";
-        [self.class printDebugMsg:msg];
+        //NSString *msg = @"----------发送进度没有更新--------------------";
+        //[self.class printDebugMsg:msg];
         return;
     }
-    if ([currentDelegate respondsToSelector:@selector(ws:sendProgress:)]) {
-        [currentDelegate ws:self sendProgress:rate];
+    
+    sendDate = [NSDate date];
+    if ([_delegate respondsToSelector:@selector(ws:sendProgress:)]) {
+        [_delegate ws:self sendProgress:rate];
     }
-    else if ([currentDelegate respondsToSelector:@selector(sendProgress:)]) {
-        [currentDelegate sendProgress:rate];
+    else if ([_delegate respondsToSelector:@selector(sendProgress:)]) {
+        [_delegate sendProgress:rate];
     }
 }
 
@@ -150,6 +255,13 @@
     //NSLog(@"File Size:%lld",contentLength);
 }
 
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
+{
+    //缓存处理
+    //NSLog(@"method : %@",_method);
+    return nil;
+}
+
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
     //接收数据回调
@@ -160,17 +272,18 @@
     CGFloat totalLen = contentLength * 1.0;
     CGFloat rate = activeDownload.length / totalLen;
     NSTimeInterval space = [[NSDate date] timeIntervalSinceDate:receiveDate];
-    receiveDate = [NSDate date];
     if (space < 0.02 && rate != 1) {
         NSString *msg = @"----------接收进度没有更新--------------------";
         [self.class printDebugMsg:msg];
         return;
     }
-    if ([currentDelegate respondsToSelector:@selector(ws:receiveProgress:)]) {
-        [currentDelegate ws:self receiveProgress:rate];
+    
+    receiveDate = [NSDate date];
+    if ([_delegate respondsToSelector:@selector(ws:receiveProgress:)]) {
+        [_delegate ws:self receiveProgress:rate];
     }
-    else if ([currentDelegate respondsToSelector:@selector(receiveProgress:)]) {
-        [currentDelegate receiveProgress:rate];
+    else if ([_delegate respondsToSelector:@selector(receiveProgress:)]) {
+        [_delegate receiveProgress:rate];
     }
 }
 
@@ -178,7 +291,7 @@
 {
     //请求失败
     NSDictionary *userInfo = error.userInfo;
-    NSLog(@"错误码:%d, %@, %@",_responseStatusCode,_method,error.localizedDescription);
+    NSLog(@"%d, %@, %@",_responseStatusCode,_method,error.localizedDescription);
     //NSString *path = [[NSBundle mainBundle] pathForResource:@"errDic" ofType:@"txt"];
     //NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:path];
     //NSLog(@"%@",dic[@(error.code).stringValue]);
@@ -187,23 +300,25 @@
         _errMsg = [_errMsg substringToIndex:_errMsg.length-1];
     }
     _urlString = userInfo[@"NSErrorFailingURLStringKey"];
-    [self wsFailedWithDelegate:currentDelegate];
+    [self wsFailedWithDelegate:_delegate];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     //请求完成
+    _responseData = activeDownload;
     if (_responseStatusCode != 200) {
         //请求失败
-        [self wsFailedWithDelegate:currentDelegate];
+        [self parseData:activeDownload];
     }else{
-        _responseData = activeDownload;
-        if ([_dataType hasPrefix:@"application/"]) {
+        if ([_dataType hasPrefix:@"application/"]||[_dataType hasPrefix:@"text/html"]) {
+            //解析成字符
             [self parseData:activeDownload];
         }else{
+            //文件
             _method = @"fileDownload";
-            if ([currentDelegate respondsToSelector:@selector(wsOK:)]) {
-                [currentDelegate wsOK:self];
+            if ([_delegate respondsToSelector:@selector(wsOK:)]) {
+                [_delegate wsOK:self];
             }
         }
     }
@@ -229,23 +344,28 @@
         
         NSError *error1 = nil;
         NSData *data = [stringL dataUsingEncoding:NSUTF8StringEncoding];
-        NSDictionary *jsonDic = nil;
-        if (data) {
-            jsonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&error1];
+        if (data.length <= 0) {
+            //文件
+            _method = @"fileDownload";
+            if ([_delegate respondsToSelector:@selector(wsOK:)]) {
+                [_delegate wsOK:self];
+            }
+            return;
         }
+        NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&error1];
         //NSLog(@"%@",resultsDictionary);
         
         BOOL isSuccess = [[jsonDic objectForKey:@"flag"] boolValue];
         if (isSuccess && !error1) {
             _jsonDic = jsonDic;
-            if ([currentDelegate respondsToSelector:@selector(wsOK:)]) {
+            if ([_delegate respondsToSelector:@selector(wsOK:)]) {
                 @try {
-                    [currentDelegate wsOK:self];
+                    [_delegate wsOK:self];
                 }
                 @catch (NSException *exception) {
                     NSLog(@"RequestOK,%@,%@,%@",_method,exception.name,exception.reason);
                     _errMsg = @"解析错误";
-                    [self wsFailedWithDelegate:currentDelegate];
+                    [self wsFailedWithDelegate:_delegate];
                 }
                 @finally {
                 }
@@ -256,27 +376,28 @@
             msg = (msg && [msg isKindOfClass:[NSString class]]) ? msg : @"请求错误";
             _jsonDic = jsonDic;
             _errMsg = msg;
-            [self wsFailedWithDelegate:currentDelegate];
+            [self wsFailedWithDelegate:_delegate];
         }else{
-            //NSString *msg = [GDataXMLNode getBody:stringL];
-            NSString *msg = nil;
+            NSString *msg = [GDataXMLNode getBody:stringL];
             msg = msg ?: @"服务暂时不可用";
             _errMsg = msg;
-            [self wsFailedWithDelegate:currentDelegate];
+            [self wsFailedWithDelegate:_delegate];
         }
+        
     }
 }
 
 - (void)wsFailedWithDelegate:(id)delegate
 {
-    NSString *stringL = [[NSString alloc] initWithData:activeDownload encoding:NSUTF8StringEncoding];
-    if (!stringL) {
-        NSStringEncoding GBEncoding = 0x80000632;
-        stringL = [[NSString alloc] initWithData:activeDownload encoding: GBEncoding];
-    }
-    NSLog(@"请求失败,%d,%@",_responseStatusCode,stringL);
     if ([delegate respondsToSelector:@selector(wsFailed:)]) {
         @try {
+            if (!_isShowErrmsg) {
+                NSLog(@"%@,%@",_method,_errMsg);
+                _errMsg = nil;
+            }
+            else if (_responseStatusCode == 500) {
+                _errMsg = @"无法连接到服务器,请稍候再试";
+            }
             [delegate wsFailed:self];
         }
         @catch (NSException *exception) {
@@ -295,42 +416,31 @@
     {
         NSError* error;
         NSData* jsonData = [NSJSONSerialization dataWithJSONObject:body options:NSJSONWritingPrettyPrinted error: &error];//利用系统自带 JSON 工具封装 JSON 数据
-        NSString *urlString = [NSString stringWithFormat:@"%@/%@/%@",k_host,k_action,method];
+        NSString *urlString = [HTTPRequest initUrl:method];;
         _urlString = _urlString ?: urlString;
         if ([method hasPrefix:@"http:"]) {
             _urlString = method;
         }
         NSURL* url = [NSURL URLWithString:_urlString];
-        request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:_timeOut];
+        request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:_timeOut];
         [request setHTTPMethod:@"POST"];//设置为 POST
         [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setValue:[NSString stringWithFormat:@"%ld",(long)[jsonData length]] forHTTPHeaderField:@"Content-length"];
         [request setTimeoutInterval:_timeOut];
         [request setHTTPBody:jsonData];//把刚才封装的 JSON 数据塞进去
-        //NSURLConnection *connect = [[NSURLConnection alloc] initWithRequest: request delegate:self];
-        //[connect start];
         
         /*
          *发起异步访问网络操作 并用 block 操作回调函数
          */
-        //[NSURLConnection sendAsynchronousRequest:request queue:[[NSOperationQueue alloc] init] completionHandler:handler];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^{
-            NSURLResponse *response = nil;
-            NSError *error = nil;
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                handler(response,data,error);
-            });
-        });
+        [NSURLConnection sendAsynchronousRequest:request queue:[[NSOperationQueue alloc] init] completionHandler:handler];
     }
 }
 
 + (HTTPRequest *)run:(NSString *)method body:(NSDictionary *)body delegate:(id)thedelegate
 {
-    HTTPRequest *result = [[HTTPRequest alloc] init];
-    [result setMethod:method];
-    [result run:method body:body delegate:thedelegate];
+    HTTPRequest *result = [[HTTPRequest alloc] initWithDelegate:thedelegate];
+    [result run:method body:body];
     [result start];
     
     return result;
@@ -339,7 +449,6 @@
 + (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler
 {
     HTTPRequest *result = [[HTTPRequest alloc] init];
-    [result setMethod:method];
     [result run:method body:body completionHandler:handler];
 }
 
