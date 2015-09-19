@@ -98,6 +98,10 @@
     else if (Type == 2) {
         [self searchHostDevice];
     }
+    else if (Type == 3) {
+        [self getHeadList];
+        [myTableView reloadData];
+    }
 }
 
 - (void)searchAccessDevice
@@ -142,6 +146,51 @@
     udpSocket.port = 8003;
     [udpSocket sendData:data];
     [udpSocket receiveWithTimeout:20.0 tag:0];
+}
+
+- (void)getHeadList
+{
+    NSArray *list = @[@"General&path=About",
+                      @"General&path=ACCESSIBILITY",
+                      @"AIRPLANE_MODE",
+                      @"General&path=AUTOLOCK",
+                      @"General&path=USAGE/CELLULAR_USAGE",
+                      @"Brightness",
+                      @"Bluetooth",
+                      @"General&path=DATE_AND_TIME",
+                      @"FACETIME",
+                      @"General",
+                      @"General&path=Keyboard",
+                      @"CASTLE",
+                      @"CASTLE&path=STORAGE_AND_BACKUP",
+                      @"General&path=INTERNATIONAL",
+                      @"LOCATION_SERVICES",
+                      @"ACCOUNT_SETTINGS",
+                      @"MUSIC",
+                      @"MUSIC&path=EQ",
+                      @"MUSIC&path=VolumeLimit",
+                      @"General&path=Network",
+                      @"NIKE_PLUS_IPOD",
+                      @"NOTES",
+                      @"NOTIFICATIONS_ID",
+                      @"Phone",
+                      @"Photos",
+                      @"General&path=ManagedConfigurationList",
+                      @"General&path=Reset",
+                      @"Sounds&path=Ringtone",
+                      @"Safari",
+                      @"General&path=Assistant",
+                      @"Sounds",
+                      @"General&path=SOFTWARE_UPDATE_LINK",
+                      @"STORE",
+                      @"TWITTER",
+                      @"General&path=USAGE",
+                      @"VIDEO",
+                      @"General&path=Network/VPN",
+                      @"Wallpaper",
+                      @"WIFI",
+                      @"INTERNET_TETHERING"];
+    listData.array = list;
 }
 
 - (BOOL)onUdpSocket:(AsyncUdpSocket *)sock didReceiveData:(NSData *)data withTag:(long)tag fromHost:(NSString *)host port:(UInt16)port
@@ -226,16 +275,14 @@
 }
 
 #pragma mark - ======tableView========================
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSInteger row_Count = 0;
-    
-    row_Count = listData.count;
+    NSInteger row_Count = listData.count;
     
     return row_Count;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *identify = [NSString stringWithFormat:@"%d/%d",(int)indexPath.section,(int)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identify];
@@ -244,8 +291,14 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identify];
     }
     
-    NSDictionary *dic = [listData[indexPath.row] convertToDic];
-    NSString *msg = [NSString format:@"SN:%@,PWD:%@,IP:%@,Port:%@",dic[@"SN"],dic[@"PWD"],dic[@"IP"],dic[@"Port"]];
+    NSString *msg = @"";
+    if (Type != 3) {
+        NSDictionary *dic = [listData[indexPath.row] convertToDic];
+        msg = [NSString format:@"SN:%@,PWD:%@,IP:%@,Port:%@",dic[@"SN"],dic[@"PWD"],dic[@"IP"],dic[@"Port"]];
+    }
+    else if (Type == 3) {
+        msg = listData[indexPath.row];
+    }
     cell.textLabel.text = msg;
     cell.textLabel.font = [UIFont systemFontOfSize:14.0];
     cell.textLabel.numberOfLines = 0;
@@ -260,18 +313,28 @@
     NSString *msg = listData[indexPath.row];
     [self.view makeToast:msg];
     
-    if (Type == 2) {
-        return;
+    if (Type == 1) {
+        NSDictionary *dic = [msg convertToDic];
+        NSString *host = dic[@"IP"] ?: @"";
+        UInt16 port = [dic[@"Port"] intValue];
+        [_tcpSocket connectToHost:host port:port];
+        
+        UIViewController *Test = getController(@"Test", nil);
+        [Test setValue:dic forKey:@"dicAccess"];
+        [self.navigationController pushViewController:Test animated:YES];
     }
-    
-    NSDictionary *dic = [msg convertToDic];
-    NSString *host = dic[@"IP"] ?: @"";
-    UInt16 port = [dic[@"Port"] intValue];
-    [_tcpSocket connectToHost:host port:port];
-    
-    UIViewController *Test = getController(@"Test", nil);
-    [Test setValue:dic forKey:@"dicAccess"];
-    [self.navigationController pushViewController:Test animated:YES];
+    else if (Type == 2) {
+        
+    }
+    else if (Type == 3) {
+        NSString *head = @"prefs:root=";
+        NSString *content = listData[indexPath.row];
+        NSString *urlStr = [head AppendString:content];
+        NSURL *url = [NSURL URLWithString:urlStr];
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    }
 }
 
 -(void)test:(NSString *)aString with:(NSString *)bString

@@ -50,7 +50,7 @@
     [self addSubview:btnBrow];
     
     //语音
-    btnVoice=[UIButton buttonWithType:UIButtonTypeCustom];
+    btnVoice = [iButton buttonWithType:UIButtonTypeCustom];
     btnVoice.frame = CGRectMake(Screen_Width-44, 0, 44, 44);
     [btnVoice setImage:[UIImage imageNamed:@"底部语音图标"] forState:UIControlStateNormal];
     [btnVoice setImage:[UIImage imageNamed:@"语音-绿"] forState:UIControlStateHighlighted];

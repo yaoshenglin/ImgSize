@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E21020621B9D3D3D00D528EF /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21020611B9D3D3D00D528EF /* ImageIO.framework */; };
+		E21020641B9D412500D528EF /* 灯闪动画.gif in Resources */ = {isa = PBXBuildFile; fileRef = E21020631B9D412500D528EF /* 灯闪动画.gif */; };
 		E216D3C41942F76200A81FC6 /* EmojiView.m in Sources */ = {isa = PBXBuildFile; fileRef = E216D3C31942F76200A81FC6 /* EmojiView.m */; };
 		E216DD40192B352A00B17105 /* Second_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E216DD3F192B352A00B17105 /* Second_ViewController.m */; };
 		E216DD43192B398D00B17105 /* Third_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E216DD42192B398D00B17105 /* Third_ViewController.m */; };
@@ -126,6 +128,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E21020611B9D3D3D00D528EF /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		E21020631B9D412500D528EF /* 灯闪动画.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "灯闪动画.gif"; sourceTree = "<group>"; };
 		E216D3C21942F76200A81FC6 /* EmojiView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmojiView.h; sourceTree = "<group>"; };
 		E216D3C31942F76200A81FC6 /* EmojiView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmojiView.m; sourceTree = "<group>"; };
 		E216DD3E192B352A00B17105 /* Second_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Second_ViewController.h; sourceTree = "<group>"; };
@@ -308,6 +312,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E21020621B9D3D3D00D528EF /* ImageIO.framework in Frameworks */,
 				E22073611B959EB900DBB8D4 /* CoreTelephony.framework in Frameworks */,
 				E2BDE5961B539E320098CF42 /* libxml2.2.dylib in Frameworks */,
 				E263E34F1AC92F3800785EE4 /* SystemConfiguration.framework in Frameworks */,
@@ -357,6 +362,7 @@
 		E21EE5E619270DBF0051408C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E21020611B9D3D3D00D528EF /* ImageIO.framework */,
 				E22073601B959EB900DBB8D4 /* CoreTelephony.framework */,
 				E2BDE5951B539E320098CF42 /* libxml2.2.dylib */,
 				E263E34E1AC92F3800785EE4 /* SystemConfiguration.framework */,
@@ -674,6 +680,7 @@
 				E24D35F11B7B252400991739 /* 按钮-选中效果@2x.png */,
 				E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */,
 				E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */,
+				E21020631B9D412500D528EF /* 灯闪动画.gif */,
 				E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */,
 				E2A1FFF91B4272FE00E7BA97 /* 配置iface信号发射@2x.png */,
 			);
@@ -744,7 +751,7 @@
 		E21EE5DC19270DBF0051408C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = caidan;
 				TargetAttributes = {
 					E21EE5E319270DBF0051408C = {
@@ -788,6 +795,7 @@
 				E2B3B8B81B1D4590004ED953 /* 二维码大@2x.png in Resources */,
 				E2B3B8C11B1D45D6004ED953 /* msg2@2x.png in Resources */,
 				E2231D5919496404003ADE6F /* voice_note_error.wav in Resources */,
+				E21020641B9D412500D528EF /* 灯闪动画.gif in Resources */,
 				E2B3B8BA1B1D4590004ED953 /* 微菜单超大-@2x.png in Resources */,
 				E24D35F01B7B231100991739 /* IQKeyboardManager.bundle in Resources */,
 				E2231D5A19496404003ADE6F /* voice_note_start.wav in Resources */,
@@ -959,6 +967,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1029,6 +1038,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "235ff3f3-5410-4d85-9d5c-729b254ea94d";
 				SDKROOT = iphoneos;
@@ -1056,6 +1066,7 @@
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "235ff3f3-5410-4d85-9d5c-729b254ea94d";
 				SDKROOT = iphoneos;
@@ -1081,6 +1092,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "ImgSizeTests/ImgSizeTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -1099,6 +1111,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
 				INFOPLIST_FILE = "ImgSizeTests/ImgSizeTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

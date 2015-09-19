@@ -46,6 +46,7 @@
  @param frame Initial frame of barButtonItem
  @param title Title of barButtonItem.
  */
--(instancetype)initWithFrame:(CGRect)frame title:(NSString *)title NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithFrame:(CGRect)frame title:(NSString *)title;
+//-(instancetype)initWithFrame:(CGRect)frame title:(NSString *)title NS_DESIGNATED_INITIALIZER;
 
 @end

@@ -770,7 +770,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     UIWebView *webView = [[UIWebView alloc] init];
     webView.scalesPageToFit = YES;
     webView.scrollView.scrollEnabled = NO;
-    [webView loadData:gifData MIMEType:@"image/gif" textEncodingName:nil baseURL:nil];
+    [webView loadData:gifData MIMEType:@"image/gif" textEncodingName:@"" baseURL:[NSURL URLWithString:@""]];
     
     webView.opaque = NO;
 
