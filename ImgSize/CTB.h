@@ -42,14 +42,14 @@
 #define select(x) @selector(x)
 #define iPhone [[[UIDevice currentDevice] systemVersion] floatValue]
 
-#define isSimulator (BOOL)[[UIDevice currentDevice].model isEqualToString:@"iPhone Simulator"]
+#define isSimulator (BOOL)[[UIDevice currentDevice].name isEqualToString:@"iPhone Simulator"]
 
 #define iPhone7 iPhone>=7.0
 
 #define Screen_Height [UIScreen mainScreen].bounds.size.height
 #define Screen_Width [UIScreen mainScreen].bounds.size.width
 #define barH (CGFloat)[UIApplication sharedApplication].statusBarFrame.size.height
-#define currrentNavH (CGFloat)(self.navigationController.navigationBar.frame.size.height)
+#define currrentNavH (CGFloat)([UINavigationBar appearance].frame.size.height)
 #define navH (CGFloat)((currrentNavH > 0) ? currrentNavH : 44.0)
 #define topH (CGFloat)((iPhone >= 7) ? barH : 0)
 #define viewW Screen_Width
@@ -71,7 +71,8 @@
 #define intToString(x) [NSString stringWithFormat:@"%d",x]
 #define floatToString(x) [NSString stringWithFormat:@"%f",x]
 #define NotificationCenter [NSNotificationCenter defaultCenter]
-#define varString(var) [NSString stringWithFormat:@"%s",#var]
+#define UserDefaults [NSUserDefaults standardUserDefaults]
+#define varStr(x) [NSString stringWithFormat:@"%s",#x]
 #define N(x) @(x)
 #define NSOK NSLog(@"OK")
 #define Linefeed printf("\n")
@@ -164,6 +165,7 @@ id getController(NSString *identifier,NSString *title);
 + (void)setBottomLineToBtn:(id)button, ... NS_REQUIRES_NIL_TERMINATION;
 + (void)setBottomLineHigh:(CGFloat)high Color:(UIColor *)color toV:(id)button, ...NS_REQUIRES_NIL_TERMINATION;
 + (void)setLeftViewWithWidth:(CGFloat)w textField:(UITextField *)textField, ... NS_REQUIRES_NIL_TERMINATION;
++ (void)setRightViewWithWidth:(CGFloat)w textField:(UITextField *)textField, ... NS_REQUIRES_NIL_TERMINATION;
 
 
 #pragma mark 添加圆角
@@ -222,9 +224,9 @@ id getSuperView(Class aClass,UIView *View);
 id getSuperViewBy(Class aClass,UIView *View,NSInteger tag);
 //根据类名从导航中获取指定视图
 + (UIViewController *)getControllerFrom:(UINavigationController *)Nav className:(NSString *)className;
-UIViewController *getControllerFrom(UINavigationController *Nav,NSString *className);
-UIViewController *getControllerFor(UIViewController *VC,NSString *className);
-UIViewController *getParentController(UIViewController *VC,NSString *className);
+id getControllerFrom(UINavigationController *Nav,NSString *className);
+id getControllerFor(UIViewController *VC,NSString *className);
+id getParentController(UIViewController *VC,NSString *className);
 + (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav;
 + (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav;
 void forbiddenNavPan(UIViewController *VC,BOOL isForbid);
@@ -357,7 +359,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha);
 #pragma mark 保存图片到文件
 + (void)saveImgToFile:(NSString *)FilePath withImg:(UIImage *)image;
 //压缩图片
-+ (UIImage*)imageWithImageSimple:(UIImage*)image scaledToSize:(CGSize)newSize;
++ (UIImage *)imageWithImageSimple:(UIImage*)image scaledToSize:(CGSize)newSize;
 + (UIImage *)imageWithImg:(UIImage *)img scaledToSize:(CGSize)newSize;
 #pragma mark 压缩ImageData, 指定最大的kb数
 + (NSData *)scaleImageToDataByMaxKB:(long)maxKB image:(UIImage *)image;
@@ -377,6 +379,10 @@ NSArray *getDBPath();
  @return App信息详情
  */
 + (NSDictionary *)infoDictionary;
+#pragma mark 获取App版本号
++ (NSString *)getAppVersion;
+#pragma mark 获取AppBuidl
++ (NSInteger)getAppBuild;
 
 NSString *getPartString(NSString *string,NSString *aString,NSString *bString);
 NSString *getUTF8String(NSString *string);//使用UTF8编码
@@ -441,6 +447,7 @@ void hiddenNavBar(UIViewController *VC,BOOL hidden,BOOL animaion);
 + (void)UIControllerEdgeNone:(UIViewController *)VC;
 #pragma mark 打印调试信息
 + (void)printDebugMsg:(NSString *)msg;
+void CTBNSLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
 #pragma mark - ----------其它------------------------
 + (void)duration:(NSTimeInterval)dur block:(dispatch_block_t)block;
@@ -453,6 +460,8 @@ void setUserData(id obj,NSString *key);
 void removeObjectForKey(NSString *key);
 id getUserData(NSString *key);
 
++ (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName;
++ (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName  object:(id)anObject;
 + (void)postNoticeName:(NSString *)aName object:(id)anObject;
 + (void)postNoticeName:(NSString *)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo;
 
@@ -463,6 +472,10 @@ id getUserData(NSString *key);
 
 //发送本地通知
 + (void)sendLocalNotice;
+
+//键盘通知事件
++ (void)KeyboardWillShowAddObserver:(id)observer selector:(SEL)aSelector;
++ (void)KeyboardWillHideAddObserver:(id)observer selector:(SEL)aSelector;
 
 #pragma mark APP核对
 + (NSArray *)checkHasOwnApp;
@@ -492,7 +505,7 @@ id getUserData(NSString *key);
 
 - (void)ButtonEvents:(UIButton *)button;
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
-
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end
 
@@ -511,8 +524,12 @@ id getUserData(NSString *key);
 - (NSString *)AppendString:(NSString *)aString;
 - (NSString *)AppendFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
+#pragma mark 日期字符串转成日期
+- (NSDate *)dateWithFormat:(NSString *)format;
+
 //十六进制字符串转换为NSData bytes
 - (NSData *)dataByHexString;
+- (NSString *)uppercaseByHexString;
 //字符串转化成字典
 - (NSDictionary *)convertToDic;
 //判断是否包含字符串
@@ -520,7 +537,6 @@ id getUserData(NSString *key);
 //获取中文字符的拼音
 - (NSString *) phonetic;
 - (NSString *)getPhonetic;
-- (NSDate *)dateWithFormat:(NSString *)format;//字符串转化为时间
 - (NSString *)firstString;//获取第一个字符
 - (NSData *)dataUsingUTF8;
 #pragma mark 使用MD5加密
@@ -541,6 +557,7 @@ id getUserData(NSString *key);
 - (NSString *)removeSuffix:(NSString *)aString;
 
 - (BOOL)isNull;//判断是否为空字符串
+- (BOOL)isNonEmpty;
 
 - (long)parseInt:(int)type;//转化为十进制
 
@@ -549,6 +566,8 @@ id getUserData(NSString *key);
 
 #pragma mark 解析字符串中的网址
 - (NSArray *)getURL;
+//IP专用
+- (NSString *)getHex;
 
 @end
 
@@ -574,18 +593,21 @@ id getUserData(NSString *key);
 #pragma mark - NSArray
 @interface NSArray (NSObject)
 
-- (id)objAtIndex:(NSUInteger)index;//根据下标获取数据
+- (id)objAtIndex:(NSInteger)index;//根据下标获取数据
 
 - (void)perExecute:(SEL)aSelector;
 - (void)perExecute:(SEL)aSelector withObject:(id)argument;
+- (void)perExecute:(SEL)aSelector forClass:(Class)class;
 
 - (NSArray *)getListKey:(id)key;
 
 - (id)getObjByKey:(NSString *)key value:(id)value;//根据对象中的键值和值找到对象
-//根据对象中的键值和值找到对象所在下标
+//根据对象中的键和值找到对象所在下标
 - (int)getIndexByKey:(NSString *)key value:(id)value;
 //删除重复的对象
 - (NSArray *)removeRepeatFor:(NSString *)key;
+//根据对象中的键和值删除对象
+- (NSArray *)removeObjByKey:(NSString *)key value:(id)value;
 //替换对象
 - (NSArray *)replaceObject:(NSUInteger)index with:(id)anObject;
 
@@ -599,6 +621,7 @@ id getUserData(NSString *key);
 - (NSString *)convertToString;
 
 - (id)checkClass:(Class)aClass key:(id)key;//判断key对应的值的类型
+- (id)checkClasses:(NSArray *)listClass key:(id)key;
 
 //根据关键字获取对应数据
 - (NSString *)stringForKey:(id)key;
@@ -625,8 +648,8 @@ id getUserData(NSString *key);
 
 #pragma mark - --------NSDate
 @interface NSDate (NSObject)
-+ (NSString *)dateWithFormat:(NSString *)format;
-- (NSString *)dateWithFormat:(NSString *)format;
++ (NSString *)stringWithFormat:(NSString *)format;
+- (NSString *)stringWithFormat:(NSString *)format;
 
 @end
 
@@ -653,6 +676,9 @@ id getUserData(NSString *key);
 - (UIImage *)imageWithCapInsets:(UIEdgeInsets)capInsets;
 + (UIImage *)imageFromLibrary:(NSString *)imgName;
 
+#pragma mark 截取部分图像
+- (UIImage *)imageWithInRect:(CGRect)rect;
+
 @end
 
 #pragma mark - UIView
@@ -664,16 +690,20 @@ id getUserData(NSString *key);
 - (void)setSizeToW:(CGFloat)w;
 - (void)setSizeToH:(CGFloat)h;
 - (void)setSizeToW:(CGFloat)w height:(CGFloat)h;
+- (void)setSizeWithCenterToW:(CGFloat)w height:(CGFloat)h;
 - (void)setOriginX:(CGFloat)x width:(CGFloat)w;
 - (void)setOriginY:(CGFloat)y height:(CGFloat)h;
 
 - (void)setOrigin:(CGPoint)origin;
 - (void)setSize:(CGSize)size;
+- (void)setOrigin:(CGPoint)origin size:(CGSize)size;
 
 - (void)setCenterX:(CGFloat)x;
 - (void)setCenterY:(CGFloat)y;
 - (void)setCenterX:(CGFloat)x Y:(CGFloat)y;
 - (void)setToParentCenter;
+- (void)setOriginScale:(CGFloat)scale;
+- (void)setCenterScale:(CGFloat)scale;
 
 - (void)rotation:(CGFloat)angle;//旋转angle度
 
@@ -681,6 +711,22 @@ id getUserData(NSString *key);
 - (id)viewWithClass:(Class)aClass;
 - (id)viewWithClass:(Class)aClass tag:(NSInteger)tag;
 - (NSArray *)viewsWithClass:(Class)aClass;//该类的合集
+
+//添加视图约束
+- (void)addConstraintsWithFormat:(NSString *)format views:(NSDictionary *)views;
+
+//视图切换动画
+- (void)addAnimationType:(NSString *)type subType:(NSString *)subType duration:(CFTimeInterval)duration;
+- (void)commitAnimations;
+- (void)addAnimationType:(NSString *)type subType:(NSString *)subType duration:(CFTimeInterval)duration operation:(dispatch_block_t)operation completion:(dispatch_block_t)completion;
+
+- (UIActivityIndicatorView *)addActivityIndicatorStyle:(UIActivityIndicatorViewStyle)style;
+- (void)stopActivityIndicator;
+- (void)removeActivityIndicator;
+
+//添加虚线边框
+- (void)dashLineForBorderWithRadius:(CGFloat)radius;
+- (void)dashLineWithRadius:(CGFloat)radius borderWidth:(CGFloat)borderWidth dashPattern:(CGFloat)dashPattern spacePattern:(CGFloat)spacePattern lineColor:(UIColor *)lineColor;
 
 @end
 
@@ -705,8 +751,14 @@ id getUserData(NSString *key);
 - (void)setImage:(UIImage *)image normal:(BOOL)normal highlighted:(BOOL)highlighted;
 
 - (void)setNormalBackgroundImage:(UIImage *)image;
-- (void)setHighlightedBackgroundImage:(UIImage *)image;
+- (void)setHighlightedBGImage:(UIImage *)image;
 - (void)setBackgroundImage:(UIImage *)image normal:(BOOL)normal highlighted:(BOOL)highlighted;
+
+- (void)setNormalTitle:(NSString *)title;
+- (void)setHighlightedTitle:(NSString *)title;
+
+- (void)setContentAlignment:(UIControlContentHorizontalAlignment)alignment;
+- (void)setContentAlignment:(UIControlContentHorizontalAlignment)alignment edgeInsets:(UIEdgeInsets)edgeInsets;
 
 @end
 
@@ -747,6 +799,16 @@ id getUserData(NSString *key);
 + (BOOL)fileExistsAtPath:(NSString *)path isDirectory:(BOOL *)isDirectory;
 + (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data attributes:(NSDictionary *)attr;
 + (BOOL)moveItemAtPath:(NSString *)srcPath toPath:(NSString *)dstPath error:(NSError **)error;
+
+@end
+
+#pragma mark - UILabel
+@interface UILabel (NSObject)
+
+- (void)attribute:(NSString *)aString fontSize:(CGFloat)fontSize range:(NSRange)range;
+- (void)attribute:(NSString *)aString font:(UIFont *)font range:(NSRange)range;
+- (void)attributedText:(NSString *)text name:(NSString *)name value:(id)value range:(NSRange)range;
+- (void)attributedText:(NSString *)text dicValue:(NSDictionary *)dicValue range:(NSRange)range;
 
 @end
 

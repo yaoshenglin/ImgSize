@@ -35,7 +35,7 @@
 #pragma mark -根据索引ID获取键值索引ID（p15000、p3000、p15公共方法）
 + (int)getKeyIndexWithID:(Enum_InfraedType)infraedType index:(int)preIndex
 {
-    NSString *tableName = varString(infraedType);
+    NSString *tableName = varStr(infraedType);
     NSArray *listName = @[@"P15",@"P3000",@"P15000"];
     if (![listName containsObject:tableName]) {
         tableName = nil;
