@@ -2370,6 +2370,24 @@ NSArray *getDBPath()
     return getDBPath();
 }
 
++ (void)getContentsAtPath:(NSString *)path inArray:(NSMutableArray *)array
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isDirectory = NO;
+    if ([fileManager fileExistsAtPath:path isDirectory:&isDirectory]) {
+        if (isDirectory) {
+            NSError *error = nil;
+            NSArray *list = [fileManager contentsOfDirectoryAtPath:path error:&error];
+            for (NSString *subName in list) {
+                NSString *subPath = [path stringByAppendingPathComponent:subName];
+                [self getContentsAtPath:subPath inArray:array];
+            }
+        }else{
+            [array addObject:path];
+        }
+    }
+}
+
 #pragma mark 获取-info.plist中的数据
 + (NSDictionary *)infoDictionary
 {

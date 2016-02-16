@@ -55,6 +55,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     UIButton *btnTest;
     
     MBProgressHUD *hudView;
+    SOLStumbler *stumbler;
     //NSDate *date;
     UILabel *lblInstantSpeed;
     UILabel *lblPeakSpeed;
@@ -188,26 +189,28 @@ static NSString *const SBStyle2 = @"SBStyle2";
         //[request run:urlString body:nil];
         //[request start];
         
-        NSString *msg = @"场景命令执行成功，请选择继续的操作";
-        NSAlertView *alert = [[NSAlertView alloc] initWithTitle:@"场景命令" message:msg delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定"];
-        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-        UITextField *txtName = [alert textFieldAtIndex:0];
-        txtName.text = @"远在天边";
-        [alert show];
-        //[self scanWifis];
+//        NSString *msg = @"场景命令执行成功，请选择继续的操作";
+//        NSAlertView *alert = [[NSAlertView alloc] initWithTitle:@"场景命令" message:msg delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定"];
+//        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+//        UITextField *txtName = [alert textFieldAtIndex:0];
+//        txtName.text = @"远在天边";
+//        [alert show];
+        [self scanWifis];
     }
 }
 
 //扫描网络
 - (void)scanWifis
 {
-    SOLStumbler *stumbler = [[SOLStumbler alloc]init];
+    stumbler = stumbler ?: [[SOLStumbler alloc] init];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [stumbler scanNetworks];
         NSMutableArray *dicts = stumbler.networkDicts;
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            NSLog(@"%@",dicts);
+            if (dicts.count > 0) {
+                NSLog(@"%@",dicts);
+            }
         });
     });
 }

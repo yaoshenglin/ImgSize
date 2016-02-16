@@ -16,12 +16,10 @@
 	networks = [[NSMutableDictionary alloc] init];
     networkDicts = [NSMutableArray array];
     //iOS5+
-    libHandle = dlopen(
-                       "System/Library/SystemConfiguration/IPConfiguration.bundle/IPConfiguration",
-                       RTLD_LAZY);
+    libHandle = dlopen("System/Library/SystemConfiguration/IPConfiguration.bundle/IPConfiguration", RTLD_LAZY);
 
     //iOS4
-//	libHandle = dlopen("/System/Library/SystemConfiguration/WiFiManager.bundle/WiFiManager", RTLD_LAZY);
+    //libHandle = dlopen("/System/Library/SystemConfiguration/WiFiManager.bundle/WiFiManager", RTLD_LAZY);
 	char *error;
 	if (libHandle == NULL && (error = dlerror()) != NULL)  {
 		NSLog(@"error = %s",error);
@@ -32,8 +30,10 @@
     apple80211Close = dlsym(libHandle, "Apple80211Close");
     apple80211Scan = dlsym(libHandle, "Apple80211Scan");
     apple80211Associate = dlsym(libHandle, "Apple80211Associate");
-    apple80211Open(&airportHandle);
-    apple80211Bind(airportHandle, @"en0");
+    if (apple80211Open) {
+        apple80211Open(&airportHandle);
+        apple80211Bind(airportHandle, @"en0");
+    }
 
 	return self;
 }
@@ -52,8 +52,12 @@
 }
 - (void)scanNetworks
 {
-	NSLog(@"Scanning WiFi Channels...");
+    if (!apple80211Scan) {
+        NSLog(@"Scanning WiFi Failed!");
+        return;
+    }
 	
+    NSLog(@"Scanning WiFi Channels...");
 	NSDictionary *parameters = [[NSDictionary alloc] init];
 	NSArray *scan_networks; //is a CFArrayRef of CFDictionaryRef(s) containing key/value data on each discovered network
 	apple80211Scan(airportHandle, &scan_networks, (__bridge void *)(parameters));

@@ -371,6 +371,8 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha);
 NSArray *getDBPath();
 + (NSArray *)getDBPath;
 
++ (void)getContentsAtPath:(NSString *)path inArray:(NSMutableArray *)array;
+
 #pragma mark 获取-info.plist中的数据
 /**
  获取-info.plist中的数据
