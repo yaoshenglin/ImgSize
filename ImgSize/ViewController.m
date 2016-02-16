@@ -189,13 +189,13 @@ static NSString *const SBStyle2 = @"SBStyle2";
         //[request run:urlString body:nil];
         //[request start];
         
-//        NSString *msg = @"场景命令执行成功，请选择继续的操作";
-//        NSAlertView *alert = [[NSAlertView alloc] initWithTitle:@"场景命令" message:msg delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定"];
-//        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-//        UITextField *txtName = [alert textFieldAtIndex:0];
-//        txtName.text = @"远在天边";
-//        [alert show];
-        [self scanWifis];
+        NSString *msg = @"场景命令执行成功，请选择继续的操作";
+        NSAlertView *alert = [[NSAlertView alloc] initWithTitle:@"场景命令" message:msg delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定"];
+        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        UITextField *txtName = [alert textFieldAtIndex:0];
+        txtName.text = @"远在天边";
+        [alert show];
+        //[self scanWifis];
     }
 }
 
