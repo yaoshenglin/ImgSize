@@ -109,12 +109,12 @@
     [self.status setText:@""];
 }
 
--(void)forget
+- (void)forget
 {
     [gesturePasswordDelegate forget];
 }
 
--(void)change
+- (void)change
 {
     [gesturePasswordDelegate change];
 }

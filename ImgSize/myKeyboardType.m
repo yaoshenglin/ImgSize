@@ -23,7 +23,7 @@
     return sharedInstance;
 }
 
--(id)init
+- (id)init
 {
     keyboards = [super init];
     if (!self) {

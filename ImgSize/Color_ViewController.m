@@ -133,14 +133,18 @@
             return;
         }
         
+        //@"device:switch;id:01000001;tag:3";
+        //@"device:plug;id:02000001;ver:1.0";
+        //@"device:doorlock;id:03000001;tag:1;ver:1.0";
+        
         NSString *value = @"";
         if (tag == 1) {
             //主机
             value = [NSString format:@"device:host;content:%@;ver:1.0",host_mac];
         }
         else if (tag == 2) {
-            //开关
-            value = [NSString format:@"device:switch;id:%@",host_mac];
+            //开关(3目)
+            value = [NSString format:@"device:switch;id:%@;tag:3",host_mac];
         }
         
         if (isSelect) {

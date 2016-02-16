@@ -35,7 +35,7 @@
 @protocol PhotoPreViewDelegate <NSObject>
 
 @optional
--(void)photoPreView:(PhotoPreView*)photoPreView didSelectImage:(UIImage *)image;
--(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;
+- (void)photoPreView:(PhotoPreView*)photoPreView didSelectImage:(UIImage *)image;
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;
 
 @end

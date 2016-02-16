@@ -67,13 +67,13 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     objc_setAssociatedObject(self, @selector(isAskingCanBecomeFirstResponder), [NSNumber numberWithBool:isAskingCanBecomeFirstResponder], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
--(BOOL)isAskingCanBecomeFirstResponder
+- (BOOL)isAskingCanBecomeFirstResponder
 {
     NSNumber *isAskingCanBecomeFirstResponder = objc_getAssociatedObject(self, @selector(isAskingCanBecomeFirstResponder));
     return [isAskingCanBecomeFirstResponder boolValue];
 }
 
--(UIViewController*)viewController
+- (UIViewController*)viewController
 {
     UIResponder *nextResponder =  self;
     
@@ -89,7 +89,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     return nil;
 }
 
--(UIViewController *)topMostController
+- (UIViewController *)topMostController
 {
     NSMutableArray *controllersHierarchy = [[NSMutableArray alloc] init];
     
@@ -120,7 +120,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     return (UIViewController*)matchController;
 }
 
--(UIView*)superviewOfClassType:(Class)classType
+- (UIView*)superviewOfClassType:(Class)classType
 {
     UIView *superview = self.superview;
     
@@ -139,7 +139,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     return nil;
 }
 
--(BOOL)_IQcanBecomeFirstResponder
+- (BOOL)_IQcanBecomeFirstResponder
 {
     [self _setIsAskingCanBecomeFirstResponder:YES];
     BOOL _IQcanBecomeFirstResponder = ([self canBecomeFirstResponder] && [self isUserInteractionEnabled] && ![self isHidden] && [self alpha]!=0.0 && ![self isAlertViewTextField]  && ![self isSearchBarTextField]);
@@ -215,7 +215,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     return textFields;
 }
 
--(CGAffineTransform)convertTransformToView:(UIView*)toView
+- (CGAffineTransform)convertTransformToView:(UIView*)toView
 {
     if (toView == nil)
     {
@@ -299,7 +299,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     return debugInfo;
 }
 
--(NSString *)debugHierarchy
+- (NSString *)debugHierarchy
 {
     NSMutableString *debugInfo = [[NSMutableString alloc] init];
 
@@ -319,12 +319,12 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     return debugInfo;
 }
 
--(BOOL)isSearchBarTextField
+- (BOOL)isSearchBarTextField
 {
     return ([self isKindOfClass:UISearchBarTextFieldClass] || [self isKindOfClass:[UISearchBar class]]);
 }
 
--(BOOL)isAlertViewTextField
+- (BOOL)isAlertViewTextField
 {
     return ([self isKindOfClass:UIAlertSheetTextFieldClass] || [self isKindOfClass:UIAlertSheetTextFieldClass_iOS8]);
 }
@@ -334,7 +334,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
 
 @implementation NSObject (IQ_Logging)
 
--(NSString *)_IQDescription
+- (NSString *)_IQDescription
 {
     return [NSString stringWithFormat:@"<%@ %p>",NSStringFromClass([self class]),self];
 }

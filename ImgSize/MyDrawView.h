@@ -14,6 +14,6 @@
 @property (assign ,nonatomic) CGRect lRect;
 @property (retain ,nonatomic) UIColor *fillColor;
 
--(void)changeFillColor:(UIColor *)color;
+- (void)changeFillColor:(UIColor *)color;
 
 @end

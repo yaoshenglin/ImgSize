@@ -395,7 +395,7 @@ void _IQShowLog(NSString *logString);
 #pragma mark - Private Methods
 
 /** Getting keyWindow. */
--(UIWindow *)keyWindow
+- (UIWindow *)keyWindow
 {
     if (_textFieldView.window)
     {
@@ -1346,7 +1346,7 @@ void _IQShowLog(NSString *logString);
 }
 
 /** To not detect touch events in a subclass of UIControl, these may have added their own selector for specific work */
--(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
     //  Should not recognize gesture if the clicked view is either UIControl or UINavigationBar(<Back button etc...)    (Bug ID: #145)
     return ([[touch view] isKindOfClass:[UIControl class]] || [[touch view] isKindOfClass:[UINavigationBar class]]) ? NO : YES;
@@ -1379,7 +1379,7 @@ void _IQShowLog(NSString *logString);
 }
 
 /** Returns YES if can navigate to previous responder textField/textView, otherwise NO. */
--(BOOL)canGoPrevious
+- (BOOL)canGoPrevious
 {
     //Getting all responder view's.
     NSArray *textFields = [self responderViews];
@@ -1400,7 +1400,7 @@ void _IQShowLog(NSString *logString);
 }
 
 /** Returns YES if can navigate to next responder textField/textView, otherwise NO. */
--(BOOL)canGoNext
+- (BOOL)canGoNext
 {
     //Getting all responder view's.
     NSArray *textFields = [self responderViews];
@@ -1497,7 +1497,7 @@ void _IQShowLog(NSString *logString);
 #pragma mark AutoToolbar methods
 
 /**	Get all UITextField/UITextView siblings of textFieldView. */
--(NSArray*)responderViews
+- (NSArray*)responderViews
 {
     UIView *superConsideredView;
     
@@ -1784,7 +1784,7 @@ void _IQShowLog(NSString *logString);
 }
 
 /** Returns YES if ViewController class is disabled for library, otherwise returns NO. */
--(BOOL)isDisableInViewControllerClass:(Class)disabledClass
+- (BOOL)isDisableInViewControllerClass:(Class)disabledClass
 {
     return [_disabledClasses containsObject:disabledClass];
 }
@@ -1802,7 +1802,7 @@ void _IQShowLog(NSString *logString);
 }
 
 /** Returns YES if toolbar is disabled in ViewController class, otherwise returns NO.   */
--(BOOL)isDisableToolbarInViewControllerClass:(Class)toolbarDisabledClass
+- (BOOL)isDisableToolbarInViewControllerClass:(Class)toolbarDisabledClass
 {
     return [_disabledToolbarClasses containsObject:toolbarDisabledClass];
 }
@@ -1820,7 +1820,7 @@ void _IQShowLog(NSString *logString);
 }
 
 /** Returns YES if inner hierarchy is considered for previous/next in class, otherwise returns NO.  */
--(BOOL)isConsiderToolbarPreviousNextInViewClass:(Class)toolbarPreviousNextConsideredClass
+- (BOOL)isConsiderToolbarPreviousNextInViewClass:(Class)toolbarPreviousNextConsideredClass
 {
     return [_toolbarPreviousNextConsideredClass containsObject:toolbarPreviousNextConsideredClass];
 }

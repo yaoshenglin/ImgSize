@@ -37,7 +37,7 @@
 }
 @synthesize font = _font;
 
--(instancetype)initWithFrame:(CGRect)frame title:(NSString *)title
+- (instancetype)initWithFrame:(CGRect)frame title:(NSString *)title
 {
     self = [super initWithTitle:nil style:UIBarButtonItemStylePlain target:nil action:nil];
     if (self)

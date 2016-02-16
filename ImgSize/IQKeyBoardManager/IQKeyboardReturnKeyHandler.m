@@ -57,7 +57,7 @@ NSString *const kIQTextFieldReturnKeyType   =   @"kIQTextFieldReturnKeyType";
 @synthesize toolbarManageBehaviour = _toolbarManageBehaviour;
 @synthesize delegate = _delegate;
 
--(instancetype)initWithViewController:(UIViewController*)controller
+- (instancetype)initWithViewController:(UIViewController*)controller
 {
     self = [super init];
     
@@ -70,7 +70,7 @@ NSString *const kIQTextFieldReturnKeyType   =   @"kIQTextFieldReturnKeyType";
     return self;
 }
 
--(NSDictionary*)textFieldCachedInfo:(UITextField*)textField
+- (NSDictionary*)textFieldCachedInfo:(UITextField*)textField
 {
     for (NSDictionary *infoDict in textFieldInfoCache)
         if ([infoDict objectForKey:kIQTextField] == textField)  return infoDict;
@@ -271,7 +271,7 @@ NSString *const kIQTextFieldReturnKeyType   =   @"kIQTextFieldReturnKeyType";
         return YES;
 }
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     BOOL shouldReturn = YES;
 

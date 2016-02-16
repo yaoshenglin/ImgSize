@@ -16,8 +16,8 @@
     UIImageView *imgViewHighlighted;
 }
 
--(void)setImage:(UIImage *)image forState:(UIControlState)state;
--(void)setBackgroundImage:(UIImage *)image forState:(UIControlState)state;
--(void)addTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)controlEvents;
+- (void)setImage:(UIImage *)image forState:(UIControlState)state;
+- (void)setBackgroundImage:(UIImage *)image forState:(UIControlState)state;
+- (void)addTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)controlEvents;
 
 @end

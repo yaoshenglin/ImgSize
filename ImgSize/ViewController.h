@@ -22,6 +22,6 @@
 
 @protocol MainDelegate <NSObject>
 
--(void)addDataFrom:(NSArray *)array;
+- (void)addDataFrom:(NSArray *)array;
 
 @end

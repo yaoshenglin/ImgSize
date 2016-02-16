@@ -61,7 +61,7 @@
 /**
  Returns the superView of provided class type.
  */
--(UIView*)superviewOfClassType:(Class)classType;
+- (UIView*)superviewOfClassType:(Class)classType;
 
 /**
  Returns all siblings of the receiver which canBecomeFirstResponder.
@@ -94,7 +94,7 @@
 /**
  Returns current view transform with respect to the 'toView'.
  */
--(CGAffineTransform)convertTransformToView:(UIView*)toView;
+- (CGAffineTransform)convertTransformToView:(UIView*)toView;
 
 ///-----------------
 /// @name Hierarchy

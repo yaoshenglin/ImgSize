@@ -19,7 +19,7 @@
 
 @synthesize lRect,fillColor;
 
--(instancetype)initWithFrame:(CGRect)frame
+- (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
@@ -29,19 +29,19 @@
     return self;
 }
 
--(void)setBackgroundColor:(UIColor *)backgroundColor
+- (void)setBackgroundColor:(UIColor *)backgroundColor
 {
     backgroundColor = [UIColor clearColor];
     [super setBackgroundColor:backgroundColor];
 }
 
--(void)changeFillColor:(UIColor *)color
+- (void)changeFillColor:(UIColor *)color
 {
     fillColor = color;
     [self setNeedsDisplay];
 }
 
--(void)initCapacity:(CGRect)frame
+- (void)initCapacity:(CGRect)frame
 {
     //// Bezier 3 Drawing
     bezier3Path = UIBezierPath.bezierPath;
@@ -101,7 +101,7 @@
 //    CGContextSetLineJoin(ref, kCGLineJoinRound);
 }
 
--(void)drawFill
+- (void)drawFill
 {
     if (!bezier3Path) {
         [self initCapacity:self.bounds];

@@ -30,7 +30,7 @@
     return self;
 }
 
--(void)setImage:(UIImage *)image forState:(UIControlState)state
+- (void)setImage:(UIImage *)image forState:(UIControlState)state
 {
     if (state == UIControlStateNormal) {
         imgViewNormal.image = image;
@@ -44,7 +44,7 @@
     }
 }
 
--(void)setBackgroundImage:(UIImage *)image forState:(UIControlState)state
+- (void)setBackgroundImage:(UIImage *)image forState:(UIControlState)state
 {
     if (state == UIControlStateNormal) {
         imgViewNormal.image = image;
@@ -58,7 +58,7 @@
     }
 }
 
--(void)addTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)controlEvents
+- (void)addTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)controlEvents
 {
     delegate = target;
     actionMethod = action;
@@ -66,13 +66,13 @@
     [super addTarget:self action:select(UpInsideEvents:) forControlEvents:UIControlEventTouchUpInside];
 }
 
--(void)DownEvents:(UIButton *)button
+- (void)DownEvents:(UIButton *)button
 {
     imgViewNormal.hidden = YES;
     imgViewHighlighted.hidden = NO;
 }
 
--(void)UpInsideEvents:(UIButton *)button
+- (void)UpInsideEvents:(UIButton *)button
 {
     imgViewNormal.hidden = NO;
     imgViewHighlighted.hidden = YES;
@@ -88,7 +88,7 @@
     [self reSetImgSize];
 }
 
--(void)refreshState
+- (void)refreshState
 {
     if (self.highlighted) {
         imgViewNormal.hidden = YES;
@@ -99,7 +99,7 @@
     }
 }
 
--(void)reSetImgSize
+- (void)reSetImgSize
 {
     UIImage *imgNormal = imgViewNormal.image;
     UIImage *imgHighlighted = imgViewHighlighted.image;
@@ -115,7 +115,7 @@
     }
 }
 
--(CGSize)getSizeBy:(UIImage *)image
+- (CGSize)getSizeBy:(UIImage *)image
 {
     if (image.size.width*self.frame.size.height>image.size.height*self.frame.size.width) {
         return CGSizeMake(self.frame.size.width, self.frame.size.width*image.size.height/image.size.width);

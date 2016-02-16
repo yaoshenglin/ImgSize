@@ -46,14 +46,14 @@
     return self;
 }
 
--(void)loadView
+- (void)loadView
 {
     [super loadView];
     
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"叶子大"] style:UIBarButtonItemStylePlain target:nil action:nil];
 }
 
--(void)viewWillAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     [CTB setViewBounds:self];
@@ -64,7 +64,7 @@
     }
 }
 
--(void)back
+- (void)back
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -78,7 +78,7 @@
     // Do any additional setup after loading the view.
 }
 
--(void)initCapacity
+- (void)initCapacity
 {
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"相册" target:self tag:1];
     
@@ -117,7 +117,7 @@
     [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:select(getHostList:) userInfo:nil repeats:NO];
 }
 
--(void)getDoorList
+- (void)getDoorList
 {
     [listData removeAllObjects];
     
@@ -133,7 +133,7 @@
     [udpSocket receiveWithTimeout:20.0 tag:0];
 }
 
--(void)getHostList:(NSTimer *)timer
+- (void)getHostList:(NSTimer *)timer
 {
     if (isStop) {
         [timer invalidate];
@@ -306,7 +306,7 @@
     return cell;
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
@@ -337,7 +337,7 @@
     }
 }
 
--(void)test:(NSString *)aString with:(NSString *)bString
+- (void)test:(NSString *)aString with:(NSString *)bString
 {
     NSLog(@"a = %@,b = %@",aString,bString);
     if ([bString isKindOfClass:[NSTimer class]]) {
@@ -349,13 +349,13 @@
     }
 }
 
--(void)showWord:(CGFloat)y
+- (void)showWord:(CGFloat)y
 {
     NSString *msg = @"您好！您好！您好！您好！您好?您好?您好?您好?您好?您好?您好?您好?";
     [self.view makeToast:msg];
 }
 
--(UILabel *)getLabelWith:(NSString *)msg
+- (UILabel *)getLabelWith:(NSString *)msg
 {
     UILabel *label = [[UILabel alloc] initWithFrame:GetRect(0, 0, 280, 80)];
     label.textColor = [UIColor whiteColor];
@@ -367,7 +367,7 @@
     return label;
 }
 
--(void)setScrollViewToHigh:(CGFloat)height
+- (void)setScrollViewToHigh:(CGFloat)height
 {
     //[CTB setAnimationWith:0.3 delegate:nil complete:nil];
     //[CTB setRectWith:myTableView toHeight:height];
@@ -383,21 +383,21 @@
                      }];
 }
 
--(void)setScrollViewToPoint:(NSValue *)value
+- (void)setScrollViewToPoint:(NSValue *)value
 {
     CGPoint point;
     [value getValue:&point];
     [CTB setAnimationWith:myTableView Offset:point];
 }
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [textField resignFirstResponder];
     return YES;
 }
 
 #pragma mark - ======ButtonEvents========================
--(void)ButtonEvents:(UIButton *)button
+- (void)ButtonEvents:(UIButton *)button
 {
     if (button.tag==1) {
         
@@ -421,7 +421,7 @@
     }
 }
 
--(void)backPage
+- (void)backPage
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -442,7 +442,7 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
--(void)viewWillDisappear:(BOOL)animated
+- (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
     

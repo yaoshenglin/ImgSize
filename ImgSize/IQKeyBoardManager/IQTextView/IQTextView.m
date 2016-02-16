@@ -133,7 +133,7 @@
 }
 
 //When any text changes on textField, the delegate getter is called. At this time we refresh the textView's placeholder
--(id<UITextViewDelegate>)delegate
+- (id<UITextViewDelegate>)delegate
 {
     [self refreshPlaceholder];
     return [super delegate];

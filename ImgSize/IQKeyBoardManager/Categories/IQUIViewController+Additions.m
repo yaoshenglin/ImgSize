@@ -31,7 +31,7 @@
     objc_setAssociatedObject(self, @selector(IQLayoutGuideConstraint), IQLayoutGuideConstraint, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
--(NSLayoutConstraint *)IQLayoutGuideConstraint
+- (NSLayoutConstraint *)IQLayoutGuideConstraint
 {
     return objc_getAssociatedObject(self, @selector(IQLayoutGuideConstraint));
 }

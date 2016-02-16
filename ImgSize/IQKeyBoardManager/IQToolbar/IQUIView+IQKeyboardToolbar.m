@@ -41,7 +41,7 @@
     objc_setAssociatedObject(self, @selector(shouldHideTitle), [NSNumber numberWithBool:shouldHideTitle], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
--(BOOL)shouldHideTitle
+- (BOOL)shouldHideTitle
 {
     NSNumber *shouldHideTitle = objc_getAssociatedObject(self, @selector(shouldHideTitle));
     return [shouldHideTitle boolValue];
@@ -92,17 +92,17 @@
     objc_setAssociatedObject(self, @selector(doneInvocation), doneInvocation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
--(NSInvocation *)previousInvocation
+- (NSInvocation *)previousInvocation
 {
     return objc_getAssociatedObject(self, @selector(previousInvocation));
 }
 
--(NSInvocation *)nextInvocation
+- (NSInvocation *)nextInvocation
 {
     return objc_getAssociatedObject(self, @selector(nextInvocation));
 }
 
--(NSInvocation *)doneInvocation
+- (NSInvocation *)doneInvocation
 {
     return objc_getAssociatedObject(self, @selector(doneInvocation));
 }

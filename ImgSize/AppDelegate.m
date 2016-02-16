@@ -72,7 +72,7 @@
     NSLog(@"程序终止");
 }
 
--(void)print
+- (void)print
 {
     count ++ ;
     NSLog(@"count = %d",count);

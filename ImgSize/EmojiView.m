@@ -31,7 +31,7 @@
     return self;
 }
 
--(void)initCapacity:(CGRect)frame
+- (void)initCapacity:(CGRect)frame
 {
     NSArray *arrData = [NSArray arrayWithObjects:@"Amazed.png", @"Angel.png", @"Angry.png", @"Beaten.png", @"Bored.png", @"Clown.png", @"Confused.png", @"Cool.png", @"Cry.png", @"Devil.png", @"Doubtful.png", @"Emo.png", @"Frozen.png", @"Grin.png", @"Indian.png", @"Karate.png", @"Kiss.png", @"Laugh.png", @"Love.png", @"Millionaire.png", @"Nerd.png", @"Ninja.png", @"Party.png", @"Pirate.png", @"Punk.png", @"Sad.png", @"Santa.png", @"Shy.png", @"Sick.png", @"Smile.png", @"Speechless.png", @"Sweating.png", @"Tongue.png", @"Vampire.png", @"Wacky.png", @"Wink.png",@"Amazed.png", @"Angel.png", @"Angry.png", @"Beaten.png", @"Bored.png", @"Clown.png", @"Confused.png", @"Cool.png", @"Cry.png", @"Devil.png", @"Doubtful.png", @"Emo.png", @"Frozen.png", @"Grin.png", @"Indian.png", @"Karate.png", @"Kiss.png", @"Laugh.png", @"Love.png", @"Millionaire.png", @"Nerd.png", @"Ninja.png", @"Party.png", @"Pirate.png", @"Punk.png", @"Sad.png", @"Santa.png", @"Shy.png", @"Sick.png", @"Smile.png", @"Speechless.png", @"Sweating.png", @"Tongue.png", @"Vampire.png", @"Wacky.png", @"Wink.png",@"Amazed.png", @"Angel.png", @"Angry.png", @"Beaten.png", @"Bored.png", @"Clown.png", @"Confused.png", @"Cool.png", @"Cry.png", @"Devil.png", @"Doubtful.png", @"Emo.png", @"Frozen.png", @"Grin.png", @"Indian.png", @"Karate.png", @"Kiss.png", @"Laugh.png", @"Love.png", @"Millionaire.png", @"Nerd.png", @"Ninja.png", @"Party.png", @"Pirate.png", @"Punk.png", @"Sad.png", @"Santa.png", @"Shy.png", @"Sick.png", @"Smile.png", @"Speechless.png", @"Sweating.png", @"Tongue.png", @"Vampire.png", @"Wacky.png", @"Wink.png", nil];//108个    
     //定义UIScrollView
@@ -87,7 +87,7 @@
     iPageControl.currentPage = page;//pagecontroll响应值的变化
 }
 
--(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     [CTB setAnimationWith:0.3 delegate:nil complete:nil];
     NSInteger page = iPageControl.currentPage;//获取当前pagecontroll的值
@@ -105,7 +105,7 @@
     
 }
 
--(void)ButtonEvents:(UIButton *)button
+- (void)ButtonEvents:(UIButton *)button
 {
     NSLog(@"%@",button.currentTitle);
 }

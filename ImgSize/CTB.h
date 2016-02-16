@@ -728,6 +728,8 @@ id getUserData(NSString *key);
 - (void)dashLineForBorderWithRadius:(CGFloat)radius;
 - (void)dashLineWithRadius:(CGFloat)radius borderWidth:(CGFloat)borderWidth dashPattern:(CGFloat)dashPattern spacePattern:(CGFloat)spacePattern lineColor:(UIColor *)lineColor;
 
+- (void)playGifImgWithPath:(NSString *)imagePath;
+
 @end
 
 #pragma mark - UIControl

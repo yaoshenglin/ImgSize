@@ -5,7 +5,7 @@
 //
 
 #import "MBProgressHUD.h"
-
+#import "CTB.h"
 
 #if __has_feature(objc_arc)
 	#define MB_AUTORELEASE(exp) exp
@@ -152,7 +152,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	return [NSArray arrayWithArray:huds];
 }
 
-+(MBProgressHUD *)showRuningView:(UIView *)View
++ (MBProgressHUD *)showRuningView:(UIView *)View
 {
     MBProgressHUD *hudView = [[self class] showRuningView:View activity:UIActivityIndicatorViewStyleWhiteLarge];
     hudView.yOffset = 0;
@@ -161,7 +161,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
     return hudView;
 }
 
-+(MBProgressHUD *)showRuningView:(UIView *)View activity:(UIActivityIndicatorViewStyle)style
++ (MBProgressHUD *)showRuningView:(UIView *)View activity:(UIActivityIndicatorViewStyle)style
 {
     MBProgressHUD *hudView = nil;
     NSArray *subviews = View.subviews;
@@ -187,7 +187,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
     return hudView;
 }
 
-+(UIImageView *)initWithImgName:(NSString *)imgName
++ (UIImageView *)initWithImgName:(NSString *)imgName
 {
     UIImageView *imgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:imgName]];
     return imgView;
@@ -303,9 +303,87 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	}
 }
 
+- (UIView *)viewWithCustom
+{
+    CGFloat ScreenW = [UIScreen mainScreen].bounds.size.width;
+    CGFloat ScreenH = [UIScreen mainScreen].bounds.size.height;
+    UIView *vActivity = [[UIView alloc] initWithFrame:CGRectMake(ScreenW/2-80, ScreenH/2-64-45, 160, 90)];
+    vActivity.layer.cornerRadius = 7;
+    
+    //登陆上方图片
+//    UIImageView *imgLoading = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 110, 22)];
+//    imgLoading.center = CGPointMake(vActivity.frame.size.width/2, vActivity.frame.size.height/2-15);
+//    UIImage *image = [UIImage imageNamed:@"加载拼接图"];
+//    NSArray *listImg = [CTB getImagesWith:image count:12];
+//    imgLoading.animationImages = listImg;
+//    imgLoading.animationDuration = 1.5;
+//    [imgLoading startAnimating];
+//    [vActivity addSubview:imgLoading];
+    
+    [self hide:YES];
+    
+    GIFImgView *gifView = [vActivity viewWithClass:[GIFImgView class] tag:1];
+    if (!gifView) {
+        gifView = [[GIFImgView alloc] initWithFrame:GetRect(0, 0, 120, 22)];
+        gifView.center = GetPoint(GetVWidth(vActivity)/2, GetVHeight(vActivity)/2);
+        gifView.tag = 1;
+        [vActivity addSubview:gifView];
+        
+        UIImage *image = [UIImage imageNamed:@"加载拼接图"];
+        gifView.image = image;
+        gifView.count = 12;
+        gifView.duration = 1.5;
+    }
+    [gifView startAnimating];
+    
+    return vActivity;
+}
+
+- (void)showCustomView:(BOOL)animated
+{
+    [self show:animated];
+    self.mode = MBProgressHUDModeCustomView;
+    
+    self.customView = [self viewWithCustom];
+    
+    self.msgBackground = [UIColor clearColor];
+}
+
+- (void)showCustomView:(BOOL)animated text:(NSString *)text backColor:(UIColor *)backColor
+{
+    [self show:animated];
+    self.mode = MBProgressHUDModeCustomView;
+    UIView *vActivity = [self viewWithCustom];
+    
+    UILabel *lblLoading = [[UILabel alloc] initWithFrame:CGRectMake(10, 55, vActivity.frame.size.width-20, 20)];
+    lblLoading.textColor = [UIColor whiteColor];
+    lblLoading.textAlignment = NSTextAlignmentCenter;
+    lblLoading.font = [UIFont systemFontOfSize:16];
+    lblLoading.text = text;
+    [vActivity addSubview:lblLoading];
+    
+    self.customView = vActivity;
+    self.msgBackground = [UIColor clearColor];
+}
+
+- (MBProgressHUD *)reShowIn:(UIView *)View
+{
+    UIView *superView = self.superview;
+    [self removeFromSuperview];
+    
+    if (!superView) {
+        superView = View;
+    }
+    
+    MBProgressHUD *hudView = [MBProgressHUD showRuningView:superView];
+    return hudView;
+}
+
 - (void)hide:(BOOL)animated 
 {
 	useAnimation = animated;
+    GIFImgView *gifView = [self.customView viewWithClass:[GIFImgView class] tag:1];
+    [gifView stopAnimating];
 	// If the minShow time is set, calculate how long the hud was shown,
 	// and pospone the hiding operation if necessary
 	if (self.minShowTime > 0.0 && showStarted) {
@@ -330,9 +408,29 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	[self hide:[animated boolValue]];
 }
 
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View
+{
+    MBProgressHUD *hudView = [MBProgressHUD HUDForView:View];
+    if (hudView) {
+        [hudView removeFromSuperview];
+    }
+    
+    hudView = [MBProgressHUD showRuningView:View];
+    [hudView showDetailMsg:msg delay:delay];
+    hudView.removeFromSuperViewOnHide = YES;
+    return hudView;
+}
+
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View yOffset:(CGFloat)y
+{
+    MBProgressHUD *hudView = [self showMsg:msg delay:delay View:View];
+    hudView.yOffset = y;
+    return hudView;
+}
+
 - (void)showDetailMsg:(NSString *)msg delay:(NSTimeInterval)delay
 {
-    if (!self) {
+    if (![msg isKindOfClass:[NSString class]]) {
         return;
     }
     
@@ -442,7 +540,11 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	self.alpha = 0.0f;
 	if ([delegate respondsToSelector:@selector(hudWasHidden:)]) {
 		[delegate performSelector:@selector(hudWasHidden:) withObject:self];
-	} 
+	}
+    
+    [self.customView removeFromSuperview];
+    self.customView = nil;
+    
 	if (removeFromSuperViewOnHide) {
 		[self removeFromSuperview];
 	}
@@ -589,7 +691,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	totalSize.width = MAX(totalSize.width, indicatorF.size.width);
 	totalSize.height += indicatorF.size.height;
 	
-    CGSize labelSize = [label.text sizeWithAttributes:@{NSFontAttributeName:label.font}];
+	CGSize labelSize = [label.text sizeWithFont:label.font];
 	labelSize.width = MIN(labelSize.width, maxWidth);
 	totalSize.width = MAX(totalSize.width, labelSize.width);
 	totalSize.height += labelSize.height;
@@ -599,7 +701,8 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 
 	CGFloat remainingHeight = bounds.size.height - totalSize.height - kPadding - 4 * margin; 
 	CGSize maxSize = CGSizeMake(maxWidth, remainingHeight);
-    CGSize detailsLabelSize = [detailsLabel.text boundingRectWithSize:maxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:detailsLabel.font} context:nil].size;
+	CGSize detailsLabelSize = [detailsLabel.text sizeWithFont:detailsLabel.font 
+								constrainedToSize:maxSize lineBreakMode:detailsLabel.lineBreakMode];
 	totalSize.width = MAX(totalSize.width, detailsLabelSize.width);
 	totalSize.height += detailsLabelSize.height;
 	if (detailsLabelSize.height > 0.f && (indicatorF.size.height > 0.f || labelSize.height > 0.f)) {
@@ -713,11 +816,12 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
     //indicator.center = CGPointMake(indicator.center.x, Point_Y+40);
     
     if (self.msgBackground != NULL) {
+        //显示框背景色
         CGContextSetFillColorWithColor(context, self.msgBackground.CGColor);
     }
     
-    if (self.msgTextColor!=NULL) {
-        label.textColor=self.msgTextColor;
+    if (self.msgTextColor != NULL) {
+        label.textColor = self.msgTextColor;//文字颜色
     }
     
 	CGContextMoveToPoint(context, CGRectGetMinX(boxRect) + radius, CGRectGetMinY(boxRect));
@@ -940,5 +1044,150 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 		CGContextFillPath(context);
 	}
 }
+
+@end
+
+@implementation HUD
+
++ (MBProgressHUD *)showMsg:(NSString *)msg View:(UIView *)View
+{
+    MBProgressHUD *hud = [MBProgressHUD showMsg:msg delay:1.8f View:View];
+    hud.userInteractionEnabled = NO;
+    return hud;
+}
+
++ (MBProgressHUD *)showBottomMsg:(NSString *)msg View:(UIView *)View
+{
+    MBProgressHUD *hud = [MBProgressHUD showMsg:msg delay:1.8f View:View yOffset:100.0];
+    hud.userInteractionEnabled = NO;
+    return hud;
+}
+
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View
+{
+    MBProgressHUD *hud = [MBProgressHUD showMsg:msg delay:delay View:View];
+    hud.userInteractionEnabled = NO;
+    return hud;
+}
+
++ (MBProgressHUD *)showBottomMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View
+{
+    MBProgressHUD *hud = [MBProgressHUD showMsg:msg delay:delay View:View yOffset:100.0];
+    hud.userInteractionEnabled = NO;
+    return hud;
+}
+
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View yOffset:(CGFloat)y
+{
+    MBProgressHUD *hud = [MBProgressHUD showMsg:msg delay:delay View:View yOffset:y];
+    hud.userInteractionEnabled = NO;
+    return hud;
+}
+
+@end
+
+CGRect CGRectWith(CGPoint point, CGSize size)
+{
+    CGRect rect;
+    rect.origin.x = point.x; rect.origin.y = point.y;
+    rect.size.width = size.width; rect.size.height = size.height;
+    return rect;
+}
+
+@interface GIFImgView ()
+{
+    NSInteger i;
+    NSTimer *timer;
+    UIImageView *imageView;
+}
+
+@end
+
+@implementation GIFImgView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        imageView = [[UIImageView alloc] init];
+        imageView.frame = self.bounds;
+        [self addSubview:imageView];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithImage:(UIImage *)image
+{
+    self = [super init];
+    if (self) {
+        if (image) {
+            //CGSize size = image.size;
+            self.frame = CGRectWith(CGPointZero, image.size);
+            imageView = [[UIImageView alloc] init];
+            imageView.frame = self.bounds;
+            imageView.center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
+            [self addSubview:imageView];
+        }
+    }
+    
+    return self;
+}
+
+- (BOOL)isAnimating
+{
+    BOOL isValid = [timer isValid];
+    return isValid;
+}
+
+- (void)startAnimating
+{
+    if (![timer isValid] && _count > 0) {
+        NSTimeInterval ti = _duration/_count;//时间间隔
+        timer = [NSTimer scheduledTimerWithTimeInterval:ti target:self selector:@selector(playAnimation) userInfo:nil repeats:YES];
+    }
+}
+
+- (void)stopAnimating
+{
+    if ([timer isValid]) {
+        [timer invalidate];
+    }
+}
+
+- (void)playAnimation
+{
+    if (i < _count-1) {
+        i++;
+    }else{
+        i = 0;
+    }
+    CGFloat w = _image.size.width/_count;
+    CGFloat h = _image.size.height;
+    CGFloat scale = _image.scale;
+    CGRect rect = CGRectMake(w*i*scale, 0, w*scale, h*scale);//截取位置尺寸
+    UIImage *img = [self getSubImage:_image rect:rect];//截取图像
+    [UIView animateWithDuration:0.1 animations:^{
+        imageView.image = img;
+    }];
+}
+
+#pragma mark 截取部分图像
+- (UIImage *)getSubImage:(UIImage *)image rect:(CGRect)rect
+{
+    if (!image) return nil;
+    CGImageRef cgImage = CGImageCreateWithImageInRect(image.CGImage, rect);
+    UIImage *newImage = [UIImage imageWithCGImage:cgImage scale:image.scale orientation:UIImageOrientationUp];
+    CGImageRelease(cgImage);
+    return newImage;
+}
+
+/*
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect {
+ // Drawing code
+ }
+ */
 
 @end

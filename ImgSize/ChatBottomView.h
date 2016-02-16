@@ -32,7 +32,7 @@
 
 @protocol ChatBottomDelegate <NSObject>
 
--(void)showEmojiView;
--(void)SendWordMsg:(UIButton *)button;
+- (void)showEmojiView;
+- (void)SendWordMsg:(UIButton *)button;
 
 @end

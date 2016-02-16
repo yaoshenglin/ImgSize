@@ -189,15 +189,15 @@ typedef enum {
  * @param view The view that is going to be searched.
  * @return first found HUD view.
  */
-+(MBProgressHUD *)showRuningView:(UIView *)View;
-+(MBProgressHUD *)showRuningView:(UIView *)View activity:(UIActivityIndicatorViewStyle)style;
++ (MBProgressHUD *)showRuningView:(UIView *)View;
++ (MBProgressHUD *)showRuningView:(UIView *)View activity:(UIActivityIndicatorViewStyle)style;
 
 /**
  * Finds HUD customView and returns them.
  * @param view The view that is going to be searched.
  * @return HUD customView.
  */
-+(UIImageView *)initWithImgName:(NSString *)imgName;
++ (UIImageView *)initWithImgName:(NSString *)imgName;
 
 /** 
  * Display the HUD. You need to make sure that the main thread completes its run loop soon after this method call so
@@ -210,6 +210,20 @@ typedef enum {
  * @see animationType
  */
 - (void)show:(BOOL)animated;
+
+/**
+ * Display the HUD. You need to make sure that the main thread completes its run loop soon after this method call so
+ * the user interface can be updated. Call this method when your task is already set-up to be executed in a new thread
+ * (e.g., when using something like NSOperation or calling an asynchronous call like NSURLRequest).
+ *
+ * @param animated If set to YES the HUD will appear using the current animationType. If set to NO the HUD will not use
+ * animations while appearing.
+ *
+ * @see animationType
+ */
+- (void)showCustomView:(BOOL)animated;
+- (void)showCustomView:(BOOL)animated text:(NSString *)text backColor:(UIColor *)backColor;
+- (MBProgressHUD *)reShowIn:(UIView *)View;
 
 /** 
  * Hide the HUD. This still calls the hudWasHidden: delegate. This is the counterpart of the show: method. Use it to
@@ -244,6 +258,8 @@ typedef enum {
  *
  * @see animationType
  */
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View;
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View yOffset:(CGFloat)y;
 - (void)showDetailMsg:(NSString *)msg delay:(NSTimeInterval)delay;
 - (void)showDetailMsg:(NSString *)msg delay:(NSTimeInterval)delay yOffset:(CGFloat)y;
 
@@ -448,5 +464,35 @@ typedef enum {
  * Display mode - NO = round or YES = annular. Defaults to round.
  */
 @property (nonatomic, assign, getter = isAnnular) BOOL annular;
+
+@end
+
+@interface HUD : MBProgressHUD
+
++ (MBProgressHUD *)showMsg:(NSString *)msg View:(UIView *)View;
+
++ (MBProgressHUD *)showBottomMsg:(NSString *)msg View:(UIView *)View;
+
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View;
+
++ (MBProgressHUD *)showBottomMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View;
+
++ (MBProgressHUD *)showMsg:(NSString *)msg delay:(NSTimeInterval)delay View:(UIView *)View yOffset:(CGFloat)y;
+
+@end
+
+@interface GIFImgView : UIView
+
+//- (instancetype)initWithImage:(UIImage *)image;
+//- (instancetype)initWithImage:(UIImage *)image highlightedImage:(UIImage *)highlightedImage NS_AVAILABLE_IOS(3_0);
+
+@property (retain, nonatomic) UIImage *image;
+@property (assign, nonatomic) NSInteger count;
+@property (assign, nonatomic) NSInteger repeatCount;
+@property (assign, nonatomic) NSTimeInterval duration;
+
+- (void)startAnimating;
+- (void)stopAnimating;
+- (BOOL)isAnimating;
 
 @end

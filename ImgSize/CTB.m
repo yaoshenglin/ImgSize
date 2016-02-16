@@ -13,6 +13,7 @@
 #include <netdb.h>
 #import <objc/runtime.h>//对象转Dic用
 #include <CommonCrypto/CommonDigest.h>
+#import <ImageIO/ImageIO.h>//图片动画
 #import <SystemConfiguration/CaptiveNetwork.h>//获取WiFi信息
 
 @interface CTB () <UIAlertViewDelegate,UITableViewDelegate,UIActionSheetDelegate>
@@ -4447,6 +4448,56 @@ id getUserData(NSString *key)
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
+}
+
+- (void)playGifImgWithPath:(NSString *)imagePath
+{
+    NSURL *url = [NSURL fileURLWithPath:imagePath];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    CGImageSourceRef cImageSource = CGImageSourceCreateWithData((CFDataRef)data,
+                                                NULL);
+    // Make sure the image source exists before continuing.
+    if (cImageSource == NULL){
+        fprintf(stderr, "Image source is NULL.");
+        return;
+    }
+    
+    size_t imageCount = CGImageSourceGetCount(cImageSource);//
+    NSMutableArray *images = [NSMutableArray array];
+    NSMutableArray *times = [NSMutableArray array];
+    NSMutableArray *keyTimes = [NSMutableArray array];
+    
+    CGSize _size;
+    float totalTime = 0;
+    for (size_t i = 0; i < imageCount; i++) {
+        CGImageRef cgimage = CGImageSourceCreateImageAtIndex(cImageSource, i, NULL);
+        [images addObject:(__bridge id)cgimage];
+        CGImageRelease(cgimage);
+        
+        NSDictionary *properties = (__bridge NSDictionary *)CGImageSourceCopyPropertiesAtIndex(cImageSource, i, NULL);
+        NSDictionary *gifProperties = [properties valueForKey:(__bridge NSString *)kCGImagePropertyGIFDictionary];
+        NSString *gifDelayTime = [gifProperties valueForKey:(__bridge NSString* )kCGImagePropertyGIFDelayTime];
+        [times addObject:gifDelayTime];
+        totalTime += [gifDelayTime floatValue];
+        
+        _size.width = [[properties valueForKey:(NSString*)kCGImagePropertyPixelWidth] floatValue];
+        _size.height = [[properties valueForKey:(NSString*)kCGImagePropertyPixelHeight] floatValue];
+    }
+    
+    float currentTime = 0;
+    for (size_t i = 0; i < times.count; i++) {
+        float keyTime = currentTime / totalTime;
+        [keyTimes addObject:[NSNumber numberWithFloat:keyTime]];
+        currentTime += [[times objectAtIndex:i] floatValue];
+    }
+    
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
+    [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]];
+    [animation setValues:images];
+    [animation setKeyTimes:keyTimes];
+    animation.duration = totalTime;
+    animation.repeatCount = HUGE_VALF;
+    [self.layer addAnimation:animation forKey:@"gifAnimation"];
 }
 
 @end

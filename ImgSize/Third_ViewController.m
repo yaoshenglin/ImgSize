@@ -33,7 +33,7 @@
     return self;
 }
 
--(void)viewWillAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     [CTB setViewBounds:self];
@@ -47,7 +47,7 @@
     // Do any additional setup after loading the view.
 }
 
--(void)initCapacity
+- (void)initCapacity
 {
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithImg:[UIImage imageNamed:@"二维码大"] target:self tag:2];
     
@@ -56,7 +56,7 @@
     [self.view addSubview:iScrollView];
 }
 
--(void)ButtonEvents:(UIButton *)button
+- (void)ButtonEvents:(UIButton *)button
 {
     if (button.tag==1) {
         

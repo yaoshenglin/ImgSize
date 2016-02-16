@@ -34,7 +34,7 @@
     return self;
 }
 
--(void)initCapacity
+- (void)initCapacity
 {
     //底部输入信息框
     txtInputMsg=[[UITextField alloc]initWithFrame:CGRectMake(45,7, Screen_Width-90, 30)];
@@ -75,7 +75,7 @@
     [self addGestureRecognizer:panPress];
 }
 
--(void)SendBrow:(UIButton *)button
+- (void)SendBrow:(UIButton *)button
 {
     [self setPlayFromFile:@"voice_note_error.wav"];
     if ([delegate respondsToSelector:select(showEmojiView)]) {
@@ -101,7 +101,7 @@
     }
 }
 
--(void)stopRecord:(UIButton *)button
+- (void)stopRecord:(UIButton *)button
 {
     NSLog(@"弹起");
     [self textFieldShouldReturn:txtInputMsg];
@@ -131,7 +131,7 @@
     }
 }
 
--(void)PanEvents:(UIPanGestureRecognizer *)gesture
+- (void)PanEvents:(UIPanGestureRecognizer *)gesture
 {
     if (gesture.state == UIGestureRecognizerStateBegan) {
         NSLog(@"拖动开始");
@@ -155,7 +155,7 @@
 }
 
 #pragma mark - =======textField===================
--(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
     if ([delegate respondsToSelector:select(textFieldShouldBeginEditing:)]) {
         return [delegate textFieldShouldBeginEditing:textField];
@@ -163,7 +163,7 @@
     return YES;
 }
 
--(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
     if (range.length==0) {
         if (textField.text.length>0 || string.length>0) {
@@ -191,13 +191,13 @@
     return YES;
 }
 
--(BOOL)textFieldShouldEndEditing:(UITextField *)textField
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
 {
     return [delegate textFieldShouldEndEditing:textField];
 }
 
 //点击return执行的方法
--(BOOL)textFieldShouldReturn:(UITextField *)textField
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     //取消键盘的第一响应者，就会实现键盘自动下去
     [txtInputMsg resignFirstResponder];
@@ -216,7 +216,7 @@
 }
 
 #pragma mark 准备播放
--(void)setPlayFromFile:(NSString *)fileName
+- (void)setPlayFromFile:(NSString *)fileName
 {
     NSString *currentSoundFilePath = [[NSBundle mainBundle] pathForResource:fileName ofType:nil];
     NSURL *currentFileURL = [NSURL fileURLWithPath:currentSoundFilePath];

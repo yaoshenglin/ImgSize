@@ -19,7 +19,9 @@
 #import <sys/socket.h>
 #import <netdb.h>
 #import <QuartzCore/QuartzCore.h>
-#import <ImageIO/ImageIO.h>
+//#import "GIFImgView.h"
+#import "NSAlertView.h"
+#import "SOLStumbler.h"
 
 
 extern NSString *CTSettingCopyMyPhoneNumber(void);
@@ -56,6 +58,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     //NSDate *date;
     UILabel *lblInstantSpeed;
     UILabel *lblPeakSpeed;
+    UILabel *lblTime;
     
     UIView *baseView;
     UIImageView *gameView;
@@ -71,7 +74,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
 //static const CGSize BASE_SIZE = { 180, 20 };
 //@synthesize earthquakeList;
 
--(void)viewWillAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     [CTB setViewBounds:self];
@@ -79,7 +82,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     self.view.backgroundColor = [CTB colorWithHexString:@"#E5E5E5"];
 }
 
--(void)loadView
+- (void)loadView
 {
     [super loadView];
     
@@ -93,7 +96,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
 	// Do any additional setup after loading the view, typically from a nib.
 }
 
--(void)initCapacity
+- (void)initCapacity
 {
     self.navigationItem.leftBarButtonItem = [CTB BarButtonWithTitle:@"退出" target:self tag:1];
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"更多" target:self tag:2];
@@ -127,6 +130,12 @@ static NSString *const SBStyle2 = @"SBStyle2";
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:baseView];
     _animator.delegate = self;
+    
+    lblTime = [CTB labelTag:1 toView:baseView text:@"00:00:00" wordSize:48];
+    lblTime.textColor = [UIColor blueColor];
+    lblTime.frame = GetRect(30, 50, GetVWidth(baseView)-60, 38);
+    
+    [NSTimer scheduled:0.5 target:self selector:@selector(updateTime:) userInfo:nil repeats:YES];
 }
 
 - (void)PrintWord
@@ -150,11 +159,20 @@ static NSString *const SBStyle2 = @"SBStyle2";
 //    return _push;
 //}
 
+- (void)updateTime:(NSTimer *)timer
+{
+    NSString *dateStr = [CTB getDateWithFormat:@"HH:mm:ss"];
+    lblTime.text = dateStr;
+}
+
 #pragma mark - ========ButtonEvents========================
--(void)ButtonEvents:(UIButton *)button
+- (void)ButtonEvents:(UIButton *)button
 {
     if (button.tag==1) {
         [CTB alertWithMessage:@"你确定要退出吗" Delegate:self tag:1];
+//        GIFImgView *gifView = [baseView viewWithClass:[GIFImgView class] tag:1];
+//        [gifView stopAnimating];
+        [hudView hide:YES];
     }
     if (button.tag==2) {
         
@@ -170,70 +188,76 @@ static NSString *const SBStyle2 = @"SBStyle2";
         //[request run:urlString body:nil];
         //[request start];
         
-        UIGravityBehavior *gravityBeahvior = [[UIGravityBehavior alloc] init];
-        gravityBeahvior.magnitude = 0.3;
-        [gravityBeahvior addItem:gameView];//重力行为
-        UICollisionBehavior *collider = [[UICollisionBehavior alloc] init];
-        collider.translatesReferenceBoundsIntoBoundary = YES;
-        collider.collisionMode = UICollisionBehaviorModeBoundaries;
-        [collider addItem:gameView];//碰撞行为
-//        UIPushBehavior *push = [[UIPushBehavior alloc]init];
-//        [push setAngle:0 magnitude:0.1];
-//        [push addItem:gameView];//推动行为
-        CGPoint frogCenter = GetPoint(gameView.center.x, GetVHeight(baseView)-120);
-        UIAttachmentBehavior *attach = [[UIAttachmentBehavior alloc] initWithItem:gameView attachedToAnchor:frogCenter];//弹性行为
-        attach.frequency = 0.3;
-        attach.damping = 0.1;
-        attach.length = 10.0;
-        gameView.transform = CGAffineTransformRotate(gameView.transform, 45);
-        [_animator addBehavior:gravityBeahvior];
-        [_animator addBehavior:collider];
-//        [_animator addBehavior:attach];
-//        [_animator addBehavior:push];
-        
-        [self playGifImg];
+        NSString *msg = @"场景命令执行成功，请选择继续的操作";
+        NSAlertView *alert = [[NSAlertView alloc] initWithTitle:@"场景命令" message:msg delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定"];
+        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        UITextField *txtName = [alert textFieldAtIndex:0];
+        txtName.text = @"远在天边";
+        [alert show];
+        //[self scanWifis];
     }
+}
+
+//扫描网络
+- (void)scanWifis
+{
+    SOLStumbler *stumbler = [[SOLStumbler alloc]init];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [stumbler scanNetworks];
+        NSMutableArray *dicts = stumbler.networkDicts;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSLog(@"%@",dicts);
+        });
+    });
+}
+
+- (void)animationEvent
+{
+    UIGravityBehavior *gravityBeahvior = [[UIGravityBehavior alloc] init];
+    gravityBeahvior.magnitude = 0.3;
+    [gravityBeahvior addItem:gameView];//重力行为
+    UICollisionBehavior *collider = [[UICollisionBehavior alloc] init];
+    collider.translatesReferenceBoundsIntoBoundary = YES;
+    collider.collisionMode = UICollisionBehaviorModeBoundaries;
+    [collider addItem:gameView];//碰撞行为
+//    UIPushBehavior *push = [[UIPushBehavior alloc]init];
+//    [push setAngle:0 magnitude:0.1];
+//    [push addItem:gameView];//推动行为
+    CGPoint frogCenter = GetPoint(gameView.center.x, GetVHeight(baseView)-120);
+    UIAttachmentBehavior *attach = [[UIAttachmentBehavior alloc] initWithItem:gameView attachedToAnchor:frogCenter];//弹性行为
+    attach.frequency = 0.3;
+    attach.damping = 0.1;
+    attach.length = 10.0;
+    gameView.transform = CGAffineTransformRotate(gameView.transform, 45);
+    [_animator addBehavior:gravityBeahvior];
+    [_animator addBehavior:collider];
+//    [_animator addBehavior:attach];
+//    [_animator addBehavior:push];
+    
+//    [self playGifImg];
+    hudView = [MBProgressHUD showRuningView:self.view];
+    [hudView showCustomView:YES];
 }
 
 - (void)playGifImg
 {
-    NSString *imagePath =[[NSBundle mainBundle] pathForResource:@"灯闪动画" ofType:@"gif"];
-    CGImageSourceRef cImageSource = CGImageSourceCreateWithURL((__bridge CFURLRef)[NSURL fileURLWithPath:imagePath], NULL);
-    size_t imageCount = CGImageSourceGetCount(cImageSource);//
-    NSMutableArray *images = [NSMutableArray array];
-    NSMutableArray *times = [NSMutableArray array];
-    NSMutableArray *keyTimes = [NSMutableArray array];
+//    NSString *imagePath =[[NSBundle mainBundle] pathForResource:@"灯闪动画" ofType:@"gif"];
+//    [baseView playGifImgWithPath:imagePath];
     
-    float totalTime = 0;
-    for (size_t i = 0; i < imageCount; i++) {
-        CGImageRef cgimage = CGImageSourceCreateImageAtIndex(cImageSource, i, NULL);
-        [images addObject:(__bridge id)cgimage];
-        CGImageRelease(cgimage);
+    GIFImgView *gifView = [baseView viewWithClass:[GIFImgView class] tag:1];
+    if (!gifView) {
+        gifView = [[GIFImgView alloc] initWithFrame:GetRect(0, 0, 120, 22)];
+        gifView.center = GetPoint(GetVWidth(baseView)/2, GetVHeight(baseView)/2);
+        gifView.tag = 1;
+        [baseView addSubview:gifView];
         
-        NSDictionary *properties = (__bridge NSDictionary *)CGImageSourceCopyPropertiesAtIndex(cImageSource, i, NULL);
-        NSDictionary *gifProperties = [properties valueForKey:(__bridge NSString *)kCGImagePropertyGIFDictionary];
-        NSString *gifDelayTime = [gifProperties valueForKey:(__bridge NSString* )kCGImagePropertyGIFDelayTime];
-        [times addObject:gifDelayTime];
-        totalTime += [gifDelayTime floatValue];
-        
-        _size.width = [[properties valueForKey:(NSString*)kCGImagePropertyPixelWidth] floatValue];
-        _size.height = [[properties valueForKey:(NSString*)kCGImagePropertyPixelHeight] floatValue];
+        UIImage *image = [UIImage imageNamed:@"加载拼接图"];
+        gifView.image = image;
+        gifView.count = 12;
+        gifView.duration = 1.5;
     }
-    
-    float currentTime = 0;
-    for (size_t i = 0; i < times.count; i++) {
-        float keyTime = currentTime / totalTime;
-        [keyTimes addObject:[NSNumber numberWithFloat:keyTime]];
-        currentTime += [[times objectAtIndex:i] floatValue];
-    }
-    
-    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
-    [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]];
-    [animation setValues:images];
-    [animation setKeyTimes:keyTimes];
-    animation.duration = totalTime;
-    animation.repeatCount = HUGE_VALF;
-    [baseView.layer addAnimation:animation forKey:@"gifAnimation"];
+    [gifView startAnimating];
 }
 
 - (void)dynamicAnimatorWillResume:(UIDynamicAnimator*)animator
@@ -452,7 +476,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     }
 }
 
--(void)addContacts
+- (void)addContacts
 {
     ABAddressBookRef addressBook = [AddressBook getAddressBookRef];
     for (int i=0; i<1000; i++) {

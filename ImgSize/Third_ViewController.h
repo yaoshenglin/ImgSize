@@ -24,6 +24,6 @@
 
 @protocol ThirdDelegate <NSObject>
 
--(void)backPage;
+- (void)backPage;
 
 @end

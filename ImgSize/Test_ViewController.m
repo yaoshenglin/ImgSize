@@ -39,7 +39,7 @@
     return self;
 }
 
--(void)viewWillAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     if (isFirstAppear) {
@@ -56,7 +56,7 @@
     // Do any additional setup after loading the view.
 }
 
--(void)initCapacity
+- (void)initCapacity
 {
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"开门" target:self tag:1];
     TimeOut_Never = -1;
@@ -80,7 +80,7 @@
     myLabel.frame = GetRect(30, 70, Screen_Width-60, 30);
 }
 
--(void)buttonAction
+- (void)buttonAction
 {
     hudView = [MBProgressHUD showRuningView:self.view];
     NSString *msg = @"010E00D1";
@@ -219,7 +219,7 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void)viewWillDisappear:(BOOL)animated
+- (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
     if (![CTB isExistSelf:self]) {

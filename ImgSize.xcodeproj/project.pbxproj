@@ -47,6 +47,7 @@
 		E22C944719CC35ED00D9EAC1 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E22C944619CC35ED00D9EAC1 /* libsqlite3.dylib */; };
 		E23410A4195BAA560086AE54 /* PhotoPreView.m in Sources */ = {isa = PBXBuildFile; fileRef = E23410A3195BAA560086AE54 /* PhotoPreView.m */; };
 		E23410A6195BEFA00086AE54 /* 服务条款.txt in Resources */ = {isa = PBXBuildFile; fileRef = E23410A5195BEFA00086AE54 /* 服务条款.txt */; };
+		E23D99D91C71D8DB00653A7F /* SOLStumbler.m in Sources */ = {isa = PBXBuildFile; fileRef = E23D99D81C71D8DB00653A7F /* SOLStumbler.m */; };
 		E24D35B71B7B1FF500991739 /* bitstream.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35A91B7B1FF500991739 /* bitstream.c */; };
 		E24D35B81B7B1FF500991739 /* mask.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35AB1B7B1FF500991739 /* mask.c */; };
 		E24D35B91B7B1FF500991739 /* qrencode.c in Sources */ = {isa = PBXBuildFile; fileRef = E24D35AD1B7B1FF500991739 /* qrencode.c */; };
@@ -74,6 +75,7 @@
 		E24D35F91B7B2BD900991739 /* StringEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35F81B7B2BD900991739 /* StringEncryption.m */; };
 		E24D35FC1B7B2C8700991739 /* QRCodeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35FB1B7B2C8700991739 /* QRCodeGenerator.m */; };
 		E24D35FF1B7B2DFC00991739 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = E24D35FE1B7B2DFC00991739 /* NSData+Base64.m */; };
+		E25A34F71C2D2B1B00621B4B /* NSAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = E25A34F61C2D2B1B00621B4B /* NSAlertView.m */; };
 		E25B076A19A491B1001EA090 /* JDStatusBarNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076519A491B1001EA090 /* JDStatusBarNotification.m */; };
 		E25B076B19A491B1001EA090 /* JDStatusBarStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076719A491B1001EA090 /* JDStatusBarStyle.m */; };
 		E25B076C19A491B1001EA090 /* JDStatusBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = E25B076919A491B1001EA090 /* JDStatusBarView.m */; };
@@ -115,6 +117,7 @@
 		E2BDE5941B539D710098CF42 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE5931B539D710098CF42 /* GDataXMLNode.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		E2BDE5961B539E320098CF42 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E2BDE5951B539E320098CF42 /* libxml2.2.dylib */; };
 		E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */; };
+		E2ED89B41BB1601B00EF6AFF /* 加载拼接图@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2ED89B31BB1601B00EF6AFF /* 加载拼接图@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,6 +188,8 @@
 		E23410A2195BAA560086AE54 /* PhotoPreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoPreView.h; sourceTree = "<group>"; };
 		E23410A3195BAA560086AE54 /* PhotoPreView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoPreView.m; sourceTree = "<group>"; };
 		E23410A5195BEFA00086AE54 /* 服务条款.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "服务条款.txt"; sourceTree = "<group>"; };
+		E23D99D71C71D8DB00653A7F /* SOLStumbler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SOLStumbler.h; sourceTree = "<group>"; };
+		E23D99D81C71D8DB00653A7F /* SOLStumbler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SOLStumbler.m; sourceTree = "<group>"; };
 		E24D35A91B7B1FF500991739 /* bitstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitstream.c; sourceTree = "<group>"; };
 		E24D35AA1B7B1FF500991739 /* bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstream.h; sourceTree = "<group>"; };
 		E24D35AB1B7B1FF500991739 /* mask.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mask.c; sourceTree = "<group>"; };
@@ -238,6 +243,8 @@
 		E24D35FB1B7B2C8700991739 /* QRCodeGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeGenerator.m; sourceTree = "<group>"; };
 		E24D35FD1B7B2DFC00991739 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
 		E24D35FE1B7B2DFC00991739 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
+		E25A34F51C2D2B1B00621B4B /* NSAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSAlertView.h; sourceTree = "<group>"; };
+		E25A34F61C2D2B1B00621B4B /* NSAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSAlertView.m; sourceTree = "<group>"; };
 		E25B076419A491B1001EA090 /* JDStatusBarNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JDStatusBarNotification.h; sourceTree = "<group>"; };
 		E25B076519A491B1001EA090 /* JDStatusBarNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JDStatusBarNotification.m; sourceTree = "<group>"; };
 		E25B076619A491B1001EA090 /* JDStatusBarStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JDStatusBarStyle.h; sourceTree = "<group>"; };
@@ -305,6 +312,7 @@
 		E2BFE72C1B2FD59E00B5F622 /* Toast+UIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Toast+UIView.h"; sourceTree = "<group>"; };
 		E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		E2E7E5EC1A27008200E6A108 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		E2ED89B31BB1601B00EF6AFF /* 加载拼接图@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "加载拼接图@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -657,6 +665,8 @@
 				E216D3C31942F76200A81FC6 /* EmojiView.m */,
 				E28EBFA119FA00ED007753E5 /* MyDrawView.h */,
 				E28EBFA219FA00ED007753E5 /* MyDrawView.m */,
+				E25A34F51C2D2B1B00621B4B /* NSAlertView.h */,
+				E25A34F61C2D2B1B00621B4B /* NSAlertView.m */,
 				E2BFE72B1B2FD59E00B5F622 /* Toast */,
 			);
 			name = UIView;
@@ -683,6 +693,7 @@
 				E21020631B9D412500D528EF /* 灯闪动画.gif */,
 				E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */,
 				E2A1FFF91B4272FE00E7BA97 /* 配置iface信号发射@2x.png */,
+				E2ED89B31BB1601B00EF6AFF /* 加载拼接图@2x.png */,
 			);
 			path = Image;
 			sourceTree = "<group>";
@@ -692,6 +703,8 @@
 			children = (
 				E2BCF2841B46225B00485CC0 /* Brands.h */,
 				E2BCF2851B46225B00485CC0 /* Brands.m */,
+				E23D99D71C71D8DB00653A7F /* SOLStumbler.h */,
+				E23D99D81C71D8DB00653A7F /* SOLStumbler.m */,
 				E290A8331B5D138E00D43DDA /* DownloadService.h */,
 				E290A8341B5D138E00D43DDA /* DownloadService.m */,
 			);
@@ -755,7 +768,7 @@
 				ORGANIZATIONNAME = caidan;
 				TargetAttributes = {
 					E21EE5E319270DBF0051408C = {
-						DevelopmentTeam = DM47ELF9D6;
+						DevelopmentTeam = 24UPQ796CD;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -800,6 +813,7 @@
 				E24D35F01B7B231100991739 /* IQKeyboardManager.bundle in Resources */,
 				E2231D5A19496404003ADE6F /* voice_note_start.wav in Resources */,
 				E24D35F51B7B26A200991739 /* 单选_未选中@2x.png in Resources */,
+				E2ED89B41BB1601B00EF6AFF /* 加载拼接图@2x.png in Resources */,
 				E2B3B8B51B1D4590004ED953 /* 底部表情@2x.png in Resources */,
 				E2A1FFFA1B4272FE00E7BA97 /* 配置iface信号发射@2x.png in Resources */,
 				E2231D5B19496404003ADE6F /* voice_note_stop.wav in Resources */,
@@ -858,6 +872,7 @@
 				E216DD40192B352A00B17105 /* Second_ViewController.m in Sources */,
 				E21EE62119270E240051408C /* MBProgressHUD.m in Sources */,
 				E2BCF2861B46225B00485CC0 /* Brands.m in Sources */,
+				E25A34F71C2D2B1B00621B4B /* NSAlertView.m in Sources */,
 				E24D35EF1B7B231100991739 /* IQUIView+IQKeyboardToolbar.m in Sources */,
 				E216D3C41942F76200A81FC6 /* EmojiView.m in Sources */,
 				E24D35E41B7B231100991739 /* IQUITextFieldView+Additions.m in Sources */,
@@ -885,6 +900,7 @@
 				E24D35B91B7B1FF500991739 /* qrencode.c in Sources */,
 				E2727A7B1A6A59EA00CC57D6 /* TentacleView.m in Sources */,
 				E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */,
+				E23D99D91C71D8DB00653A7F /* SOLStumbler.m in Sources */,
 				E24D35BA1B7B1FF500991739 /* qrinput.c in Sources */,
 				E228DFD9196F7FF200C882E0 /* Test_ViewController.m in Sources */,
 				E22C944219CC351F00D9EAC1 /* AddressBook.m in Sources */,
@@ -965,7 +981,6 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1004,7 +1019,6 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1026,7 +1040,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: yong yin (PCML72KPNS)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Guanyu Yi (7QTF4Q37EW)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -1038,9 +1052,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "235ff3f3-5410-4d85-9d5c-729b254ea94d";
+				PROVISIONING_PROFILE = "a22b7ec0-5c88-4409-94bb-4d5ba5abf3fb";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1055,7 +1069,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: yong yin (PCML72KPNS)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Guanyu Yi (7QTF4Q37EW)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -1066,9 +1080,9 @@
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "235ff3f3-5410-4d85-9d5c-729b254ea94d";
+				PROVISIONING_PROFILE = "a22b7ec0-5c88-4409-94bb-4d5ba5abf3fb";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				VALID_ARCHS = "armv7 armv7s";
