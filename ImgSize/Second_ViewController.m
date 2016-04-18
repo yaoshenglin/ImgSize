@@ -124,7 +124,7 @@
     NSString *SN = @"FF-FFFFFFFFFFFFF";
     NSString *PWD = @"FFFFFFFF";
     NSString *msg = @"030300D1";//开门
-    NSString *value = @"FFFF";//门1
+    NSString *value = [CTB getRandomByString:@"123456789ABCDEF" Length:4];//网络标识
     NSString *control = [Tools makeControl:@"01FE00" dataLen:2 value:value];
     NSData *buffer = [Tools makeDoorCommandWith:SN pwd:PWD msg:msg control:control];
     

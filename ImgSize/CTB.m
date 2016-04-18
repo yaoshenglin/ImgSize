@@ -4104,7 +4104,7 @@ id getUserData(NSString *key)
 {
     CGFloat fontSize;
     UIFont *font = [UIFont systemFontOfSize:Screen_Width*1.1];
-    [aString sizeWithFont:font minFontSize:10.0f actualFontSize:&fontSize forWidth:width lineBreakMode:lineBreakMode];
+    [aString sizeWithFont:font minFontSize:1.0f actualFontSize:&fontSize forWidth:width lineBreakMode:lineBreakMode];
     
     return fontSize;
 }

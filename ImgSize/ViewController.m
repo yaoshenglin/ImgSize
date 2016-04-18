@@ -60,6 +60,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     UILabel *lblInstantSpeed;
     UILabel *lblPeakSpeed;
     UILabel *lblTime;
+    UILabel *textLabel;
     
     UIView *baseView;
     UIImageView *gameView;
@@ -113,6 +114,18 @@ static NSString *const SBStyle2 = @"SBStyle2";
     self.title = @"哈哈";
     
     [self createUI];
+    
+    CGFloat x = 120.0f;
+    CGFloat w = Screen_Width - x*2;
+    textLabel = [[UILabel alloc] initWithFrame:GetRect(x, 300, w, w)];
+    textLabel.backgroundColor = [[UIColor redColor] colorWithAlpha:0.3];
+    textLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+    textLabel.textAlignment = NSTextAlignmentCenter;
+    textLabel.adjustsFontSizeToFitWidth = YES;
+    textLabel.adjustsLetterSpacingToFitWidth = YES;
+    textLabel.clipsToBounds = YES;
+    textLabel.text = @"曾在月光之下望烟花,曾共看夕阳渐降下";
+    [self.view addSubview:textLabel];
 }
 
 - (void)createUI
@@ -192,8 +205,9 @@ static NSString *const SBStyle2 = @"SBStyle2";
         NSString *msg = @"场景命令执行成功，请选择继续的操作";
         NSAlertView *alert = [[NSAlertView alloc] initWithTitle:@"场景命令" message:msg delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定"];
         alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        alert.tag = 3;
         UITextField *txtName = [alert textFieldAtIndex:0];
-        txtName.text = @"远在天边";
+        txtName.text = textLabel.text.length > 0 ? textLabel.text : @"远在天边";
         [alert show];
         //[self scanWifis];
     }
@@ -476,6 +490,12 @@ static NSString *const SBStyle2 = @"SBStyle2";
             [self.navigationController pushViewController:Second animated:YES];
         }
         self.hidesBottomBarWhenPushed = NO;
+    }
+    else if (alertView.tag == 3) {
+        UITextField *txtName = [alertView textFieldAtIndex:0];
+        textLabel.text = txtName.text;
+        CGFloat fontSize = [UIFont sizeWithString:textLabel.text forWidth:GetVWidth(textLabel)];
+        textLabel.font = [UIFont systemFontOfSize:fontSize];
     }
 }
 
