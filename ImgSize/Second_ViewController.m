@@ -187,6 +187,7 @@
                       @"General&path=USAGE",
                       @"VIDEO",
                       @"General&path=Network/VPN",
+                      @"Privacy&path=CAMERA",
                       @"Wallpaper",
                       @"WIFI",
                       @"INTERNET_TETHERING"];

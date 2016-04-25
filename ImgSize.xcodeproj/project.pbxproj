@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */; };
+		14FC50CC1CC5DA4000155EBE /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FC50CB1CC5DA4000155EBE /* DrawView.m */; };
 		E21020621B9D3D3D00D528EF /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21020611B9D3D3D00D528EF /* ImageIO.framework */; };
 		E21020641B9D412500D528EF /* 灯闪动画.gif in Resources */ = {isa = PBXBuildFile; fileRef = E21020631B9D412500D528EF /* 灯闪动画.gif */; };
 		E216D3C41942F76200A81FC6 /* EmojiView.m in Sources */ = {isa = PBXBuildFile; fileRef = E216D3C31942F76200A81FC6 /* EmojiView.m */; };
@@ -131,6 +133,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "立即体验按钮点击效果@2x.png"; sourceTree = "<group>"; };
+		14FC50CA1CC5DA4000155EBE /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
+		14FC50CB1CC5DA4000155EBE /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
 		E21020611B9D3D3D00D528EF /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		E21020631B9D412500D528EF /* 灯闪动画.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "灯闪动画.gif"; sourceTree = "<group>"; };
 		E216D3C21942F76200A81FC6 /* EmojiView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmojiView.h; sourceTree = "<group>"; };
@@ -667,6 +672,8 @@
 				E28EBFA219FA00ED007753E5 /* MyDrawView.m */,
 				E25A34F51C2D2B1B00621B4B /* NSAlertView.h */,
 				E25A34F61C2D2B1B00621B4B /* NSAlertView.m */,
+				14FC50CA1CC5DA4000155EBE /* DrawView.h */,
+				14FC50CB1CC5DA4000155EBE /* DrawView.m */,
 				E2BFE72B1B2FD59E00B5F622 /* Toast */,
 			);
 			name = UIView;
@@ -691,6 +698,7 @@
 				E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */,
 				E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */,
 				E21020631B9D412500D528EF /* 灯闪动画.gif */,
+				14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */,
 				E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */,
 				E2A1FFF91B4272FE00E7BA97 /* 配置iface信号发射@2x.png */,
 				E2ED89B31BB1601B00EF6AFF /* 加载拼接图@2x.png */,
@@ -830,6 +838,7 @@
 				E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */,
 				E21EE60019270DBF0051408C /* Images.xcassets in Resources */,
 				E2231D5719496404003ADE6F /* n105.wav in Resources */,
+				14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */,
 				E21EE5F219270DBF0051408C /* InfoPlist.strings in Resources */,
 				E2B3B8BB1B1D4590004ED953 /* 信生活大-@2x.png in Resources */,
 				E2231D5619496404003ADE6F /* c101.wav in Resources */,
@@ -867,6 +876,7 @@
 				E28EBFA319FA00ED007753E5 /* MyDrawView.m in Sources */,
 				E264915C1A651ED8009910C5 /* Color_ViewController.m in Sources */,
 				E21EE62019270E240051408C /* CTB.m in Sources */,
+				14FC50CC1CC5DA4000155EBE /* DrawView.m in Sources */,
 				E2866C971AAEE5B400D8B6D3 /* UdpSocket.m in Sources */,
 				E25B076B19A491B1001EA090 /* JDStatusBarStyle.m in Sources */,
 				E216DD40192B352A00B17105 /* Second_ViewController.m in Sources */,
@@ -1054,7 +1064,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "a22b7ec0-5c88-4409-94bb-4d5ba5abf3fb";
+				PROVISIONING_PROFILE = "97bdb51f-dd30-4f3e-b7f8-b4588a782df5";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1082,7 +1092,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "a22b7ec0-5c88-4409-94bb-4d5ba5abf3fb";
+				PROVISIONING_PROFILE = "97bdb51f-dd30-4f3e-b7f8-b4588a782df5";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				VALID_ARCHS = "armv7 armv7s";
