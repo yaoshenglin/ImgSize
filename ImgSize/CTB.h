@@ -99,17 +99,17 @@ NS_INLINE CGFloat GetMaxY(CGRect rect) { return rect.origin.y+rect.size.height; 
 NS_INLINE CGFloat GetWidth(CGRect rect) { return rect.size.width; }
 NS_INLINE CGFloat GetHeight(CGRect rect) { return rect.size.height; }
 
-NS_INLINE CGFloat GetVMinX(UIView *View) { return View.frame.origin.x; }
-NS_INLINE CGFloat GetVMinY(UIView *View) { return View.frame.origin.y; }
-NS_INLINE CGFloat GetVMaxX(UIView *View) { return View.frame.origin.x+View.frame.size.width; }
-NS_INLINE CGFloat GetVMaxY(UIView *View) { return View.frame.origin.y+View.frame.size.height; }
-NS_INLINE CGFloat GetVCenterX(UIView *View) { return View.frame.origin.x+View.frame.size.width/2; }
-NS_INLINE CGFloat GetVCenterY(UIView *View) { return View.frame.origin.y+View.frame.size.height/2; }
+NS_INLINE CGFloat GetVMinX(UIView *View) { return CGRectGetMinX(View.frame); }
+NS_INLINE CGFloat GetVMinY(UIView *View) { return CGRectGetMinY(View.frame); }
+NS_INLINE CGFloat GetVMaxX(UIView *View) { return CGRectGetMaxX(View.frame); }
+NS_INLINE CGFloat GetVMaxY(UIView *View) { return CGRectGetMaxY(View.frame); }
+NS_INLINE CGFloat GetVCenterX(UIView *View) { return CGRectGetMidX(View.frame); }
+NS_INLINE CGFloat GetVCenterY(UIView *View) { return CGRectGetMidY(View.frame); }
 NS_INLINE CGPoint GetBCenter(UIView *View) { return CGPointMake(View.frame.size.width/2, View.frame.size.height/2); }
 NS_INLINE CGFloat GetBCenterX(UIView *View) { return View.frame.size.width/2; }
 NS_INLINE CGFloat GetBCenterY(UIView *View) { return View.frame.size.height/2; }
-NS_INLINE CGFloat GetVWidth(UIView *View) { return View.frame.size.width; }
-NS_INLINE CGFloat GetVHeight(UIView *View) { return View.frame.size.height; }
+NS_INLINE CGFloat GetVWidth(UIView *View) { return CGRectGetWidth(View.frame); }
+NS_INLINE CGFloat GetVHeight(UIView *View) { return CGRectGetHeight(View.frame); }
 
 NS_INLINE CGRect GetRect(CGFloat x,CGFloat y,CGFloat w,CGFloat h) { return CGRectMake(x, y, w, h); };
 NS_INLINE CGPoint GetPoint(CGFloat x,CGFloat y) { return CGPointMake(x, y); }

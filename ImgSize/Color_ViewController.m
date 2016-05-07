@@ -15,13 +15,14 @@
 {
     UIButton *btnSelect;
     UILabel *lblSelect;
+    UILabel *lblDevice;
     UITextField *txtAccount;
     UIScrollView *iScrollView;
     UIImageView *imgQRCodeView;
     
     BOOL isSelect;
-    NSInteger tag;
-    NSMutableArray *listBtn;
+    int selectType;
+    NSMutableArray *listDevice;
 }
 
 @end
@@ -37,8 +38,9 @@
 
 - (void)initCapacity
 {
-    tag = 1;
-    listBtn = [@[] mutableCopy];
+    selectType = 1;
+    listDevice = [@[] mutableCopy];
+    listDevice.array = @[@"主机",@"开关",@"插座"];
     //self.view.backgroundColor = [UIColor blackColor];
     iScrollView = [[UIScrollView alloc] initWithFrame:GetRect(0, 20, Screen_Width, Screen_Height-49-20)];
     [self.view addSubview:iScrollView];
@@ -57,7 +59,7 @@
     lblPhoneLeftView.textColor = [UIColor blackColor];
     [CTB setBorderWidth:0.8 Color:[CTB colorWithHexString:@"#DADADA"] View:txtAccount, nil];
     
-    //选择按钮
+    //选择按钮(加密)
     isSelect = YES;
     btnSelect = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:3 title:@"" img:@"单选_选中"];
     btnSelect.showsTouchWhenHighlighted = NO;
@@ -67,27 +69,39 @@
     lblSelect = [CTB labelTag:0 toView:iScrollView text:@"加密" wordSize:16];
     lblSelect.frame = CGRectMake(GetVMaxX(btnSelect), GetVMinY(btnSelect), 50, 20);
     
-    UIButton *btnHostMac = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:1 title:@"主机" img:@""];
-    btnHostMac.frame = GetRect(20, GetVMaxY(txtAccount)+10, Screen_Width/2-40, 30);
-    [btnHostMac setNormalBackgroundImage:[UIImage imageNamed:@"按钮-选中效果"]];
-    [btnHostMac setNormalTitleColor:[UIColor whiteColor]];
+    x = 30;
+    UIView *DeviceView = [[UIView alloc] init];
+    DeviceView.clipsToBounds = YES;
+    DeviceView.frame = GetRect(x, GetVMaxY(txtAccount)+10, Screen_Width-x*2, 30);
+    DeviceView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"按钮-选中效果"]];
+    [iScrollView addSubview:DeviceView];
     
-    UIButton *btnSwitch = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:2 title:@"开关" img:@""];
-    btnSwitch.frame = GetRect(Screen_Width/2+20, GetVMinY(btnHostMac), Screen_Width/2-40, 30);
-    [btnSwitch setNormalBackgroundImage:[UIImage imageNamed:@"选中背景图"]];
-    listBtn.array = @[btnHostMac,btnSwitch];
+    lblDevice = [CTB labelTag:2 toView:DeviceView text:@"主机" wordSize:-1];
+    lblDevice.frame = GetRect(0, 0, GetVWidth(DeviceView), 30);
+    lblDevice.backgroundColor = [UIColor clearColor];
+    lblDevice.textColor = [UIColor whiteColor];
     
+    UIButton *btnSwitch = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:2 title:@"" img:@""];
+    btnSwitch.frame = GetRect(CGRectGetMaxX(DeviceView.frame)-30, GetVMinY(DeviceView), 30, 30);
+    [btnSwitch setNormalImage:[UIImage imageNamed:@"向下图标"]];
+    
+    //生成二维码
     UIButton *btnConfirm = [CTB buttonType:UIButtonTypeCustom delegate:self to:iScrollView tag:4 title:@"生成二维码" img:@""];
     [btnConfirm setNormalTitleColor:[UIColor whiteColor]];
-    btnConfirm.frame = GetRect(20, GetVMaxY(btnSwitch)+10, Screen_Width-40, 38);
+    btnConfirm.frame = GetRect(x, GetVMaxY(btnSwitch)+10, Screen_Width-x*2, 38);
     [btnConfirm setNormalBackgroundImage:[UIImage imageNamed:@"按钮-选中效果"]];
     
-    [CTB setRadius:3.0 View:btnHostMac,btnSwitch,btnConfirm, nil];
+    [CTB setRadius:3.0 View:DeviceView,btnSwitch,btnConfirm, nil];
     [CTB setRadius:1.0 View:btnSelect, nil];
     
     imgQRCodeView = [[UIImageView alloc] initWithFrame:GetRect(Screen_Width/2-100, GetVMaxY(btnConfirm)+40, 200, 200)];
     [self.view addSubview:imgQRCodeView];
     [CTB setBorderWidth:0.8 Color:[CTB colorWithHexString:@"#DADADA"] View:imgQRCodeView, nil];
+    
+    x = CGRectGetMinX(DeviceView.frame);
+    UITableView *tableView = [CTB tableViewStyle:UITableViewStylePlain delegate:self toV:iScrollView];
+    tableView.frame = CGRectMake(x, GetVMaxY(DeviceView), Screen_Width-x*2, 0);
+    tableView.backgroundColor = [[UIColor grayColor] colorWithAlpha:0.5];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -96,22 +110,65 @@
     return YES;
 }
 
+#pragma mark - --------tableView------------------------
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    NSInteger row_Count = listDevice.count;
+    
+    return row_Count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *identifier = [NSString stringWithFormat:@"%d/%d/",(int)indexPath.section,(int)indexPath.row];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        cell.backgroundColor = [UIColor clearColor];
+        cell.textLabel.textColor = [UIColor whiteColor];
+        [CTB setBottomLineAtTable:tableView dicData:@{@"indexPath":indexPath,@"cell":cell,@"borderColor":[[UIColor whiteColor] colorWithAlpha:0.5]}];
+    }
+    
+    cell.textLabel.text = [listDevice objAtIndex:indexPath.row];
+    
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    NSString *wifiSSID = [listDevice objAtIndex:indexPath.row];
+    lblDevice.text = wifiSSID;
+    
+    selectType = indexPath.row + 1;
+    
+    [CTB animateWithDur:0.3 animations:^{
+        [tableView setSizeToH:0];
+    } completion:^(BOOL finished) {
+        
+    }];
+}
+
+#pragma mark - --------ButtonEvents------------------------
 - (void)ButtonEvents:(UIButton *)button
 {
     [txtAccount resignFirstResponder];
     
     if (button.tag == 1|| button.tag == 2) {
-        tag = button.tag;
-        for (UIButton *btn in listBtn) {
-            UIImage *image;
-            if (btn == button) {
-                image = [UIImage imageNamed:@"按钮-选中效果"];
-                [btn setNormalTitleColor:[UIColor whiteColor]];
-            }else{
-                image = [UIImage imageNamed:@"选中背景图"];
-                [btn setNormalTitleColor:[UIColor blackColor]];
-            }
-            [btn setNormalBackgroundImage:image];
+        UITableView *tableView = [iScrollView viewWithClass:[UITableView class]];
+        if (GetVHeight(tableView) > 0) {
+            [CTB animateWithDur:0.3 animations:^{
+                [tableView setSizeToH:0];
+            } completion:^(BOOL finished) {
+                
+            }];
+        }else{
+            [CTB animateWithDur:0.3 animations:^{
+                [tableView setSizeToH:200];
+            } completion:^(BOOL finished) {
+                
+            }];
         }
     }
     else if (button.tag == 3) {
@@ -138,13 +195,17 @@
         //@"device:doorlock;id:03000001;tag:1;ver:1.0";
         
         NSString *value = @"";
-        if (tag == 1) {
+        if (selectType == 1) {
             //主机
             value = [NSString format:@"device:host;content:%@;ver:1.0",host_mac];
         }
-        else if (tag == 2) {
+        else if (selectType == 2) {
             //开关(3目)
             value = [NSString format:@"device:switch;id:%@;tag:3",host_mac];
+        }
+        else if (selectType == 3) {
+            //插座
+            value = [NSString format:@"device:plug;id:%@",host_mac];
         }
         
         if (isSelect) {
