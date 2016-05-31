@@ -55,6 +55,7 @@
 
 - (void)initCapacity
 {
+    self.title = @"自定义分享";
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithImg:[UIImage imageNamed:@"二维码大"] target:self tag:2];
     
     CGFloat x,y;
