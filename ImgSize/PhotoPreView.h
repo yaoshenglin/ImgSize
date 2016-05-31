@@ -10,8 +10,8 @@
 
 @protocol PhotoPreViewDelegate;
 @class PhotoMaskView;
-@interface PhotoPreView : UIViewController<UIScrollViewDelegate> {
-
+@interface PhotoPreView : UIViewController<UIScrollViewDelegate>
+{
     UIScrollView *myScrollView;
     UIImageView *myImageView;
     PhotoMaskView *myMaskView;
@@ -25,9 +25,9 @@
     BOOL isOnlyRead;
 }
 
-@property (retain, nonatomic) id Tag;
+@property (weak, nonatomic) id Tag;
 
-- (id)init:(UIImage *)image cropSize:(CGSize)size isOnlyRead:(BOOL)onlyRead delegate:(id<PhotoPreViewDelegate>)delegate;
+- (id)init:(UIImage *)image cropSize:(CGSize)size isOnlyRead:(BOOL)onlyRead delegate:(id)delegate;
 
 @end
 

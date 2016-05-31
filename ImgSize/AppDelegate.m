@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "CTB.h"
+#import "Share.h"
 #import "BackRequest.h"
 #import "HTTPRequest.h"
 
@@ -24,6 +25,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     backRequest = [[BackRequest alloc] init];
+    [WXShare registerApp];//微信注册
     // Override point for customization after application launch.
     return YES;
 }
@@ -122,6 +124,27 @@
 {
     completionHandler(UIBackgroundFetchResultNewData);
     NSLog(@"传输已经完成");
+}
+
+#pragma mark - --------QQ------------------------
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    id delegate = _delegate;
+    _delegate = nil;
+    NSString *URL = [NSString stringWithFormat:@"%@",url];
+    if ([URL hasPrefix:@"wx"]) {
+        //微信
+        return [WXShare handleOpenURL:url delegate:delegate];
+    }
+    else if ([URL hasPrefix:@"QQ"]) {
+        //QQ
+        if ([delegate respondsToSelector:select(HandleOpenURL:)]) {
+            [delegate HandleOpenURL:url];
+        }
+        return [QQShare HandleOpenURL:url];
+    }
+    
+    return [QQShare HandleOpenURL:url];
 }
 
 @end

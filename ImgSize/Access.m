@@ -82,7 +82,7 @@
     
     sqlite3_stmt *stmt = [DB query:sql];
     if (stmt) {
-        bindInt(stmt, 1, entity.remoteID);
+        bindInt(stmt, 1, (int)entity.remoteID);
         bindInt(stmt, 2, entity.count);
         bindText(stmt, 3, entity.SN);
         bindText(stmt, 4, entity.Name);
@@ -148,7 +148,7 @@
     NSString *sql = [NSString stringWithFormat:@"update Access set %@ where ID = %d",[DB getUpdateColumnsWith:listKey],entity.ID];
     sqlite3_stmt *stmt = [DB query:sql];
     if (stmt) {
-        bindInt(stmt, 1, entity.remoteID);
+        bindInt(stmt, 1, (int)entity.remoteID);
         bindInt(stmt, 2, entity.count);
         bindText(stmt, 3, entity.SN);
         bindText(stmt, 4, entity.Name);
@@ -255,7 +255,7 @@
     
     NSString *lenString = [data stringWithRange:NSMakeRange(28, 4)];
     char *errMsg;
-    _len = strtoul([lenString UTF8String],&errMsg,16);
+    _len = (int)strtoul([lenString UTF8String],&errMsg,16);
     _value = [data stringWithRange:NSMakeRange(32, _len)];
     
     if (strlen(errMsg)) {

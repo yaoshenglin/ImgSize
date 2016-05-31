@@ -141,7 +141,7 @@
     NSString *wifiSSID = [listDevice objAtIndex:indexPath.row];
     lblDevice.text = wifiSSID;
     
-    selectType = indexPath.row + 1;
+    selectType = (int)indexPath.row + 1;
     
     [CTB animateWithDur:0.3 animations:^{
         [tableView setSizeToH:0];

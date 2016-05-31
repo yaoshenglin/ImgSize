@@ -144,7 +144,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:baseView];
     _animator.delegate = self;
-    
+
     lblTime = [CTB labelTag:1 toView:baseView text:@"00:00:00" wordSize:48];
     lblTime.textColor = [UIColor blueColor];
     lblTime.frame = GetRect(30, 50, GetVWidth(baseView)-60, 38);
@@ -217,124 +217,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
 //            [drawView removeFromSuperview];
 //        }];
         
-        CGFloat y = 10;
-        UIImage *image = [UIImage imageNamed:@"立即体验按钮点击效果"];
-        UIImageView *imgView1 = [[UIImageView alloc] initWithImage:image];
-//        [imgView1 setSizeToW:image.size.width/2 height:image.size.height/2];
-        [imgView1 setOriginX:50 Y:y];
-        [self.view addSubview:imgView1];
-        
-        UIColor *color = [CTB colorBy:image atPixel:CGPointMake(1, 1)];
-        NSLog(@"color = %@",color);
-        
-        y = GetVMaxY(imgView1)+10;
-        image = [self imageToTransparent:image];
-        imgView1 = [[UIImageView alloc] initWithImage:image];
-//        [imgView1 setSizeToW:image.size.width/2 height:image.size.height/2];
-        [imgView1 setOriginX:50 Y:y];
-        [self.view addSubview:imgView1];
     }
-}
-
-//颜色替换
-- (UIImage*) imageToTransparent:(UIImage*) image
-{
-    // 分配内存
-    const int imageWidth = image.size.width;
-    const int imageHeight = image.size.height;
-    size_t      bytesPerRow = imageWidth * 4;
-    uint32_t* rgbImageBuf = (uint32_t*)malloc(bytesPerRow * imageHeight);
-    
-    // 创建context
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(rgbImageBuf, imageWidth, imageHeight, 8, bytesPerRow, colorSpace,
-                                                 kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipLast);
-    CGContextDrawImage(context, CGRectMake(0, 0, imageWidth, imageHeight), image.CGImage);
-    
-    int countBG = 0;
-    int countF = 0;
-    NSMutableArray *listColor = [@[] mutableCopy];
-    // 遍历像素
-    int pixelNum = imageWidth * imageHeight;
-    uint32_t* pCurPtr = rgbImageBuf;
-    for (int i = 0; i < pixelNum; i++, pCurPtr++)
-    {
-        // 改成下面的代码，会将图片转成想要的颜色(0x29BB9C->0x00A0E9)
-        if ((*pCurPtr & 0x65815A00) == 0x65815a00)    // 将背景变成透明
-        {
-            uint8_t* ptr = (uint8_t*)pCurPtr;
-            ptr[3] = 00; //0~255
-            ptr[2] = 00;
-            ptr[1] = 00;
-            ptr[0] = 00;
-            countBG ++ ;
-        }
-        else if ((*pCurPtr & 0x29BB9C00) == 0x29bb9c00)    // 将背景变成透明
-        {
-            uint8_t *ptr = (uint8_t *)pCurPtr;
-            ptr[3] = 00; //0~255
-            ptr[2] = 160;
-            ptr[1] = 233;
-        }
-        else if ((*pCurPtr & 0xFFFFFFFF) == 0xFFFFFFFF)    // 将背景变成透明
-        {
-            uint8_t *ptr = (uint8_t *)pCurPtr;
-            ptr[3] = 255; //0~255
-            ptr[2] = 255;
-            ptr[1] = 255;
-            ptr[0] = 255;
-        }else{
-            uint8_t* ptr = (uint8_t*)pCurPtr;
-            ptr[3] = 00; //0~255
-            ptr[2] = 160;
-            ptr[1] = 233;
-            ptr[0] = 255;
-            countF ++ ;
-        }
-        
-        if (![listColor containsObject:@(*pCurPtr)]) {
-            [listColor addObject:@(*pCurPtr)];
-        }
-//        else if ((*pCurPtr & 0xFFFFFF00) == 0xffffff00)    // 将白色变成透明
-//        {
-//            uint8_t* ptr = (uint8_t*)pCurPtr;
-//            ptr[0] = 0;
-//        }
-//        else
-//        {
-//            // 改成下面的代码，会将图片转成想要的颜色(0x29BB9C->0x00A0E9)
-//            uint8_t* ptr = (uint8_t*)pCurPtr;
-//            ptr[3] = 41; //0~255
-//            ptr[2] = 187;
-//            ptr[1] = 156;
-//        }
-        
-    }
-    
-    NSLog(@"%d个,countBG = %d, countF = %d",listColor.count,countBG,countF);
-    
-    // 将内存转成image
-    CGDataProviderRef dataProvider =CGDataProviderCreateWithData(NULL, rgbImageBuf, bytesPerRow * imageHeight, ProviderReleaseData);
-    CGImageRef imageRef = CGImageCreate(imageWidth, imageHeight,8, 32, bytesPerRow, colorSpace,
-                                        kCGImageAlphaLast |kCGBitmapByteOrder32Little, dataProvider,
-                                        NULL, true,kCGRenderingIntentDefault);
-    CGDataProviderRelease(dataProvider);
-    
-    UIImage* resultUIImage = [UIImage imageWithCGImage:imageRef];
-    
-    // 释放
-    CGImageRelease(imageRef);
-    CGContextRelease(context);
-    CGColorSpaceRelease(colorSpace);
-    // free(rgbImageBuf) 创建dataProvider时已提供释放函数，这里不用free
-    
-    return resultUIImage;
-}
-
-/** 颜色变化 */
-void ProviderReleaseData (void *info, const void *data, size_t size)
-{
-    free((void*)data);
 }
 
 //扫描网络
@@ -494,7 +377,7 @@ void ProviderReleaseData (void *info, const void *data, size_t size)
                            @"hwName":@"iFace SP1",
                            @"hwVer":@(1)};
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:body options:NSJSONWritingPrettyPrinted error: &error];
-    int value = send(socketFileDescriptor, [jsonData bytes], jsonData.length, 0);
+    ssize_t value = send(socketFileDescriptor, [jsonData bytes], jsonData.length, 0);
     if (value < 0) {
         NSLog(@"发送数据失败");
     }
@@ -509,7 +392,7 @@ void ProviderReleaseData (void *info, const void *data, size_t size)
         
         // Read a buffer's amount of data from the socket; the number of bytes read is returned
         //
-        int result = recv(socketFileDescriptor, &buffer, length, 0);
+        ssize_t result = recv(socketFileDescriptor, &buffer, length, 0);
         if (result > 0) {
             [data appendBytes:buffer length:result];
         }

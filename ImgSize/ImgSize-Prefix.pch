@@ -20,3 +20,8 @@
     #define k_res_host @"http://121.201.17.130:8100"
     //#define k_res_host @"http://res.weicontrol.cn"   //http://res.weicontrol.cn
 #endif
+
+#define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
+
+//蓝色0x20ACED //绿色 00a0e9
+#define MasterColor UIColorFromRGB(0x00A0E9)    //绿色(当前主要颜色)

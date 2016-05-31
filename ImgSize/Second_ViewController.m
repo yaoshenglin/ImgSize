@@ -402,14 +402,8 @@
 {
     if (button.tag==1) {
         
-//        [listData removeAllObjects];
-        [listData removeObjectAtIndex:0];
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-        [myTableView deleteAtIndexPath:indexPath rowCount:0];
-        
-        //UIViewController *Third = [CTB getControllerWithIdentity:@"Third" storyboard:@"Main"];
-        //[self.navigationController pushViewController:Third animated:YES];
-        //[self.navigationController presentViewController:Third animated:YES completion:nil];
+        UIViewController *Third = [CTB getControllerWithIdentity:@"Third" storyboard:@"Main"];
+        [self.navigationController pushViewController:Third animated:YES];
     }
     if (button.tag==2) {
         
