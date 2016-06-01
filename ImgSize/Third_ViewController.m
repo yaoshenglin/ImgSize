@@ -123,9 +123,20 @@
         [sheet showInView:self.navigationController.navigationBar];
     }
     else if (button.tag == 3) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"选择分享类型" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:@"微信分享" otherButtonTitles:@"QQ分享", nil];
-        sheet.tag = 2;
-        [sheet showInView:self.navigationController.navigationBar];
+        NSString *format = @"(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?";
+        if (!_txtTitle.text.isNonEmpty) {
+            [self.view makeToast:@"请输入标题"];
+        }
+        else if (!_txtUrl.text.isNonEmpty) {
+            [self.view makeToast:@"请输入网址"];
+        }
+        else if (![_txtUrl.text evaluateWithFormat:format]) {
+            [self.view makeToast:@"网址格式不对"];
+        }else{
+            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"选择分享类型" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:@"微信分享" otherButtonTitles:@"QQ分享", nil];
+            sheet.tag = 2;
+            [sheet showInView:self.navigationController.navigationBar];
+        }
     }
 }
 

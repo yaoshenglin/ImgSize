@@ -66,15 +66,29 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.happyeasy.carea</string>
+			<string>com.weicontrol.imgSize</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.happyeasy.carea</string>
+				<string>com.weicontrol.imgSize</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>2.0</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mqqOpensdkSSoLogin</string>
+		<string>mqzone</string>
+		<string>mqq</string>
+		<string>mqqapi</string>
+		<string>mqqopensdkapiV2</string>
+		<string>mqqopensdkapiV3</string>
+		<string>mqqbrowser</string>
+		<string>mqqwpa</string>
+		<string>weixin</string>
+		<string>wechat</string>
+		<string>wtloginmqq2</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -93,20 +107,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>mqqOpensdkSSoLogin</string>
-		<string>mqzone</string>
-		<string>mqq</string>
-		<string>mqqapi</string>
-		<string>mqqopensdkapiV2</string>
-		<string>mqqopensdkapiV3</string>
-		<string>mqqbrowser</string>
-		<string>mqqwpa</string>
-		<string>weixin</string>
-		<string>wechat</string>
-		<string>wtloginmqq2</string>
 	</array>
 </dict>
 </plist>
