@@ -56,10 +56,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>carea_weixin</string>
+			<string>imgSize_weixin</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>wxd4cb6799c74b3a0d</string>
+				<string>wxf51c8154f251195f</string>
 			</array>
 		</dict>
 		<dict>

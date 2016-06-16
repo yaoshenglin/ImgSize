@@ -104,6 +104,10 @@
     [CTB setLeftViewWithWidth:5 textField:txtTitle,txtUrl,txtDepict, nil];
     [CTB setRadius:3.0 View:txtTitle,txtUrl,txtDepict,btnSend, nil];
     [CTB setBorderWidth:0.5 Color:MasterColor View:txtTitle,txtUrl,txtDepict,btnSend, nil];
+    
+    txtTitle.text = @"大神啊";
+    txtUrl.text = @"http://www.html-js.com/article/1628";
+    txtDepict.text = @"我是2010年8月份开始自学Android的，到现在已经快有6年的时间了。";
 }
 
 - (void)ButtonEvents:(UIButton *)button
