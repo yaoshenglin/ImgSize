@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		144DE2B21CFD5E5500BE43B9 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 144DE2B11CFD5E5500BE43B9 /* Toast+UIView.m */; };
 		144DE2B51CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 144DE2B41CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png */; };
+		1454ACE81D275B1900BA3AB2 /* UIImage+GIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 1454ACE71D275B1900BA3AB2 /* UIImage+GIF.m */; };
 		145EFB891CDDEC1900EB7320 /* 下拉图标@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 145EFB881CDDEC1900EB7320 /* 下拉图标@2x.png */; };
 		145EFB8B1CDDF5F500EB7320 /* 向下图标.png in Resources */ = {isa = PBXBuildFile; fileRef = 145EFB8A1CDDF5F500EB7320 /* 向下图标.png */; };
 		1489C1FF1CFC350E0097E4E0 /* libWeChatSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C1FB1CFC350E0097E4E0 /* libWeChatSDK.a */; };
@@ -148,6 +149,8 @@
 		144DE2B11CFD5E5500BE43B9 /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		144DE2B31CFD5F0D00BE43B9 /* Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
 		144DE2B41CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "场景编辑_场景图片@2x.png"; sourceTree = "<group>"; };
+		1454ACE61D275B1900BA3AB2 /* UIImage+GIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+GIF.h"; sourceTree = "<group>"; };
+		1454ACE71D275B1900BA3AB2 /* UIImage+GIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+GIF.m"; sourceTree = "<group>"; };
 		145EFB881CDDEC1900EB7320 /* 下拉图标@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "下拉图标@2x.png"; sourceTree = "<group>"; };
 		145EFB8A1CDDF5F500EB7320 /* 向下图标.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "向下图标.png"; sourceTree = "<group>"; };
 		1489C1FB1CFC350E0097E4E0 /* libWeChatSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libWeChatSDK.a; sourceTree = "<group>"; };
@@ -569,6 +572,8 @@
 				E2BCF2871B46227E00485CC0 /* EnumInfraredType.h */,
 				E2BDE5891B5392770098CF42 /* BackRequest.h */,
 				E2BDE58A1B5392770098CF42 /* BackRequest.m */,
+				1454ACE61D275B1900BA3AB2 /* UIImage+GIF.h */,
+				1454ACE71D275B1900BA3AB2 /* UIImage+GIF.m */,
 				E2BDE58C1B5394B80098CF42 /* HTTPRequest.h */,
 				E2BDE58D1B5394B80098CF42 /* HTTPRequest.m */,
 				E2BDE58F1B539C9D0098CF42 /* FileDownloader.h */,
@@ -993,6 +998,7 @@
 				E24D35B91B7B1FF500991739 /* qrencode.c in Sources */,
 				E2727A7B1A6A59EA00CC57D6 /* TentacleView.m in Sources */,
 				E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */,
+				1454ACE81D275B1900BA3AB2 /* UIImage+GIF.m in Sources */,
 				E23D99D91C71D8DB00653A7F /* SOLStumbler.m in Sources */,
 				E24D35BA1B7B1FF500991739 /* qrinput.c in Sources */,
 				E228DFD9196F7FF200C882E0 /* Test_ViewController.m in Sources */,

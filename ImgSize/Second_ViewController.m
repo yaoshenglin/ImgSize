@@ -338,6 +338,31 @@
     }
 }
 
+#pragma mark 只有实现这个方法，编辑模式中才允许移动Cell
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+{
+    // 更换数据的顺序
+    [listData exchangeObjectAtIndex:sourceIndexPath.row withObjectAtIndex:destinationIndexPath.row];
+}
+
+//定义编辑样式
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellEditingStyleNone;
+}
+
+- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return NO;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Return NO if you do not want the item to be re-orderable.
+    return YES;
+}
+
+#pragma mark -
 - (void)test:(NSString *)aString with:(NSString *)bString
 {
     NSLog(@"a = %@,b = %@",aString,bString);
@@ -402,6 +427,10 @@
 {
     if (button.tag==1) {
         
+        if (Type == 3) {
+            [myTableView setEditing:!myTableView.editing animated:YES];
+            return;
+        }
         UIViewController *Third = [CTB getControllerWithIdentity:@"Third" storyboard:@"Main"];
         [self.navigationController pushViewController:Third animated:YES];
     }

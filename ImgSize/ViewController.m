@@ -22,6 +22,7 @@
 #import "DrawView.h"
 #import "NSAlertView.h"
 #import "SOLStumbler.h"
+#import "UIImage+GIF.h"
 
 
 extern NSString *CTSettingCopyMyPhoneNumber(void);
@@ -217,7 +218,43 @@ static NSString *const SBStyle2 = @"SBStyle2";
 //            [drawView removeFromSuperview];
 //        }];
         
+        
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"灯闪动画.gif" ofType:nil];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        UIImage *image = [UIImage sd_animatedGIFWithData:data];
+        NSLog(@"count = %ld, duration = %f",(long)image.images.count,image.duration);
     }
+}
+
+- (float)sd_frameDurationAtIndex:(NSUInteger)index source:(CGImageSourceRef)source {
+    float frameDuration = 0.1f;
+    CFDictionaryRef cfFrameProperties = CGImageSourceCopyPropertiesAtIndex(source, index, nil);
+    NSDictionary *frameProperties = (__bridge NSDictionary *)cfFrameProperties;
+    NSDictionary *gifProperties = frameProperties[(NSString *)kCGImagePropertyGIFDictionary];
+    
+    NSNumber *delayTimeUnclampedProp = gifProperties[(NSString *)kCGImagePropertyGIFUnclampedDelayTime];
+    if (delayTimeUnclampedProp) {
+        frameDuration = [delayTimeUnclampedProp floatValue];
+    }
+    else {
+        
+        NSNumber *delayTimeProp = gifProperties[(NSString *)kCGImagePropertyGIFDelayTime];
+        if (delayTimeProp) {
+            frameDuration = [delayTimeProp floatValue];
+        }
+    }
+    
+    // Many annoying ads specify a 0 duration to make an image flash as quickly as possible.
+    // We follow Firefox's behavior and use a duration of 100 ms for any frames that specify
+    // a duration of <= 10 ms. See <rdar://problem/7689300> and <http://webkit.org/b/36082>
+    // for more information.
+    
+    if (frameDuration < 0.011f) {
+        frameDuration = 0.100f;
+    }
+    
+    CFRelease(cfFrameProperties);
+    return frameDuration;
 }
 
 //扫描网络
