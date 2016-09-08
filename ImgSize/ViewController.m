@@ -127,6 +127,22 @@ static NSString *const SBStyle2 = @"SBStyle2";
     textLabel.clipsToBounds = YES;
     textLabel.text = @"曾在月光之下望烟花,曾共看夕阳渐降下";
     [self.view addSubview:textLabel];
+    
+    NSString *pIndexDbPath = [[NSBundle mainBundle] pathForResource:@"IRCode.db" ofType:nil];
+    NSString *Path = [@"~/Library" stringByExpandingTildeInPath];
+    NSString *dbFilePath = [Path stringByAppendingPathComponent:@"IRCode.db"];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isExist = [fileManager fileExistsAtPath:dbFilePath];//被复制后的文件
+    if (!isExist) {
+        NSData *data = [NSData dataWithContentsOfFile:pIndexDbPath];
+        if ([data writeToFile:dbFilePath atomically:YES]) {
+            NSLog(@"初始化PIndex成功");
+        }else{
+            NSLog(@"初始化PIndex失败");
+        }
+    }
+    
+    NSLog(@"IRCode : %@",pIndexDbPath);
 }
 
 - (void)createUI

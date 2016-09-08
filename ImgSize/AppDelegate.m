@@ -63,6 +63,9 @@
     NSString *Path = @"~/Documents";
     NSString *FilePath = [Path stringByExpandingTildeInPath];
     NSLog(@"Path : %@",FilePath);
+    //复制内容
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    pasteboard.string = FilePath;
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
