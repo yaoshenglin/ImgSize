@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		144DE2B21CFD5E5500BE43B9 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 144DE2B11CFD5E5500BE43B9 /* Toast+UIView.m */; };
 		144DE2B51CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 144DE2B41CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png */; };
+		14531B7F1D8138D5000466C6 /* IRCode.db in Resources */ = {isa = PBXBuildFile; fileRef = 14531B7E1D8138D5000466C6 /* IRCode.db */; };
 		1454ACE81D275B1900BA3AB2 /* UIImage+GIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 1454ACE71D275B1900BA3AB2 /* UIImage+GIF.m */; };
 		145EFB891CDDEC1900EB7320 /* 下拉图标@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 145EFB881CDDEC1900EB7320 /* 下拉图标@2x.png */; };
 		145EFB8B1CDDF5F500EB7320 /* 向下图标.png in Resources */ = {isa = PBXBuildFile; fileRef = 145EFB8A1CDDF5F500EB7320 /* 向下图标.png */; };
@@ -149,6 +150,7 @@
 		144DE2B11CFD5E5500BE43B9 /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		144DE2B31CFD5F0D00BE43B9 /* Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
 		144DE2B41CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "场景编辑_场景图片@2x.png"; sourceTree = "<group>"; };
+		14531B7E1D8138D5000466C6 /* IRCode.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = IRCode.db; sourceTree = "<group>"; };
 		1454ACE61D275B1900BA3AB2 /* UIImage+GIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+GIF.h"; sourceTree = "<group>"; };
 		1454ACE71D275B1900BA3AB2 /* UIImage+GIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+GIF.m"; sourceTree = "<group>"; };
 		145EFB881CDDEC1900EB7320 /* 下拉图标@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "下拉图标@2x.png"; sourceTree = "<group>"; };
@@ -497,6 +499,7 @@
 				E21EE5F919270DBF0051408C /* Main.storyboard */,
 				E21EE5EF19270DBF0051408C /* ImgSize-Info.plist */,
 				E21EE5F019270DBF0051408C /* InfoPlist.strings */,
+				14531B7E1D8138D5000466C6 /* IRCode.db */,
 				E21EE5F319270DBF0051408C /* main.m */,
 				E22073621B95B7CA00DBB8D4 /* ContentType.plist */,
 				E21EE5F519270DBF0051408C /* ImgSize-Prefix.pch */,
@@ -918,6 +921,7 @@
 				E2B3B8B91B1D4590004ED953 /* 发送@2x.png in Resources */,
 				E23410A6195BEFA00086AE54 /* 服务条款.txt in Resources */,
 				E2B3B8BE1B1D4590004ED953 /* 语音-红@2x.png in Resources */,
+				14531B7F1D8138D5000466C6 /* IRCode.db in Resources */,
 				E22073631B95B7CA00DBB8D4 /* ContentType.plist in Resources */,
 				E24D35F21B7B252400991739 /* 按钮-选中效果@2x.png in Resources */,
 				E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */,
