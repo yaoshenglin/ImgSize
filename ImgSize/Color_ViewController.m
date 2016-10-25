@@ -38,11 +38,21 @@
 
 - (void)initCapacity
 {
+    if (iPhone >= 7) {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+        self.navigationController.navigationBar.barTintColor = MasterColor;
+    }else{
+        self.navigationController.navigationBar.tintColor = MasterColor;
+    }
+    
+    self.title = @"二维码工具";
+    self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"扫码" target:self tag:5];
+    
     selectType = 1;
     listDevice = [@[] mutableCopy];
     listDevice.array = @[@"主机",@"开关",@"插座",@"电动窗帘"];
     //self.view.backgroundColor = [UIColor blackColor];
-    iScrollView = [[UIScrollView alloc] initWithFrame:GetRect(0, 20, Screen_Width, Screen_Height-49-20)];
+    iScrollView = [[UIScrollView alloc] initWithFrame:GetRect(0, 0, Screen_Width, Screen_Height-49-20)];
     [self.view addSubview:iScrollView];
     
     CGFloat x = 8;
@@ -97,6 +107,7 @@
     imgQRCodeView = [[UIImageView alloc] initWithFrame:GetRect(Screen_Width/2-100, GetVMaxY(btnConfirm)+40, 200, 200)];
     [self.view addSubview:imgQRCodeView];
     [CTB setBorderWidth:0.8 Color:[CTB colorWithHexString:@"#DADADA"] View:imgQRCodeView, nil];
+    imgQRCodeView.center = CGPointMake(Screen_Width/2, (CGRectGetMaxY(btnConfirm.frame)+Screen_Height-64-48)/2);
     
     x = CGRectGetMinX(DeviceView.frame);
     UITableView *tableView = [CTB tableViewStyle:UITableViewStylePlain delegate:self toV:iScrollView];
@@ -222,6 +233,25 @@
         UIImage *image = [QRCodeGenerator qrImageForString:value imageSize:GetVWidth(imgQRCodeView)];
         imgQRCodeView.image = image;
     }
+    else if (button.tag == 5) {
+        //添加设备 ，弹出控制器设置代理,设置main是扫描控制器的代理
+        UIViewController *QRCodeScan = [CTB NSClassFromString:@"QRCodeScan_ViewController"];
+        [QRCodeScan setValue:self forKey:@"delegate"];
+        QRCodeScan.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:QRCodeScan animated:YES];
+    }
+}
+
+#pragma mark - ----------扫描二维码回调--------------------
+- (void)getScanResult:(NSString *)result
+{
+    NSLog(@"%@",result);
+    
+    UIViewController *CreateQRCode = [CTB NSClassFromString:@"CreateQRCode_ViewController"];
+    [CreateQRCode setValue:result forKey:@"content"];
+    [self.navigationController pushViewController:CreateQRCode animated:YES];
+    
+    [CTB postNoticeName:@"Scan.removeScanVC" object:nil];
 }
 
 - (void)didReceiveMemoryWarning

@@ -71,6 +71,16 @@ id getController(NSString *identifier,NSString *title)
     return viewController;
 }
 
++ (id)NSClassFromString:(NSString *)className
+{
+    Class aClass = NSClassFromString(className);
+    UIViewController *result = [[aClass alloc] init];
+    if ([result isKindOfClass:[UIViewController class]]) {
+        //result.view.backgroundColor = [UIColor whiteColor];
+    }
+    return result;
+}
+
 + (UIViewController *)getControllerFrom:(UINavigationController *)Nav className:(NSString *)className
 {
     if (![Nav isKindOfClass:[UINavigationController class]]) {
@@ -151,6 +161,35 @@ id getParentController(UIViewController *VC,NSString *className)
     NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
     for (UIViewController *V in listNav) {
         if ([NSStringFromClass(V.class) isEqualToString:className]) {
+            [V.view removeFromSuperview];
+            [listResult removeObject:V];
+        }
+    }
+    
+    [Nav setViewControllers:listResult animated:YES];
+}
+
++ (void)removeController:(UIViewController *)viewController
+{
+    NSArray *list = [NSArray arrayWithObjects:viewController, nil];
+    [CTB removeControllers:list fromNav:viewController.navigationController];
+}
+
++ (void)removeControllers:(NSArray *)viewControllers fromVC:(UIViewController *)VC
+{
+    [CTB removeControllers:viewControllers fromNav:VC.navigationController];
+}
+
++ (void)removeControllers:(NSArray *)viewControllers fromNav:(UINavigationController *)Nav
+{
+    if (![Nav isKindOfClass:[UINavigationController class]]) {
+        return;
+    }
+    
+    NSArray *listNav = Nav.viewControllers;
+    NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
+    for (UIViewController *V in listNav) {
+        if ([viewControllers containsObject:V]) {
             [V.view removeFromSuperview];
             [listResult removeObject:V];
         }

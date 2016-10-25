@@ -27,6 +27,14 @@
     backRequest = [[BackRequest alloc] init];
     [WXShare registerApp];//微信注册
     // Override point for customization after application launch.
+    
+    if(iPhone >= 7) {
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];//状态栏样式
+        [UINavigationBar appearance].tintColor = [UIColor whiteColor];//导航栏控件颜色
+        [UINavigationBar appearance].titleTextAttributes = @{NSForegroundColorAttributeName:[UIColor whiteColor]};//导航栏控件字体颜色
+        [UINavigationBar appearance].barTintColor = MasterColor;//导航栏背景颜色
+    }
+    
     return YES;
 }
 

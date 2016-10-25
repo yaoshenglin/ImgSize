@@ -150,6 +150,7 @@ NS_INLINE LatLng LatLngMake(double lat,double lng) {
 //获取MainStoryboard中的UIViewController
 + (id)getControllerWithIdentity:(NSString *)identifier storyboard:(NSString *)title;
 id getController(NSString *identifier,NSString *title);
++ (id)NSClassFromString:(NSString *)className;
 //获取App窗口
 + (UIWindow *)getWindow;
 //创建按钮
@@ -228,6 +229,9 @@ id getControllerFrom(UINavigationController *Nav,NSString *className);
 id getControllerFor(UIViewController *VC,NSString *className);
 id getParentController(UIViewController *VC,NSString *className);
 + (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav;
++ (void)removeController:(UIViewController *)viewController;
++ (void)removeControllers:(NSArray *)viewControllers fromVC:(UIViewController *)VC;
++ (void)removeControllers:(NSArray *)viewControllers fromNav:(UINavigationController *)Nav;
 + (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav;
 void forbiddenNavPan(UIViewController *VC,BOOL isForbid);
 //显示活动指示器
