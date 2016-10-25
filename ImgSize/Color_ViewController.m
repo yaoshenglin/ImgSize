@@ -40,7 +40,7 @@
 {
     selectType = 1;
     listDevice = [@[] mutableCopy];
-    listDevice.array = @[@"主机",@"开关",@"插座"];
+    listDevice.array = @[@"主机",@"开关",@"插座",@"电动窗帘"];
     //self.view.backgroundColor = [UIColor blackColor];
     iScrollView = [[UIScrollView alloc] initWithFrame:GetRect(0, 20, Screen_Width, Screen_Height-49-20)];
     [self.view addSubview:iScrollView];
@@ -155,7 +155,8 @@
 {
     [txtAccount resignFirstResponder];
     
-    if (button.tag == 1|| button.tag == 2) {
+    if (button.tag == 1 || button.tag == 2) {
+        //主机或者其它的设备切换
         UITableView *tableView = [iScrollView viewWithClass:[UITableView class]];
         if (GetVHeight(tableView) > 0) {
             [CTB animateWithDur:0.3 animations:^{
@@ -172,6 +173,7 @@
         }
     }
     else if (button.tag == 3) {
+        //是否加密
         UIImage *image;
         if (isSelect) {
             isSelect = NO;
@@ -184,6 +186,7 @@
         [button setNormalBackgroundImage:image];
     }
     else if (button.tag == 4) {
+        //生成二维码
         NSString *host_mac = txtAccount.text;
         if (host_mac.length <= 0) {
             [CTB showMsg:@"请输入设备ID"];
@@ -206,6 +209,10 @@
         else if (selectType == 3) {
             //插座
             value = [NSString format:@"device:plug;id:%@",host_mac];
+        }
+        else if (selectType == 4) {
+            //电动窗帘
+            value = [NSString format:@"device:curtain;id:%@;tag:0;ver:1.0",host_mac];
         }
         
         if (isSelect) {

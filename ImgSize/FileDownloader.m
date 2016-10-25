@@ -9,7 +9,7 @@
 #import "FileDownloader.h"
 #import "Tools.h"
 #import "AppDelegate.h"
-#import "GDataXMLNode.h"
+//#import "GDataXMLNode.h"
 #import "CTB.h"
 
 @implementation FileDownloader
@@ -211,7 +211,7 @@
         if ([obj respondsToSelector:@selector(downLoadFail:)]) {
             _errMsg = @"文件下载失败";
             if (string) {
-                _errMsg = [GDataXMLNode getBody:string];
+//                _errMsg = [GDataXMLNode getBody:string];
             }
             [delegate downLoadFail:self];
         }

@@ -7,7 +7,7 @@
 //
 
 #import "HTTPRequest.h"
-#import "GDataXMLNode.h"
+//#import "GDataXMLNode.h"
 
 @interface HTTPRequest ()<NSURLConnectionDataDelegate>
 {
@@ -378,7 +378,8 @@
             _errMsg = msg;
             [self wsFailedWithDelegate:_delegate];
         }else{
-            NSString *msg = [GDataXMLNode getBody:stringL];
+            //NSString *msg = [GDataXMLNode getBody:stringL];
+            NSString *msg = nil;
             msg = msg ?: @"服务暂时不可用";
             _errMsg = msg;
             [self wsFailedWithDelegate:_delegate];

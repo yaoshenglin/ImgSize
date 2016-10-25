@@ -23,6 +23,8 @@
 #import "NSAlertView.h"
 #import "SOLStumbler.h"
 #import "UIImage+GIF.h"
+#import "DB.h"
+#include <sys/sysctl.h>
 
 
 extern NSString *CTSettingCopyMyPhoneNumber(void);
@@ -123,26 +125,27 @@ static NSString *const SBStyle2 = @"SBStyle2";
     textLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
     textLabel.textAlignment = NSTextAlignmentCenter;
     textLabel.adjustsFontSizeToFitWidth = YES;
-    textLabel.adjustsLetterSpacingToFitWidth = YES;
     textLabel.clipsToBounds = YES;
     textLabel.text = @"曾在月光之下望烟花,曾共看夕阳渐降下";
     [self.view addSubview:textLabel];
     
-    NSString *pIndexDbPath = [[NSBundle mainBundle] pathForResource:@"IRCode.db" ofType:nil];
-    NSString *Path = [@"~/Library" stringByExpandingTildeInPath];
-    NSString *dbFilePath = [Path stringByAppendingPathComponent:@"IRCode.db"];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL isExist = [fileManager fileExistsAtPath:dbFilePath];//被复制后的文件
-    if (!isExist) {
-        NSData *data = [NSData dataWithContentsOfFile:pIndexDbPath];
-        if ([data writeToFile:dbFilePath atomically:YES]) {
-            NSLog(@"初始化PIndex成功");
-        }else{
-            NSLog(@"初始化PIndex失败");
-        }
-    }
+    [CTB duration:1.0 block:^{
+        NSLog(@"%@",[self getDeviceVersionInfo]);
+    }];
+}
+
+- (NSString *)getDeviceVersionInfo
+{
+    size_t size;
+    // get the length of machine name
+    sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+    // get machine name
+    char *machine = malloc(size);
+    sysctlbyname("hw.machine", machine, &size, NULL, 0);
+    NSString *platform = [NSString stringWithFormat:@"%s", machine];
+    free(machine);
     
-    NSLog(@"IRCode : %@",pIndexDbPath);
+    return platform;
 }
 
 - (void)createUI
@@ -167,6 +170,13 @@ static NSString *const SBStyle2 = @"SBStyle2";
     lblTime.frame = GetRect(30, 50, GetVWidth(baseView)-60, 38);
     
     [NSTimer scheduled:0.5 target:self selector:@selector(updateTime:) userInfo:nil repeats:YES];
+    
+    NSString *aString = NSLocalizedString(@"Yesterday you sold apps", @"AA");
+    aString = [[NSBundle mainBundle] localizedStringForKey:@"Yesterday you sold %@ A apps" value:@"AA" table:nil];
+    NSLog(@"%@",aString);
+    
+    //CGSize size = CGSizeMake(320, 480); // size of view in popover
+    //self.preferredContentSize = size;
 }
 
 - (void)PrintWord

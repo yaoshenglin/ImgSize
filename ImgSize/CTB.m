@@ -640,11 +640,11 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 {
     //UIFont *font = [UIFont fontWithName:@"AmericanTypewriter" size:13.0f];
     //NSValue *TextShadowOffset = [NSValue valueWithUIOffset:UIOffsetMake(0.0f,1.0f)];
-    NSDictionary *dic = @{UITextAttributeTextColor:aColor};
+    NSDictionary *dic = @{NSForegroundColorAttributeName:aColor};
     //设置tabbar字体颜色(未选中)
     [[UITabBarItem appearance] setTitleTextAttributes:dic forState:UIControlStateNormal];
     
-    dic = @{UITextAttributeTextColor:bColor};
+    dic = @{NSForegroundColorAttributeName:bColor};
     //设置tabbar字体颜色(选中)
     [[UITabBarItem appearance] setTitleTextAttributes:dic forState:UIControlStateSelected];
 }
@@ -1791,13 +1791,13 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 + (float)heightOfContent:(NSString *)content width:(CGFloat)width fontSize:(CGFloat)size
 {
     UIFont *contentFont = [UIFont systemFontOfSize:size];
-    NSDictionary * tdic = [NSDictionary dictionaryWithObjectsAndKeys:contentFont, NSFontAttributeName,nil];
+    NSDictionary *tdic = @{NSFontAttributeName:contentFont};
     CGSize dateSize = CGSizeZero;
-    if (iPhone > 7) {
-        dateSize = [content boundingRectWithSize:CGSizeMake(width, 2000) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tdic context:nil].size;
-    }else{
-        dateSize = [content sizeWithFont:contentFont constrainedToSize:CGSizeMake(width, 2000) lineBreakMode:NSLineBreakByTruncatingTail];
-    }
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+    dateSize = [content boundingRectWithSize:CGSizeMake(width, 2000) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tdic context:nil].size;
+#else
+    dateSize = [content sizeWithFont:contentFont constrainedToSize:CGSizeMake(width, 2000) lineBreakMode:NSLineBreakByTruncatingTail];
+#endif
     float heightOfContent = MAX(25, dateSize.height);
     return heightOfContent;
 }
@@ -1806,22 +1806,22 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 {
     UIFont *font = [UIFont systemFontOfSize:big];
     CGSize labelsize = CGSizeZero;
-    if (iPhone > 7) {
-        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-    }else{
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
-    }
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+#else
+    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+#endif
     return labelsize;
 }
 
 + (CGSize)getSizeWith:(NSString *)content font:(UIFont *)font size:(CGSize)size
 {
     CGSize labelsize = CGSizeZero;
-    if (iPhone > 7) {
-        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-    }else{
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
-    }
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+#else
+    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+#endif
     return labelsize;
 }
 
@@ -1829,11 +1829,11 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 {
     UIFont *font = [UIFont systemFontOfSize:label.font.pointSize];
     CGSize labelsize = CGSizeZero;
-    if (iPhone > 7) {
-        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-    }else{
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
-    }
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+#else
+    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+#endif
     label.text = content;
     [label setSizeToW:labelsize.width];
 }
@@ -1843,11 +1843,11 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     CGSize size = CGSizeMake(width, 2000);
     UIFont *font = [UIFont systemFontOfSize:big];
     CGSize labelsize = CGSizeZero;
-    if (iPhone > 7) {
-        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-    }else{
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
-    }
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+#else
+    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+#endif
     return labelsize.height;
 }
 
@@ -1856,11 +1856,11 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     CGSize size = CGSizeMake(2000, high);
     UIFont *font = [UIFont systemFontOfSize:big];
     CGSize labelsize = CGSizeZero;
-    if (iPhone > 7) {
-        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-    }else{
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
-    }
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+#else
+    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+#endif
     return labelsize.width;
 }
 
@@ -4104,8 +4104,14 @@ id getUserData(NSString *key)
 {
     CGFloat fontSize;
     UIFont *font = [UIFont systemFontOfSize:Screen_Width*1.1];
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
     [aString sizeWithFont:font minFontSize:1.0f actualFontSize:&fontSize forWidth:width lineBreakMode:lineBreakMode];
-    
+#else
+    SEL action = NSSelectorFromString(@"drawAtPoint:forWidth:withFont:minFontSize:actualFontSize:lineBreakMode:baselineAdjustment:");
+    IMP imp = [aString methodForSelector:action];
+    CGSize (*func)(id, SEL,CGPoint,CGFloat,UIFont *,CGFloat,CGFloat *,NSLineBreakMode,UIBaselineAdjustment) = (void *)imp;
+    func(aString, action,CGPointZero,width,font,1.0f,&fontSize,lineBreakMode,UIBaselineAdjustmentAlignBaselines);
+#endif
     return fontSize;
 }
 

@@ -332,8 +332,16 @@
         NSString *content = listData[indexPath.row];
         NSString *urlStr = [head AppendString:content];
         NSURL *url = [NSURL URLWithString:urlStr];
-        if ([[UIApplication sharedApplication] canOpenURL:url]) {
-            [[UIApplication sharedApplication] openURL:url];
+        UIApplication *application = [UIApplication sharedApplication];
+        if ([application canOpenURL:url]) {
+            [application openURL:url];
+        }else{
+            NSLog(@"%@",UIApplicationOpenSettingsURLString);
+            NSLog(@"%@",UIApplicationOpenURLOptionsOpenInPlaceKey);
+#ifndef DEBUG
+            NSDictionary *options = nil;
+            [application openURL:url options:options completionHandler:nil];
+#endif
         }
     }
 }

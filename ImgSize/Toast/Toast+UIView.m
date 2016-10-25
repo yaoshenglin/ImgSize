@@ -256,7 +256,13 @@ static const NSString * CSToastActivityViewKey  = @"CSToastActivityViewKey";
         
         // size the title label according to the length of the text
         CGSize maxSizeTitle = CGSizeMake((self.bounds.size.width * CSToastMaxWidth) - imageWidth, self.bounds.size.height * CSToastMaxHeight);
-        CGSize expectedSizeTitle = [title sizeWithFont:titleLabel.font constrainedToSize:maxSizeTitle lineBreakMode:titleLabel.lineBreakMode]; 
+        CGSize expectedSizeTitle = CGSizeZero;
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+        NSDictionary *tdic = @{NSFontAttributeName:titleLabel.font};
+        expectedSizeTitle = [title boundingRectWithSize:maxSizeTitle options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tdic context:nil].size;
+#else
+        expectedSizeTitle = [title sizeWithFont:titleLabel.font constrainedToSize:maxSizeTitle lineBreakMode:titleLabel.lineBreakMode];
+#endif
         titleLabel.frame = CGRectMake(0.0, 0.0, expectedSizeTitle.width, expectedSizeTitle.height);
     }
     
@@ -272,7 +278,13 @@ static const NSString * CSToastActivityViewKey  = @"CSToastActivityViewKey";
         
         // size the message label according to the length of the text
         CGSize maxSizeMessage = CGSizeMake((self.bounds.size.width * CSToastMaxWidth) - imageWidth, self.bounds.size.height * CSToastMaxHeight);
-        CGSize expectedSizeMessage = [message sizeWithFont:messageLabel.font constrainedToSize:maxSizeMessage lineBreakMode:messageLabel.lineBreakMode]; 
+        CGSize expectedSizeMessage = CGSizeZero;
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
+        NSDictionary *tdic = @{NSFontAttributeName:messageLabel.font};
+        expectedSizeMessage = [message boundingRectWithSize:maxSizeMessage options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tdic context:nil].size;
+#else
+        expectedSizeMessage = [message sizeWithFont:messageLabel.font constrainedToSize:maxSizeMessage lineBreakMode:messageLabel.lineBreakMode];
+#endif
         messageLabel.frame = CGRectMake(0.0, 0.0, expectedSizeMessage.width, expectedSizeMessage.height);
     }
     

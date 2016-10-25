@@ -22,6 +22,7 @@
 		1489C2151CFC3C690097E4E0 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C2141CFC3C690097E4E0 /* libsqlite3.tbd */; };
 		1489C2171CFC3C940097E4E0 /* libz.1.2.5.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C2161CFC3C940097E4E0 /* libz.1.2.5.tbd */; };
 		1489C21B1CFC3DEB0097E4E0 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C21A1CFC3DEB0097E4E0 /* libc++.tbd */; };
+		14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 14A0E5E81DA8885400CC08B5 /* Localizable.strings */; };
 		14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */; };
 		14FC50CC1CC5DA4000155EBE /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FC50CB1CC5DA4000155EBE /* DrawView.m */; };
 		E21020621B9D3D3D00D528EF /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21020611B9D3D3D00D528EF /* ImageIO.framework */; };
@@ -131,7 +132,6 @@
 		E2BDE58E1B5394B80098CF42 /* HTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE58D1B5394B80098CF42 /* HTTPRequest.m */; };
 		E2BDE5911B539C9D0098CF42 /* FileDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE5901B539C9D0098CF42 /* FileDownloader.m */; };
 		E2BDE5941B539D710098CF42 /* GDataXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BDE5931B539D710098CF42 /* GDataXMLNode.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = E2BFE72D1B2FD59E00B5F622 /* Toast+UIView.m */; };
 		E2ED89B41BB1601B00EF6AFF /* 加载拼接图@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E2ED89B31BB1601B00EF6AFF /* 加载拼接图@2x.png */; };
 /* End PBXBuildFile section */
 
@@ -170,6 +170,8 @@
 		1489C2141CFC3C690097E4E0 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		1489C2161CFC3C940097E4E0 /* libz.1.2.5.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.5.tbd; path = usr/lib/libz.1.2.5.tbd; sourceTree = SDKROOT; };
 		1489C21A1CFC3DEB0097E4E0 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		14A0E5E61DA8885400CC08B5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		14A0E5E71DA8885400CC08B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "立即体验按钮点击效果@2x.png"; sourceTree = "<group>"; };
 		14FC50CA1CC5DA4000155EBE /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		14FC50CB1CC5DA4000155EBE /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
@@ -503,6 +505,7 @@
 				E21EE5F319270DBF0051408C /* main.m */,
 				E22073621B95B7CA00DBB8D4 /* ContentType.plist */,
 				E21EE5F519270DBF0051408C /* ImgSize-Prefix.pch */,
+				14A0E5E81DA8885400CC08B5 /* Localizable.strings */,
 				E21EE5FF19270DBF0051408C /* Images.xcassets */,
 			);
 			name = "Supporting Files";
@@ -857,11 +860,12 @@
 		E21EE5DC19270DBF0051408C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = caidan;
 				TargetAttributes = {
 					E21EE5E319270DBF0051408C = {
 						DevelopmentTeam = 24UPQ796CD;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -932,6 +936,7 @@
 				E2B3B8BB1B1D4590004ED953 /* 信生活大-@2x.png in Resources */,
 				E2231D5619496404003ADE6F /* c101.wav in Resources */,
 				E2B3B8B71B1D4590004ED953 /* 顶部左上角返回按钮@2x.png in Resources */,
+				14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */,
 				144DE2B51CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png in Resources */,
 				E21EE5FB19270DBF0051408C /* Main.storyboard in Resources */,
 			);
@@ -1001,7 +1006,6 @@
 				E2A455B01AC8E9B200AC7293 /* AsyncUdpSocket.m in Sources */,
 				E24D35B91B7B1FF500991739 /* qrencode.c in Sources */,
 				E2727A7B1A6A59EA00CC57D6 /* TentacleView.m in Sources */,
-				E2BFE72E1B2FD59E00B5F622 /* Toast+UIView.m in Sources */,
 				1454ACE81D275B1900BA3AB2 /* UIImage+GIF.m in Sources */,
 				E23D99D91C71D8DB00653A7F /* SOLStumbler.m in Sources */,
 				E24D35BA1B7B1FF500991739 /* qrinput.c in Sources */,
@@ -1042,6 +1046,16 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		14A0E5E81DA8885400CC08B5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				14A0E5E61DA8885400CC08B5 /* zh-Hans */,
+				14A0E5E71DA8885400CC08B5 /* en */,
+			);
+			name = Localizable.strings;
+			path = "../../../OC工程/test/test";
+			sourceTree = "<group>";
+		};
 		E21EE5F019270DBF0051408C /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1082,13 +1096,18 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1101,7 +1120,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -1120,19 +1139,24 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1144,7 +1168,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Guangzhou Wei Control Electronic Technology Co., Ltd (24UPQ796CD)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Guanyu Yi (7QTF4Q37EW)";
+				DEVELOPMENT_TEAM = 24UPQ796CD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1158,7 +1183,7 @@
 					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1167,7 +1192,8 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "af779bc9-28d5-42fa-b182-e02fb938e085";
+				PROVISIONING_PROFILE = "5bfda3e8-6458-4b1a-9826-f2bb30ac79cf";
+				PROVISIONING_PROFILE_SPECIFIER = "XC Ad Hoc: *";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1182,7 +1208,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Guangzhou Wei Control Electronic Technology Co., Ltd (24UPQ796CD)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Guanyu Yi (7QTF4Q37EW)";
+				DEVELOPMENT_TEAM = 24UPQ796CD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1196,7 +1223,7 @@
 					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = "ImgSize/ImgSize-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1204,7 +1231,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "af779bc9-28d5-42fa-b182-e02fb938e085";
+				PROVISIONING_PROFILE = "5bfda3e8-6458-4b1a-9826-f2bb30ac79cf";
+				PROVISIONING_PROFILE_SPECIFIER = "XC Ad Hoc: *";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				VALID_ARCHS = "armv7 armv7s arm64";
@@ -1228,6 +1256,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "ImgSizeTests/ImgSizeTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
@@ -1247,6 +1276,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ImgSize/ImgSize-Prefix.pch";
 				INFOPLIST_FILE = "ImgSizeTests/ImgSizeTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.caidan.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
