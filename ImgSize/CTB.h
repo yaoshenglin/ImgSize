@@ -228,6 +228,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag);
 id getControllerFrom(UINavigationController *Nav,NSString *className);
 id getControllerFor(UIViewController *VC,NSString *className);
 id getParentController(UIViewController *VC,NSString *className);
++ (void)hiddenBottomBarWhenPushedFor:(UIViewController *)viewController;
 + (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav;
 + (void)removeController:(UIViewController *)viewController;
 + (void)removeControllers:(NSArray *)viewControllers fromVC:(UIViewController *)VC;

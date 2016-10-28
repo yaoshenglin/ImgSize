@@ -151,6 +151,12 @@ id getParentController(UIViewController *VC,NSString *className)
     return result;
 }
 
++ (void)hiddenBottomBarWhenPushedFor:(UIViewController *)viewController
+{
+    UIViewController *VC = viewController.navigationController.viewControllers.lastObject;
+    VC.hidesBottomBarWhenPushed = YES;
+}
+
 + (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav
 {
     if (![Nav isKindOfClass:[UINavigationController class]]) {

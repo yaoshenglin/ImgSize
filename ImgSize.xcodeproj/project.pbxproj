@@ -251,6 +251,9 @@
 		14EB3F921DBF4D4100B1559C /* 开灯@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14EB3F8E1DBF4D4100B1559C /* 开灯@3x.png */; };
 		14EB3F931DBF4D4100B1559C /* 相册@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14EB3F8F1DBF4D4100B1559C /* 相册@2x.png */; };
 		14EB3F941DBF4D4100B1559C /* 相册@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14EB3F901DBF4D4100B1559C /* 相册@3x.png */; };
+		14EF59F51DC19884009C9EF1 /* 扫码框@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14EF59F21DC19884009C9EF1 /* 扫码框@2x.png */; };
+		14EF59F61DC19884009C9EF1 /* 扫码框@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14EF59F31DC19884009C9EF1 /* 扫码框@3x.png */; };
+		14EF59F71DC19884009C9EF1 /* 扫描条@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14EF59F41DC19884009C9EF1 /* 扫描条@2x.png */; };
 		14FC50CC1CC5DA4000155EBE /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FC50CB1CC5DA4000155EBE /* DrawView.m */; };
 		E21020621B9D3D3D00D528EF /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21020611B9D3D3D00D528EF /* ImageIO.framework */; };
 		E21020641B9D412500D528EF /* 灯闪动画.gif in Resources */ = {isa = PBXBuildFile; fileRef = E21020631B9D412500D528EF /* 灯闪动画.gif */; };
@@ -867,6 +870,9 @@
 		14EB3F8E1DBF4D4100B1559C /* 开灯@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "开灯@3x.png"; sourceTree = "<group>"; };
 		14EB3F8F1DBF4D4100B1559C /* 相册@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "相册@2x.png"; sourceTree = "<group>"; };
 		14EB3F901DBF4D4100B1559C /* 相册@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "相册@3x.png"; sourceTree = "<group>"; };
+		14EF59F21DC19884009C9EF1 /* 扫码框@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "扫码框@2x.png"; sourceTree = "<group>"; };
+		14EF59F31DC19884009C9EF1 /* 扫码框@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "扫码框@3x.png"; sourceTree = "<group>"; };
+		14EF59F41DC19884009C9EF1 /* 扫描条@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "扫描条@2x.png"; sourceTree = "<group>"; };
 		14FC50CA1CC5DA4000155EBE /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		14FC50CB1CC5DA4000155EBE /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
 		E21020611B9D3D3D00D528EF /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
@@ -2206,6 +2212,9 @@
 				E24D35F11B7B252400991739 /* 按钮-选中效果@2x.png */,
 				E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */,
 				E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */,
+				14EF59F21DC19884009C9EF1 /* 扫码框@2x.png */,
+				14EF59F31DC19884009C9EF1 /* 扫码框@3x.png */,
+				14EF59F41DC19884009C9EF1 /* 扫描条@2x.png */,
 				E21020631B9D412500D528EF /* 灯闪动画.gif */,
 				14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */,
 				E2B3B8B41B1D4590004ED953 /* 语音-绿@2x.png */,
@@ -2351,10 +2360,12 @@
 				E2B3B8B91B1D4590004ED953 /* 发送@2x.png in Resources */,
 				E23410A6195BEFA00086AE54 /* 服务条款.txt in Resources */,
 				E2B3B8BE1B1D4590004ED953 /* 语音-红@2x.png in Resources */,
+				14EF59F71DC19884009C9EF1 /* 扫描条@2x.png in Resources */,
 				14531B7F1D8138D5000466C6 /* IRCode.db in Resources */,
 				E22073631B95B7CA00DBB8D4 /* ContentType.plist in Resources */,
 				E24D35F21B7B252400991739 /* 按钮-选中效果@2x.png in Resources */,
 				E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */,
+				14EF59F51DC19884009C9EF1 /* 扫码框@2x.png in Resources */,
 				E21EE60019270DBF0051408C /* Images.xcassets in Resources */,
 				E2231D5719496404003ADE6F /* n105.wav in Resources */,
 				14EB3F941DBF4D4100B1559C /* 相册@3x.png in Resources */,
@@ -2367,6 +2378,7 @@
 				14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */,
 				144DE2B51CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png in Resources */,
 				14EB3F921DBF4D4100B1559C /* 开灯@3x.png in Resources */,
+				14EF59F61DC19884009C9EF1 /* 扫码框@3x.png in Resources */,
 				E21EE5FB19270DBF0051408C /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2820,7 +2832,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Guangzhou Wei Control Electronic Technology Co., Ltd (24UPQ796CD)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Guanyu Yi (7QTF4Q37EW)";
 				DEVELOPMENT_TEAM = 24UPQ796CD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2844,7 +2856,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "af779bc9-28d5-42fa-b182-e02fb938e085";
+				PROVISIONING_PROFILE = "ab1caaf7-097b-4dc9-91df-52b0763daf49";
 				PROVISIONING_PROFILE_SPECIFIER = "XC Ad Hoc: *";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
@@ -2860,7 +2872,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Guangzhou Wei Control Electronic Technology Co., Ltd (24UPQ796CD)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Guanyu Yi (7QTF4Q37EW)";
 				DEVELOPMENT_TEAM = 24UPQ796CD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2883,7 +2895,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "af779bc9-28d5-42fa-b182-e02fb938e085";
+				PROVISIONING_PROFILE = "ab1caaf7-097b-4dc9-91df-52b0763daf49";
 				PROVISIONING_PROFILE_SPECIFIER = "XC Ad Hoc: *";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";

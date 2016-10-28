@@ -239,6 +239,12 @@
         [QRCodeScan setValue:self forKey:@"delegate"];
         QRCodeScan.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:QRCodeScan animated:YES];
+        
+//        NSString *result = @"设置填充文字";
+//        UIViewController *CreateQRCode = [CTB NSClassFromString:@"CreateQRCode_ViewController"];
+//        [CreateQRCode setValue:result forKey:@"content"];
+//        CreateQRCode.hidesBottomBarWhenPushed = YES;
+//        [self.navigationController pushViewController:CreateQRCode animated:YES];
     }
 }
 

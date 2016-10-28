@@ -64,8 +64,12 @@ enum {
 	}
 	
 	// create context
+    CGFloat scale = [UIScreen mainScreen].scale;
+    size = size * scale;
+    
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 	CGContextRef ctx = CGBitmapContextCreate(0, size, size, 8, size * 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    CGColorSpaceRelease(colorSpace);
 	
 	CGAffineTransform translateTransform = CGAffineTransformMakeTranslation(0, -size);
 	CGAffineTransform scaleTransform = CGAffineTransformMakeScale(1, -1);
@@ -73,15 +77,30 @@ enum {
 	
 	// draw QR on this context	
 	[QRCodeGenerator drawQRCode:code context:ctx size:size];
+    
+    UIGraphicsPushContext(ctx);
+    //段落格式
+    NSMutableParagraphStyle *textStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+    textStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    textStyle.alignment = NSTextAlignmentCenter;//水平居中
+    /*写文字*/
+    //string = @"设置填充文字";
+    NSString *text = [string stringByReplacingOccurrencesOfString:@"\n" withString:@"/"];
+    text = [text stringByReplacingOccurrencesOfString:@"\t" withString:@"/"];
+    text = [text stringByReplacingOccurrencesOfString:@" " withString:@""];
+    text = [text stringByReplacingOccurrencesOfString:@"\r" withString:@"/"];
+    UIFont  *font = [UIFont boldSystemFontOfSize:11.0*scale];//设置
+    NSDictionary *attributes = @{NSFontAttributeName:font, NSParagraphStyleAttributeName:textStyle,NSForegroundColorAttributeName:[UIColor blueColor]};
+    [text drawInRect:CGRectMake(0, 0, size, 25*scale) withAttributes:attributes];
+    UIGraphicsPopContext();
 	
 	// get image
 	CGImageRef qrCGImage = CGBitmapContextCreateImage(ctx);
-	UIImage * qrImage = [UIImage imageWithCGImage:qrCGImage];
+	UIImage * qrImage = [UIImage imageWithCGImage:qrCGImage scale:scale orientation:UIImageOrientationUp];
 	
 	// some releases
 	CGContextRelease(ctx);
 	CGImageRelease(qrCGImage);
-	CGColorSpaceRelease(colorSpace);
 	QRcode_free(code);
 	
 	return qrImage;

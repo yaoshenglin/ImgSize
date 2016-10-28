@@ -47,6 +47,7 @@
     txtView.editable = NO;
     txtView.selectable = NO;
     txtView.textColor = [UIColor blackColor];
+    txtView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:txtView];
     
     UILongPressGestureRecognizer *longPressGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(txtViewLongPress:)];
@@ -62,6 +63,7 @@
     
     [CTB duration:0.5 block:^{
         self.navigationItem.rightBarButtonItem.enabled = YES;
+        imgQRCodeView.clipsToBounds = NO;
         UIImage *image = [QRCodeGenerator qrImageForString:_content imageSize:GetVWidth(imgQRCodeView)];
         imgQRCodeView.image = image;
     }];
@@ -71,6 +73,11 @@
 - (void)ButtonEvents:(UIButton *)button
 {
     if (button.tag == 1) {
+        UIImage *image = imgQRCodeView.image;
+        if (!image) {
+            [self.view makeToast:@""];
+            return;
+        }
         /**
          *  将图片保存到iPhone本地相册
          *  UIImage *image            图片对象
@@ -78,7 +85,7 @@
          *  SEL completionSelector    方法
          *  void *contextInfo
          */
-        UIImageWriteToSavedPhotosAlbum(imgQRCodeView.image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+        UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
     }
 }
 
