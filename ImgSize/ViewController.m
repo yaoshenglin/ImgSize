@@ -103,6 +103,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
 
 - (void)initCapacity
 {
+    [UIApplication sharedApplication].idleTimerDisabled = YES;//
     self.navigationItem.leftBarButtonItem = [CTB BarButtonWithTitle:@"退出" target:self tag:1];
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"更多" target:self tag:2];
     dicAccess = [NSMutableDictionary dictionary];

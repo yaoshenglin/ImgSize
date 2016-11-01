@@ -339,8 +339,7 @@
             NSLog(@"%@",UIApplicationOpenSettingsURLString);
             NSLog(@"%@",UIApplicationOpenURLOptionsOpenInPlaceKey);
 #ifndef DEBUG
-            NSDictionary *options = nil;
-            [application openURL:url options:options completionHandler:nil];
+            [self.view makeToast:@"不支持的操作"];
 #endif
         }
     }

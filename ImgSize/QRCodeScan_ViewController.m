@@ -609,6 +609,8 @@
     NSString *className = NSStringFromClass(self.class);
 #if DEBUG
     NSLog(@"%@ dealloc",className);
+#else
+    Unused(className);
 #endif
 }
 
