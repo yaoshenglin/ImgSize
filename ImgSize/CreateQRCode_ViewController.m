@@ -15,6 +15,9 @@
 @interface CreateQRCode_ViewController ()
 {
     BOOL isShowMore;
+    
+    NSString *word;
+    
     UIImageView *imgQRCodeView;
     iControl *myControl;
 }
@@ -39,6 +42,7 @@
         self.navigationController.navigationBar.tintColor = MasterColor;
     }
     
+    word = _content;
     self.title = @"生成二维码";
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithBtnImgName:@"更多" target:self tag:2];
     self.navigationItem.rightBarButtonItem.enabled = NO;
@@ -127,7 +131,6 @@
             [btnEdit setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
             btnEdit.titleLabel.font = [UIFont systemFontOfSize:13];
             btnEdit.frame = GetRect(0, 0, 90, 63);
-            [CTB setBottomLineHigh:0.5 Color:[UIColor grayColor] toV:btnEdit, nil];
             
             UIButton *btnSelect = [CTB buttonType:UIButtonTypeCustom delegate:self to:baseView tag:2 title:@"复制图片" img:@"点击效果/1" action:select(MoreButtonEvents:)];[UIColor grayColor];
             [btnSelect setNormalTitleColor:[UIColor grayColor]];
@@ -135,7 +138,15 @@
             btnSelect.titleLabel.font = [UIFont systemFontOfSize:13];
             btnSelect.frame = GetRect(0, 63, 90, 63);
             
-            rectEnd.size.height = GetVMaxY(btnSelect);
+            UIButton *btnModify = [CTB buttonType:UIButtonTypeCustom delegate:self to:baseView tag:3 title:@"修改文字" img:@"点击效果/1" action:select(MoreButtonEvents:)];[UIColor grayColor];
+            [btnModify setNormalTitleColor:[UIColor grayColor]];
+            [btnModify setHighlightedTitleColor:[UIColor grayColor]];
+            btnModify.titleLabel.font = [UIFont systemFontOfSize:13];
+            btnModify.frame = GetRect(0, 63*2, 90, 63);
+            
+            [CTB setBottomLineHigh:0.5 Color:[UIColor grayColor] toV:btnEdit,btnSelect, nil];
+            
+            rectEnd.size.height = GetVMaxY(btnModify);
             [myControl setStartRect:rectStart endRect:rectEnd];
         }else{
             myControl.hidden = NO;
@@ -168,6 +179,26 @@
         [self.view makeToast:@"复制成功"];
     }
     else if (button.tag == 3) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"修改文字" message:@"修改显示图片上方的文字" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        UITextField *textField = [alert textFieldAtIndex:0];
+        textField.text = word;
+        alert.tag = 1;
+        [alert show];
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *btnTitle = [alertView buttonTitleAtIndex:buttonIndex];
+    if (alertView.tag == 1) {
+        if ([btnTitle isEqualToString:@"确定"]) {
+            UITextField *textField = [alertView textFieldAtIndex:0];
+            word = textField.text;
+            
+            UIImage *image = [QRCodeGenerator qrImageForString:_content imageSize:GetVWidth(imgQRCodeView) text:word];
+            imgQRCodeView.image = image;
+        }
     }
 }
 

@@ -23,6 +23,7 @@
 		1489C2171CFC3C940097E4E0 /* libz.1.2.5.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C2161CFC3C940097E4E0 /* libz.1.2.5.tbd */; };
 		1489C21B1CFC3DEB0097E4E0 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C21A1CFC3DEB0097E4E0 /* libc++.tbd */; };
 		149AE0961DF69F6700AA22AB /* iControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 149AE0951DF69F6700AA22AB /* iControl.m */; };
+		149AE0981DF6AB1B00AA22AB /* 点击效果.png in Resources */ = {isa = PBXBuildFile; fileRef = 149AE0971DF6AB1B00AA22AB /* 点击效果.png */; };
 		14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 14A0E5E81DA8885400CC08B5 /* Localizable.strings */; };
 		14AA21A61DF693B500A3D380 /* 更多@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14AA21A51DF693B500A3D380 /* 更多@2x.png */; };
 		14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */; };
@@ -404,6 +405,7 @@
 		1489C21A1CFC3DEB0097E4E0 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		149AE0941DF69F6700AA22AB /* iControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iControl.h; sourceTree = "<group>"; };
 		149AE0951DF69F6700AA22AB /* iControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iControl.m; sourceTree = "<group>"; };
+		149AE0971DF6AB1B00AA22AB /* 点击效果.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "点击效果.png"; sourceTree = "<group>"; };
 		14A0E5E61DA8885400CC08B5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		14A0E5E71DA8885400CC08B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		14AA21A51DF693B500A3D380 /* 更多@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "更多@2x.png"; sourceTree = "<group>"; };
@@ -2218,6 +2220,7 @@
 				E24D35F41B7B26A200991739 /* 单选_选中@2x.png */,
 				E2B3B8B11B1D4590004ED953 /* 选中背景图@2x.png */,
 				E24D35F11B7B252400991739 /* 按钮-选中效果@2x.png */,
+				149AE0971DF6AB1B00AA22AB /* 点击效果.png */,
 				E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */,
 				E2B3B8B31B1D4590004ED953 /* 语音-红@2x.png */,
 				14EF59F21DC19884009C9EF1 /* 扫码框@2x.png */,
@@ -2345,6 +2348,7 @@
 			files = (
 				E2B3B8B61B1D4590004ED953 /* 底部语音图标@2x.png in Resources */,
 				E2B3B8B81B1D4590004ED953 /* 二维码大@2x.png in Resources */,
+				149AE0981DF6AB1B00AA22AB /* 点击效果.png in Resources */,
 				E2B3B8C11B1D45D6004ED953 /* msg2@2x.png in Resources */,
 				E2231D5919496404003ADE6F /* voice_note_error.wav in Resources */,
 				E21020641B9D412500D528EF /* 灯闪动画.gif in Resources */,

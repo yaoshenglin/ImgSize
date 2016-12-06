@@ -49,7 +49,7 @@
     
     selectType = 1;
     listDevice = [@[] mutableCopy];
-    listDevice.array = @[@"主机",@"开关",@"插座",@"电动窗帘"];
+    listDevice.array = @[@"主机",@"开关",@"插座",@"门锁",@"车位锁",@"雾化窗玻",@"分控器",@"电动窗帘"];
     //self.view.backgroundColor = [UIColor blackColor];
     iScrollView = [[UIScrollView alloc] initWithFrame:GetRect(0, 0, Screen_Width, Screen_Height-49-20)];
     [self.view addSubview:iScrollView];
@@ -210,19 +210,35 @@
         NSString *value = @"";
         if (selectType == 1) {
             //主机
-            value = [NSString format:@"device:host;content:%@;ver:1.0",host_mac];
+            value = [NSString format:@"device:host;content:%@;tag:4;m:SW01;t:0;ver:2.0",host_mac];
         }
         else if (selectType == 2) {
             //开关(3目)
-            value = [NSString format:@"device:switch;id:%@;tag:3",host_mac];
+            value = [NSString format:@"device:switch;id:%@;tag:3;m:CS23;t:0;ver:2.0",host_mac];
         }
         else if (selectType == 3) {
             //插座
-            value = [NSString format:@"device:plug;id:%@",host_mac];
+            value = [NSString format:@"device:plug;id:%@;m:CP11;t:0;ver:2.0",host_mac];
         }
         else if (selectType == 4) {
+            //门锁
+            value = [NSString format:@"device:plug;id:%@;tag:1;m:DL32;t:0;ver:2.0",host_mac];
+        }
+        else if (selectType == 5) {
+            //车位锁
+            value = [NSString format:@"device:parklock;id:%@;m:PL41;t:0;ver:2.0",host_mac];
+        }
+        else if (selectType == 6) {
+            //雾化窗玻
+            value = [NSString format:@"device:fogglass;id:%@;m:FG51;t:0;ver:2.0",host_mac];
+        }
+        else if (selectType == 7) {
+            //分控器
+            value = [NSString format:@"device:irrelay;id:%@;tag:1;m:IF53;t:0;ver:2.0",host_mac];
+        }
+        else if (selectType == 8) {
             //电动窗帘
-            value = [NSString format:@"device:curtain;id:%@;tag:0;ver:1.0",host_mac];
+            value = [NSString format:@"device:curtain;id:%@;tag:0;m:CT61;t:0;ver:2.0",host_mac];
         }
         
         if (isSelect) {

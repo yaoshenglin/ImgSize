@@ -119,6 +119,7 @@
     [self scanQRCodeWithZBar];
     [self duration:0.1 action:select(setupCamera)];
     self.view.backgroundColor = [UIColor grayColor];
+    self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"切换摄像头" target:self tag:1];
 }
 
 - (void)scanQRCodeWithZBar
@@ -381,11 +382,7 @@
 {
     if (button.tag == 1) {
         
-        self.navigationItem.rightBarButtonItem.enabled = NO;
-        
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"选择设备类型" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"开关", @"插座", @"门锁", @"电动窗帘",@"红外转发器",@"远程视频",nil];
-        alert.tag = 1;
-        [alert show];
+        [self swapFrontAndBackCameras];
     }
     else if (button.tag == 2) {
         if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
@@ -411,6 +408,47 @@
         
         [device unlockForConfiguration];
         [session commitConfiguration];
+    }
+}
+
+#pragma mark 切换摄像头
+- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position
+{
+    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    for ( AVCaptureDevice *avDevice in devices )
+        if ( avDevice.position == position )
+            return avDevice;
+    return nil;
+}
+
+- (void)swapFrontAndBackCameras
+{
+    // Assume the session is already running
+    
+    NSArray *inputs = self.session.inputs;
+    for ( AVCaptureDeviceInput *avInput in inputs ) {
+        AVCaptureDevice *avDevice = avInput.device;
+        if ( [avDevice hasMediaType:AVMediaTypeVideo] ) {
+            AVCaptureDevicePosition position = avDevice.position;
+            AVCaptureDevice *newCamera = nil;
+            AVCaptureDeviceInput *newInput = nil;
+            
+            if (position == AVCaptureDevicePositionFront)
+                newCamera = [self cameraWithPosition:AVCaptureDevicePositionBack];
+            else
+                newCamera = [self cameraWithPosition:AVCaptureDevicePositionFront];
+            newInput = [AVCaptureDeviceInput deviceInputWithDevice:newCamera error:nil];
+            
+            // beginConfiguration ensures that pending changes are not applied immediately
+            [self.session beginConfiguration];
+            
+            [self.session removeInput:avInput];
+            [self.session addInput:newInput];
+            
+            // Changes take effect once the outermost commitConfiguration is invoked.
+            [self.session commitConfiguration];
+            break;
+        }
     }
 }
 
@@ -524,8 +562,6 @@
             _content = @"device:remoteVideo;id:097265848;ver:1.0";//摄像头比较特殊,非自制品,故需要分开
             [self returnResult];
         }
-        
-        self.navigationItem.rightBarButtonItem.enabled = YES;
     }
     else if (alertView.tag == 2) {
         [NotificationCenter postNotificationName:@"Scan.isCanScan" object:@YES];
