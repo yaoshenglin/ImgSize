@@ -45,7 +45,6 @@
         self.navigationController.navigationBar.tintColor = MasterColor;
     }
     
-    self.title = @"二维码工具";
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"扫码" target:self tag:5];
     
     selectType = 1;

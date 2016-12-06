@@ -22,7 +22,9 @@
 		1489C2151CFC3C690097E4E0 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C2141CFC3C690097E4E0 /* libsqlite3.tbd */; };
 		1489C2171CFC3C940097E4E0 /* libz.1.2.5.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C2161CFC3C940097E4E0 /* libz.1.2.5.tbd */; };
 		1489C21B1CFC3DEB0097E4E0 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C21A1CFC3DEB0097E4E0 /* libc++.tbd */; };
+		149AE0961DF69F6700AA22AB /* iControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 149AE0951DF69F6700AA22AB /* iControl.m */; };
 		14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 14A0E5E81DA8885400CC08B5 /* Localizable.strings */; };
+		14AA21A61DF693B500A3D380 /* 更多@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14AA21A51DF693B500A3D380 /* 更多@2x.png */; };
 		14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */; };
 		14EB3CC01DBF420E00B1559C /* QRCodeScan_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */; };
 		14EB3CC31DBF423900B1559C /* CustomDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EB3CC21DBF423900B1559C /* CustomDrawView.m */; };
@@ -400,8 +402,11 @@
 		1489C2141CFC3C690097E4E0 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		1489C2161CFC3C940097E4E0 /* libz.1.2.5.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.5.tbd; path = usr/lib/libz.1.2.5.tbd; sourceTree = SDKROOT; };
 		1489C21A1CFC3DEB0097E4E0 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		149AE0941DF69F6700AA22AB /* iControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iControl.h; sourceTree = "<group>"; };
+		149AE0951DF69F6700AA22AB /* iControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iControl.m; sourceTree = "<group>"; };
 		14A0E5E61DA8885400CC08B5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		14A0E5E71DA8885400CC08B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		14AA21A51DF693B500A3D380 /* 更多@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "更多@2x.png"; sourceTree = "<group>"; };
 		14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "立即体验按钮点击效果@2x.png"; sourceTree = "<group>"; };
 		14EB3CBE1DBF420E00B1559C /* QRCodeScan_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeScan_ViewController.h; sourceTree = "<group>"; };
 		14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeScan_ViewController.m; sourceTree = "<group>"; };
@@ -1902,9 +1907,9 @@
 				E264915B1A651ED8009910C5 /* Color_ViewController.m */,
 				14EB3CBE1DBF420E00B1559C /* QRCodeScan_ViewController.h */,
 				14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */,
-				E228DFD7196F7FF200C882E0 /* Test_ViewController.h */,
 				14EB3F8A1DBF495400B1559C /* CreateQRCode_ViewController.h */,
 				14EB3F8B1DBF495400B1559C /* CreateQRCode_ViewController.m */,
+				E228DFD7196F7FF200C882E0 /* Test_ViewController.h */,
 				E228DFD8196F7FF200C882E0 /* Test_ViewController.m */,
 				E275EE7C1A08CF4C00483DE5 /* ImgSize-Bridging-Header.h */,
 				E2BCF2831B46225000485CC0 /* class */,
@@ -2184,6 +2189,8 @@
 				E25A34F61C2D2B1B00621B4B /* NSAlertView.m */,
 				14FC50CA1CC5DA4000155EBE /* DrawView.h */,
 				14FC50CB1CC5DA4000155EBE /* DrawView.m */,
+				149AE0941DF69F6700AA22AB /* iControl.h */,
+				149AE0951DF69F6700AA22AB /* iControl.m */,
 				14EB3CC11DBF423900B1559C /* CustomDrawView.h */,
 				14EB3CC21DBF423900B1559C /* CustomDrawView.m */,
 				E2BFE72B1B2FD59E00B5F622 /* Toast */,
@@ -2195,6 +2202,7 @@
 			isa = PBXGroup;
 			children = (
 				144DE2B41CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png */,
+				14AA21A51DF693B500A3D380 /* 更多@2x.png */,
 				145EFB8A1CDDF5F500EB7320 /* 向下图标.png */,
 				145EFB881CDDEC1900EB7320 /* 下拉图标@2x.png */,
 				E2B3B8A81B1D456C004ED953 /* msg1@2x.png */,
@@ -2363,6 +2371,7 @@
 				14EF59F71DC19884009C9EF1 /* 扫描条@2x.png in Resources */,
 				14531B7F1D8138D5000466C6 /* IRCode.db in Resources */,
 				E22073631B95B7CA00DBB8D4 /* ContentType.plist in Resources */,
+				14AA21A61DF693B500A3D380 /* 更多@2x.png in Resources */,
 				E24D35F21B7B252400991739 /* 按钮-选中效果@2x.png in Resources */,
 				E2B3B8BF1B1D4590004ED953 /* 语音-绿@2x.png in Resources */,
 				14EF59F51DC19884009C9EF1 /* 扫码框@2x.png in Resources */,
@@ -2686,6 +2695,7 @@
 				14EB3F7E1DBF467600B1559C /* ZXQRCode.m in Sources */,
 				14EB3F581DBF467600B1559C /* ZXPDF417BarcodeMetadata.m in Sources */,
 				E2727A781A6A59EA00CC57D6 /* GesturePasswordController.m in Sources */,
+				149AE0961DF69F6700AA22AB /* iControl.m in Sources */,
 				14EB3F681DBF467600B1559C /* ZXPDF417ErrorCorrection.m in Sources */,
 				14EB3F511DBF467600B1559C /* ZXUPCEANExtensionSupport.m in Sources */,
 			);

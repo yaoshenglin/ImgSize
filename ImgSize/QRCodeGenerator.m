@@ -54,6 +54,16 @@ enum {
 
 + (UIImage *)qrImageForString:(NSString *)string imageSize:(CGFloat)size
 {
+    NSString *text = [string stringByReplacingOccurrencesOfString:@"\n" withString:@"/"];
+    text = [text stringByReplacingOccurrencesOfString:@"\t" withString:@"/"];
+    text = [text stringByReplacingOccurrencesOfString:@" " withString:@""];
+    text = [text stringByReplacingOccurrencesOfString:@"\r" withString:@"/"];
+    
+    return [self qrImageForString:string imageSize:size text:text];
+}
+
++ (UIImage *)qrImageForString:(NSString *)string imageSize:(CGFloat)size text:(NSString *)text
+{
 	if (![string length]) {
 		return nil;
 	}
@@ -85,10 +95,6 @@ enum {
     textStyle.alignment = NSTextAlignmentCenter;//水平居中
     /*写文字*/
     //string = @"设置填充文字";
-    NSString *text = [string stringByReplacingOccurrencesOfString:@"\n" withString:@"/"];
-    text = [text stringByReplacingOccurrencesOfString:@"\t" withString:@"/"];
-    text = [text stringByReplacingOccurrencesOfString:@" " withString:@""];
-    text = [text stringByReplacingOccurrencesOfString:@"\r" withString:@"/"];
     UIFont  *font = [UIFont boldSystemFontOfSize:11.0*scale];//设置
     NSDictionary *attributes = @{NSFontAttributeName:font, NSParagraphStyleAttributeName:textStyle,NSForegroundColorAttributeName:[UIColor blueColor]};
     [text drawInRect:CGRectMake(0, 0, size, 25*scale) withAttributes:attributes];

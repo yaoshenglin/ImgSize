@@ -26,5 +26,6 @@
 @interface QRCodeGenerator : NSObject
 
 + (UIImage *)qrImageForString:(NSString *)string imageSize:(CGFloat)size;
++ (UIImage *)qrImageForString:(NSString *)string imageSize:(CGFloat)size text:(NSString *)text;
 
 @end
