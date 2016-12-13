@@ -212,15 +212,13 @@ static NSString *const SBStyle2 = @"SBStyle2";
 {
     if (button.tag==1) {
         [CTB alertWithMessage:@"你确定要退出吗" Delegate:self tag:1];
-//        GIFImgView *gifView = [baseView viewWithClass:[GIFImgView class] tag:1];
-//        [gifView stopAnimating];
         [hudView hide:YES];
     }
     if (button.tag==2) {
         
         //[self.view bringSubviewToFront:ViewBlue];
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择设备" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"门禁", @"主机",@"系统设置", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择设备" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"门禁", @"主机",@"系统设置",@"相册", nil];
         alert.tag = 2;
         [alert show];
     }
@@ -559,6 +557,10 @@ static NSString *const SBStyle2 = @"SBStyle2";
         else if ([btnTitle isEqualToString:@"系统设置"]) {
             [Second setValue:@(3) forKey:@"tag"];
             [self.navigationController pushViewController:Second animated:YES];
+        }
+        else if ([btnTitle isEqualToString:@"相册"]) {
+            UIViewController *Album = [CTB NSClassFromString:@"Album_ViewController"];
+            [self.navigationController pushViewController:Album animated:YES];
         }
         self.hidesBottomBarWhenPushed = NO;
     }

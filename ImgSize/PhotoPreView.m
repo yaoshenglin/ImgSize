@@ -169,6 +169,7 @@
     if (!isOnlyRead) {
         
         UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 44, self.view.bounds.size.width, 44)];
+        toolbar.tag = 50;
         toolbar.items = [NSArray arrayWithObjects:
                          [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStyleBordered target:self action:@selector(btnCancelPressed:)],
                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
@@ -189,8 +190,22 @@
     [self.view bringSubviewToFront:activity];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)setLeftBtnTitle:(NSString *)title
+{
+    UIToolbar *toolbar = [self.view viewWithTag:50];
+    UIBarButtonItem *leftItem = toolbar.items.firstObject;
+    leftItem.title = title;
+}
 
+- (void)setRightBtnTitle:(NSString *)title
+{
+    UIToolbar *toolbar = [self.view viewWithTag:50];
+    UIBarButtonItem *rightItem = toolbar.items.lastObject;
+    rightItem.title = title;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
     [super viewDidAppear:animated];
     [self performSelector:@selector(resetImageAndSize) withObject:nil afterDelay:0.05];
 }
@@ -223,7 +238,7 @@
 #pragma mark - --------工具函数------------------------
 - (UIImage *)fixRotaion:(UIImage *)image
 {
-    if(image.imageOrientation!=UIImageOrientationUp) {
+    if(image.imageOrientation != UIImageOrientationUp) {
         
         UIGraphicsBeginImageContext(image.size);
         [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];

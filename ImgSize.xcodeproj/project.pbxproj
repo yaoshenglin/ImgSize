@@ -13,6 +13,7 @@
 		1454ACE81D275B1900BA3AB2 /* UIImage+GIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 1454ACE71D275B1900BA3AB2 /* UIImage+GIF.m */; };
 		145EFB891CDDEC1900EB7320 /* 下拉图标@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 145EFB881CDDEC1900EB7320 /* 下拉图标@2x.png */; };
 		145EFB8B1CDDF5F500EB7320 /* 向下图标.png in Resources */ = {isa = PBXBuildFile; fileRef = 145EFB8A1CDDF5F500EB7320 /* 向下图标.png */; };
+		147ED3F91DFFA5C50060E5B5 /* Album_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 147ED3F81DFFA5C50060E5B5 /* Album_ViewController.m */; };
 		1489C1FF1CFC350E0097E4E0 /* libWeChatSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1489C1FB1CFC350E0097E4E0 /* libWeChatSDK.a */; };
 		1489C2021CFC387C0097E4E0 /* Share.m in Sources */ = {isa = PBXBuildFile; fileRef = 1489C2011CFC387C0097E4E0 /* Share.m */; };
 		1489C2091CFC38A70097E4E0 /* sdkCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 1489C2051CFC38A70097E4E0 /* sdkCall.m */; };
@@ -388,6 +389,8 @@
 		1454ACE71D275B1900BA3AB2 /* UIImage+GIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+GIF.m"; sourceTree = "<group>"; };
 		145EFB881CDDEC1900EB7320 /* 下拉图标@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "下拉图标@2x.png"; sourceTree = "<group>"; };
 		145EFB8A1CDDF5F500EB7320 /* 向下图标.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "向下图标.png"; sourceTree = "<group>"; };
+		147ED3F71DFFA5C50060E5B5 /* Album_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Album_ViewController.h; sourceTree = "<group>"; };
+		147ED3F81DFFA5C50060E5B5 /* Album_ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Album_ViewController.m; sourceTree = "<group>"; };
 		1489C1FB1CFC350E0097E4E0 /* libWeChatSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libWeChatSDK.a; sourceTree = "<group>"; };
 		1489C1FC1CFC350E0097E4E0 /* WechatAuthSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WechatAuthSDK.h; sourceTree = "<group>"; };
 		1489C1FD1CFC350E0097E4E0 /* WXApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXApi.h; sourceTree = "<group>"; };
@@ -1907,6 +1910,8 @@
 				E216DD42192B398D00B17105 /* Third_ViewController.m */,
 				E264915A1A651ED8009910C5 /* Color_ViewController.h */,
 				E264915B1A651ED8009910C5 /* Color_ViewController.m */,
+				147ED3F71DFFA5C50060E5B5 /* Album_ViewController.h */,
+				147ED3F81DFFA5C50060E5B5 /* Album_ViewController.m */,
 				14EB3CBE1DBF420E00B1559C /* QRCodeScan_ViewController.h */,
 				14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */,
 				14EB3F8A1DBF495400B1559C /* CreateQRCode_ViewController.h */,
@@ -1915,8 +1920,8 @@
 				E228DFD8196F7FF200C882E0 /* Test_ViewController.m */,
 				E275EE7C1A08CF4C00483DE5 /* ImgSize-Bridging-Header.h */,
 				E2BCF2831B46225000485CC0 /* class */,
-				E2727A6B1A6A59EA00CC57D6 /* GesturePassword */,
 				E28EBFA019FA004B007753E5 /* UIView */,
+				E2727A6B1A6A59EA00CC57D6 /* GesturePassword */,
 				E25B076319A491B1001EA090 /* JDStatusBarNotification */,
 				E21EE62419270FAE0051408C /* Tool */,
 				E2B3B8A71B1D42EE004ED953 /* Image */,
@@ -2439,6 +2444,7 @@
 				14EB3F0C1DBF467600B1559C /* ZXDataMatrixC40Encoder.m in Sources */,
 				14EB3F321DBF467600B1559C /* ZXRSSExpandedPair.m in Sources */,
 				14EB3EF21DBF467600B1559C /* ZXGridSampler.m in Sources */,
+				147ED3F91DFFA5C50060E5B5 /* Album_ViewController.m in Sources */,
 				14EB3F2C1DBF467600B1559C /* ZXRSSExpandedDecodedInformation.m in Sources */,
 				14EB3F7B1DBF467600B1559C /* ZXQRCodeFinderPattern.m in Sources */,
 				14EB3F3A1DBF467600B1559C /* ZXRSSUtils.m in Sources */,
@@ -2846,7 +2852,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Guangzhou Wei Control Electronic Technology Co., Ltd (24UPQ796CD)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Guanyu Yi (7QTF4Q37EW)";
 				DEVELOPMENT_TEAM = 24UPQ796CD;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2870,8 +2876,8 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "af779bc9-28d5-42fa-b182-e02fb938e085";
-				PROVISIONING_PROFILE_SPECIFIER = "XC Ad Hoc: *";
+				PROVISIONING_PROFILE = "ab1caaf7-097b-4dc9-91df-52b0763daf49";
+				PROVISIONING_PROFILE_SPECIFIER = "iOS_Develop(*)";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";

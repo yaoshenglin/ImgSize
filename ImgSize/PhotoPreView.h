@@ -29,6 +29,9 @@
 
 - (id)init:(UIImage *)image cropSize:(CGSize)size isOnlyRead:(BOOL)onlyRead delegate:(id)delegate;
 
+- (void)setLeftBtnTitle:(NSString *)title;
+- (void)setRightBtnTitle:(NSString *)title;
+
 @end
 
 
