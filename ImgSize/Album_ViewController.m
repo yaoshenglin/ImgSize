@@ -135,14 +135,23 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *dicData = listItems[indexPath.item];
-    UIImage *image = [UIImage imageFromLibrary:[dicData objectForKey:@"name"]];//原始图片
-    //UIImage* image = [info objectForKey: @"UIImagePickerControllerEditedImage"]; //编辑过的图片
+    NSString *imgName = [dicData objectForKey:@"name"];
+    __block UIImage *image = nil;
     
-    PhotoPreView *photoPreView = [[PhotoPreView alloc] init:image cropSize:GetSize(150, 150) isOnlyRead:YES delegate:self];
-    photoPreView.Tag = self;
-    // 显示状态栏
-    [UIApplication sharedApplication].statusBarHidden = NO;
-    [self presentViewController:photoPreView animated:YES completion:nil];
+    hudView = [MBProgressHUD showRuningView:self.view];
+    [hudView show:YES];
+    hudView.labelText = @"正在处理图片……";
+    
+    [CTB async:^{
+        image = [UIImage imageFromLibrary:imgName];//原始图片
+    } complete:^{
+        CGFloat h = Screen_Width*image.size.height/image.size.width;
+        PhotoPreView *photoPreView = [[PhotoPreView alloc] init:image cropSize:GetSize(Screen_Width, h) isOnlyRead:YES delegate:self];
+        photoPreView.Tag = self;
+        [self presentViewController:photoPreView animated:YES completion:^{
+            [hudView hide:YES];
+        }];
+    }];
 }
 
 - (BOOL)canBecomeFirstResponder

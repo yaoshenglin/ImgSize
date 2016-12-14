@@ -81,6 +81,7 @@
         
         CGFloat minScale = 1.0f;
         CGSize imgSize = image.size;
+        
         if (imgSize.width < size.width || imgSize.height < size.height) {
             //如果图片宽或者高比目标宽或者高小
             CGFloat xScale = size.width / imgSize.width;
@@ -150,7 +151,7 @@
     myScrollView.multipleTouchEnabled = YES;
     [self.view addSubview:myScrollView];
     
-    myImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, myImage.size.width, myImage.size.height)];
+    myImageView = [[UIImageView alloc] initWithImage:myImage];
     [myScrollView addSubview:myImageView];
     
     myMaskView = [[PhotoMaskView alloc] initWithFrame:myScrollView.frame];
@@ -389,8 +390,9 @@
     return image;
 }
 
-#pragma mark - UIScrollViewDelegate
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+#pragma mark - --------UIScrollViewDelegate------------------------
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
     //返回的视图尺寸作为scrollView的尺寸
     return myImageView;
 }
@@ -417,7 +419,10 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    myImageView.center = CGPointMake(scrollView.contentSize.width/2,scrollView.contentSize.height/2);
+    CGSize contentSize = scrollView.contentSize;
+    if (contentSize.width > 0 && contentSize.height > 0) {
+        myImageView.center = CGPointMake(contentSize.width/2,contentSize.height/2);
+    }
 }
 
 @end
