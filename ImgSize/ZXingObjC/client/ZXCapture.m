@@ -24,7 +24,7 @@
 #import "ZXReader.h"
 #import "ZXResult.h"
 
-@interface ZXCapture ()
+@interface ZXCapture ()<CALayerDelegate>
 
 @property (nonatomic, strong) CALayer *binaryLayer;
 @property (nonatomic, assign) BOOL cameraIsReady;
