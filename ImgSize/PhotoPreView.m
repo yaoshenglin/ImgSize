@@ -171,11 +171,11 @@
         UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 44, self.view.bounds.size.width, 44)];
         toolbar.tag = 50;
         toolbar.items = [NSArray arrayWithObjects:
-                         [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStyleBordered target:self action:@selector(btnCancelPressed:)],
+                         [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(btnCancelPressed:)],
                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                          [[UIBarButtonItem alloc] initWithTitle:@"可以移动和缩放" style:UIBarButtonItemStylePlain target:nil action:nil],
                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                         [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStyleBordered target:self action:@selector(btnOKPressed:)], nil];
+                         [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStylePlain target:self action:@selector(btnOKPressed:)], nil];
         UIBarButtonItem *item = [[toolbar items] objectAtIndex:2];
         item.enabled = NO;
         //item.tintColor = [CTB colorWithHexString:@"#2989F2"];

@@ -3101,8 +3101,7 @@ id getUserData(NSString *key)
         UIApplication *app = [UIApplication sharedApplication];
         BOOL isRegisteredNotification = NO;
         if (iPhone < 8) {
-            UIRemoteNotificationType type = [app enabledRemoteNotificationTypes];
-            isRegisteredNotification = type != UIRemoteNotificationTypeNone;
+            isRegisteredNotification = app.registeredForRemoteNotifications;
         }else{
             isRegisteredNotification = [app isRegisteredForRemoteNotifications];
         }
