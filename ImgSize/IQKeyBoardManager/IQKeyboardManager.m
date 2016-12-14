@@ -215,7 +215,6 @@ void _IQShowLog(NSString *logString);
     
     //Enabling IQKeyboardManager.
     [[IQKeyboardManager sharedManager] setEnable:YES];
-    NSLog(@"OK");
 }
 
 /*  Singleton Object Initialization. */

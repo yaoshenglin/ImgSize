@@ -24,8 +24,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    backRequest = [[BackRequest alloc] init];
-    [WXShare registerApp];//微信注册
+    //backRequest = [[BackRequest alloc] init];
+    //[WXShare registerApp];//微信注册
     // Override point for customization after application launch.
     
     if(iPhone >= 7) {
@@ -44,7 +44,7 @@
     UITabBarController *tabBar = (UITabBarController *)_window.rootViewController;
     NSArray *list = tabBar.viewControllers;
     UINavigationController *nav = list.firstObject;
-    NSLog(@"%@",nav.visibleViewController);
+    NSLog(@"本地通知,%@",nav.visibleViewController);
 }
 							
 - (void)applicationWillResignActive:(UIApplication *)application

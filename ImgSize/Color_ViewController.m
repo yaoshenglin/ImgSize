@@ -266,7 +266,7 @@
 #pragma mark - ----------扫描二维码回调--------------------
 - (void)getScanResult:(NSString *)result
 {
-    NSLog(@"%@",result);
+    NSLog(@"result = %@",result);
     
     UIViewController *CreateQRCode = [CTB NSClassFromString:@"CreateQRCode_ViewController"];
     [CreateQRCode setValue:result forKey:@"content"];

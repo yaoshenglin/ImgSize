@@ -225,7 +225,7 @@
     mp3.volume = 1;//播放音量
     [mp3 prepareToPlay];
     NSString *totalTime = [NSString stringWithFormat:@"%.0fs",mp3.duration];
-    NSLog(@"%@",totalTime);
+    NSLog(@"总时间,%@",totalTime);
     [mp3 play];
 }
 

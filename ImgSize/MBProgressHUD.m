@@ -158,6 +158,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
     hudView.yOffset = 0;
     //hudView.msgBackground = [UIColor clearColor];
     //hudView.mode = MBProgressHUDModeActivity;
+    hudView.removeFromSuperViewOnHide = YES;
     return hudView;
 }
 

@@ -87,23 +87,17 @@ static NSString *const SBStyle2 = @"SBStyle2";
     self.view.backgroundColor = [CTB colorWithHexString:@"#E5E5E5"];
 }
 
-- (void)loadView
-{
-    [super loadView];
-    
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"叶子大"] style:UIBarButtonItemStylePlain target:nil action:nil];
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self initCapacity];
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"叶子大"] style:UIBarButtonItemStylePlain target:nil action:nil];
 	// Do any additional setup after loading the view, typically from a nib.
 }
 
 - (void)initCapacity
 {
-    [UIApplication sharedApplication].idleTimerDisabled = YES;//
+    [UIApplication sharedApplication].idleTimerDisabled = YES;//防止锁屏
     self.navigationItem.leftBarButtonItem = [CTB BarButtonWithTitle:@"退出" target:self tag:1];
     self.navigationItem.rightBarButtonItem = [CTB BarButtonWithTitle:@"更多" target:self tag:2];
     dicAccess = [NSMutableDictionary dictionary];
@@ -151,6 +145,13 @@ static NSString *const SBStyle2 = @"SBStyle2";
 
 - (void)createUI
 {
+    if (iPhone >= 7) {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+        self.navigationController.navigationBar.barTintColor = MasterColor;
+    }else{
+        self.navigationController.navigationBar.tintColor = MasterColor;
+    }
+    
     baseView = [[UIView alloc] initWithFrame:GetRect(20, 10, Screen_Width-40, 350)];
     baseView.backgroundColor = [[UIColor greenColor] colorWithAlpha:0.1];
     baseView.userInteractionEnabled = NO;
@@ -171,11 +172,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     lblTime.frame = GetRect(30, 50, GetVWidth(baseView)-60, 38);
     
     [NSTimer scheduled:0.5 target:self selector:@selector(updateTime:) userInfo:nil repeats:YES];
-    
-    NSString *aString = NSLocalizedString(@"Yesterday you sold apps", @"AA");
-    aString = [[NSBundle mainBundle] localizedStringForKey:@"Yesterday you sold %@ A apps" value:@"AA" table:nil];
-    NSLog(@"%@",aString);
-    
+        
     //CGSize size = CGSizeMake(320, 480); // size of view in popover
     //self.preferredContentSize = size;
 }

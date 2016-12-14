@@ -685,6 +685,8 @@ id getUserData(NSString *key);
 
 #pragma mark 截取部分图像
 - (UIImage *)imageWithInRect:(CGRect)rect;
+#pragma mark 生成小缩略图
+- (UIImage *)imageCompressForSize:(CGSize)size;
 
 @end
 

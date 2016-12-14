@@ -4191,6 +4191,66 @@ id getUserData(NSString *key)
     return newImage;
 }
 
+#pragma mark 生成小缩略图
+- (UIImage *)imageCompressForSize:(CGSize)size
+{
+    UIImage *newImage = nil;
+    
+    CGSize imageSize = self.size;
+    
+    CGFloat imgWidth = imageSize.width;
+    CGFloat imgHeight = imageSize.height;
+    
+    CGFloat scaleFactor = 0.0;
+    CGFloat scaledWidth = size.width;
+    CGFloat scaledHeight = size.height;
+    
+    if(CGSizeEqualToSize(imageSize, size) == NO) {
+        
+        CGFloat widthFactor = size.width / imgWidth;
+        CGFloat heightFactor = size.height / imgHeight;
+        
+        if(widthFactor > heightFactor) {
+            
+            scaleFactor = heightFactor;
+            
+        }else{
+            
+            scaleFactor = widthFactor;
+            
+        }
+        
+        scaledWidth = imgWidth * scaleFactor;
+        scaledHeight = imgHeight * scaleFactor;
+    }
+    
+    CGRect thumbnailRect = CGRectZero;
+    thumbnailRect.size.width = scaledWidth;
+    thumbnailRect.size.height = scaledHeight;
+    
+    //使用尺寸创建画布
+    UIGraphicsBeginImageContextWithOptions(thumbnailRect.size, NO, [UIScreen mainScreen].scale);
+    
+    [self drawInRect:thumbnailRect];//绘画区域
+    
+    newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    if(newImage == nil){
+        
+        NSLog(@"scale image fail");
+        
+    }
+    
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+    
+}
+
+//文／Spykerking（简书作者）
+//原文链接：http://www.jianshu.com/p/543723c6da44
+//著作权归作者所有，转载请联系作者获得授权，并标注“简书作者”。
+
 @end
 
 #pragma mark - --------UIView------------------------
