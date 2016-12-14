@@ -82,7 +82,7 @@
         CGFloat minScale = 1.0f;
         CGSize imgSize = image.size;
         if (imgSize.width < size.width || imgSize.height < size.height) {
-            
+            //如果图片宽或者高比目标宽或者高小
             CGFloat xScale = size.width / imgSize.width;
             CGFloat yScale = size.height / imgSize.height;
             
@@ -132,7 +132,7 @@
     
     self.view.backgroundColor = [UIColor blackColor];
     
-    isCroped = !CGSizeEqualToSize(cropSize, CGSizeZero);
+    isCroped = !CGSizeEqualToSize(cropSize, CGSizeZero);//尺寸大小非0
     if (isOnlyRead) {
         
         isCroped = NO;
@@ -160,14 +160,14 @@
     [self.view bringSubviewToFront:myMaskView];
     
     if (isOnlyRead) {
-        
+        //添加点击事件(点击返回)
         [myImageView setUserInteractionEnabled:YES];
         UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(btnImagePressed:)];
         [myImageView addGestureRecognizer:singleTap];
     }
     
     if (!isOnlyRead) {
-        
+        //非只读状态下才有工具条
         UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 44, self.view.bounds.size.width, 44)];
         toolbar.tag = 50;
         toolbar.items = [NSArray arrayWithObjects:
