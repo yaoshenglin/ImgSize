@@ -49,8 +49,7 @@
 #define Screen_Height [UIScreen mainScreen].bounds.size.height
 #define Screen_Width [UIScreen mainScreen].bounds.size.width
 #define barH (CGFloat)[UIApplication sharedApplication].statusBarFrame.size.height
-#define currrentNavH (CGFloat)([UINavigationBar appearance].frame.size.height)
-#define navH (CGFloat)((currrentNavH > 0) ? currrentNavH : 44.0)
+#define navH 44.0f
 #define topH (CGFloat)((iPhone >= 7) ? barH : 0)
 #define viewW Screen_Width
 #define viewH Screen_Height-barH-navH
