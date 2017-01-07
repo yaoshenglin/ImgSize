@@ -11,6 +11,7 @@
 #import "iControl.h"
 #import "QRCodeGenerator.h"
 #import "Toast+UIView.h"
+#import "PhotoPreView.h"
 
 @interface CreateQRCode_ViewController ()
 {
@@ -98,7 +99,15 @@
          *  SEL completionSelector    方法
          *  void *contextInfo
          */
-        UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+        //UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+        NSData *imgData = UIImagePNGRepresentation(image);
+        [PhotoPreView saveToAlbumWithMetadata:nil imageData:imgData albumName:@"二维码图片" completionBlock:^{
+            NSLog(@"添加成功");
+            [self.view makeToast:@"图片保存成功"];
+        } failureBlock:^(NSError *error) {
+            NSLog(@"添加失败,code = %d, %@",(int)error.code,error.localizedDescription);
+            [self.view makeToast:error.localizedDescription];
+        }];
     }
     else if (button.tag == 2) {
         [self MoreOperation];//更多按钮

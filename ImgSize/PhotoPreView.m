@@ -3,15 +3,15 @@
 //  AppCaidan
 //
 //  Created by zzx on 13-10-23.
-//  Copyright (c) 2013年 zzx. All rights reserved.
+//  Copyright © 2013年 zzx. All rights reserved.
 //
 
 #import "PhotoPreView.h"
+#import <Photos/Photos.h>
+#import <AssetsLibrary/AssetsLibrary.h> 
 
-
-#pragma ***********************************************************************************************
-#pragma mark PhotoMaskView
-#pragma ***********************************************************************************************
+#pragma mark ****************PhotoMaskView********************************
+#pragma ***********************************************************************
 
 #define kMaskViewBorderWidth 2.0f
 
@@ -52,11 +52,11 @@
     
     CGContextClearRect(ctx, _cropRect);
 }
+
 @end
 
-#pragma ***********************************************************************************************
-#pragma mark PhotoPreview
-#pragma ***********************************************************************************************
+#pragma mark - ****************PhotoPreview********************************
+#pragma mark *******************************************************************
 @interface PhotoPreView ()
 {
     BOOL isFirstShow;
@@ -67,6 +67,116 @@
 @implementation PhotoPreView
 
 @synthesize Tag;
+
+//创建新相簿(如果不存在)
++ (void)createGroupAlbumWithName:(NSString *)groupName
+{
+    ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
+    NSMutableArray *groups = [[NSMutableArray alloc] init];
+    ALAssetsLibraryGroupsEnumerationResultsBlock listGroupBlock = ^(ALAssetsGroup *group, BOOL *stop)
+    {
+        if (group)
+        {
+            [groups addObject:group];
+        }
+        else
+        {
+            BOOL haveHDRGroup = NO;
+            for (ALAssetsGroup *gp in groups)
+            {
+                NSString *name =[gp valueForProperty:ALAssetsGroupPropertyName];
+                if ([name isEqualToString:groupName])
+                {
+                    haveHDRGroup = YES;
+                }
+            }
+            if (!haveHDRGroup)
+            {
+                //do add a group
+                [assetsLibrary addAssetsGroupAlbumWithName:groupName
+                                               resultBlock:^(ALAssetsGroup *group) {
+                     [groups addObject:group];
+                 }
+                                              failureBlock:nil];
+                haveHDRGroup = YES;
+            }
+        }
+    };
+    //创建相簿
+    [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum usingBlock:listGroupBlock failureBlock:nil];
+}
+
+//获取对应相簿下最后一张照片的信息(创建日期)
++ (NSDate *)getCreateDateLastPhoto
+{
+    //首先获取相册的集合
+    PHFetchOptions *options = [[PHFetchOptions alloc] init];
+    options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
+    PHFetchResult *assetsFetchResults = [PHAsset fetchAssetsWithOptions:options];
+    PHAsset *asset = assetsFetchResults.firstObject;
+    NSDate *date = asset.creationDate;
+    NSLog(@"date = %@",date);
+    
+    return date;
+}
+
++ (void)saveToAlbumWithMetadata:(NSDictionary *)metadata
+                      imageData:(NSData *)imageData
+                      albumName:(NSString *)groupName
+                completionBlock:(void (^)(void))completionBlock
+                   failureBlock:(void (^)(NSError *error))failureBlock
+{
+    
+    ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
+    __weak ALAssetsLibrary *weakSelf = assetsLibrary;
+    void (^AddAsset)(ALAssetsLibrary *, NSURL *) = ^(ALAssetsLibrary *assetsLibrary, NSURL *assetURL) {
+        [assetsLibrary assetForURL:assetURL resultBlock:^(ALAsset *asset) {
+            [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+                
+                if ([[group valueForProperty:ALAssetsGroupPropertyName] isEqualToString:groupName]) {
+                    [group addAsset:asset];//创建相册
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            } failureBlock:^(NSError *error) {
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
+        } failureBlock:^(NSError *error) {
+            if (failureBlock) {
+                failureBlock(error);
+            }
+        }];
+    };
+    [assetsLibrary writeImageDataToSavedPhotosAlbum:imageData metadata:metadata completionBlock:^(NSURL *assetURL, NSError *error) {
+        if (groupName) {
+            [assetsLibrary addAssetsGroupAlbumWithName:groupName resultBlock:^(ALAssetsGroup *group) {
+                if (group) {
+                    [weakSelf assetForURL:assetURL resultBlock:^(ALAsset *asset) {
+                        [group addAsset:asset];
+                        if (completionBlock) {
+                            completionBlock();
+                        }
+                    } failureBlock:^(NSError *error) {
+                        if (failureBlock) {
+                            failureBlock(error);
+                        }
+                    }];
+                } else {
+                    AddAsset(weakSelf, assetURL);//不存在组时先创建相册
+                }
+            } failureBlock:^(NSError *error) {
+                AddAsset(weakSelf, assetURL);
+            }];
+        } else {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }
+    }];
+}
 
 - (id)init:(UIImage *)image cropSize:(CGSize)size isOnlyRead:(BOOL)onlyRead delegate:(id)delegate
 {
@@ -81,16 +191,15 @@
         
         CGFloat minScale = 1.0f;
         CGSize imgSize = image.size;
-        
         if (imgSize.width < size.width || imgSize.height < size.height) {
-            //如果图片宽或者高比目标宽或者高小
+            
             CGFloat xScale = size.width / imgSize.width;
             CGFloat yScale = size.height / imgSize.height;
             
             minScale = MAX(xScale, yScale);
             if (minScale > 10) {
-                NSString *msg = @"你所选图片尺寸过小";
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+                NSString *msg = NSLocalizedString(@"View_Image_Size_Min",nil);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"GentleHint",nil) message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:NSLocalizedString(@"Confirm", nil), nil];
                 [alert show];
                 //[self performSelector:select(backLastPage) withObject:nil afterDelay:0.5];
             }
@@ -133,7 +242,7 @@
     
     self.view.backgroundColor = [UIColor blackColor];
     
-    isCroped = !CGSizeEqualToSize(cropSize, CGSizeZero);//尺寸大小非0
+    isCroped = !CGSizeEqualToSize(cropSize, CGSizeZero);
     if (isOnlyRead) {
         
         isCroped = NO;
@@ -151,7 +260,7 @@
     myScrollView.multipleTouchEnabled = YES;
     [self.view addSubview:myScrollView];
     
-    myImageView = [[UIImageView alloc] initWithImage:myImage];
+    myImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, myImage.size.width, myImage.size.height)];
     [myScrollView addSubview:myImageView];
     
     myMaskView = [[PhotoMaskView alloc] initWithFrame:myScrollView.frame];
@@ -161,22 +270,21 @@
     [self.view bringSubviewToFront:myMaskView];
     
     if (isOnlyRead) {
-        //添加点击事件(点击返回)
+        
         [myImageView setUserInteractionEnabled:YES];
         UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(btnImagePressed:)];
         [myImageView addGestureRecognizer:singleTap];
     }
     
     if (!isOnlyRead) {
-        //非只读状态下才有工具条
+        
         UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 44, self.view.bounds.size.width, 44)];
-        toolbar.tag = 50;
         toolbar.items = [NSArray arrayWithObjects:
-                         [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(btnCancelPressed:)],
+                         [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStylePlain target:self action:@selector(btnCancelPressed:)],
                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                         [[UIBarButtonItem alloc] initWithTitle:@"可以移动和缩放" style:UIBarButtonItemStylePlain target:nil action:nil],
+                         [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"MoveAndZoom",@"") style:UIBarButtonItemStylePlain target:nil action:nil],
                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                         [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStylePlain target:self action:@selector(btnOKPressed:)], nil];
+                         [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Confirm", nil) style:UIBarButtonItemStylePlain target:self action:@selector(btnOKPressed:)], nil];
         UIBarButtonItem *item = [[toolbar items] objectAtIndex:2];
         item.enabled = NO;
         //item.tintColor = [CTB colorWithHexString:@"#2989F2"];
@@ -191,22 +299,65 @@
     [self.view bringSubviewToFront:activity];
 }
 
-- (void)setLeftBtnTitle:(NSString *)title
+//添加工具栏
+- (void)addToolBarWithTitles:(NSArray *)listTitle selStrings:(NSArray *)listSEL
 {
-    UIToolbar *toolbar = [self.view viewWithTag:50];
-    UIBarButtonItem *leftItem = toolbar.items.firstObject;
-    leftItem.title = title;
+    NSMutableArray *listItems = [NSMutableArray array];
+    for (int i = 0; i < listTitle.count; i++) {
+        NSString *title = [listTitle objectAtIndex:i];
+        SEL action = NSSelectorFromString([listSEL objectAtIndex:i]);
+        id target = [self respondsToSelector:action] ? self : nil;
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:target action:action];
+        [listItems addObject:item];
+        
+        if (!target) {
+            item.enabled = NO;
+        }
+    }
+    UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 44, self.view.bounds.size.width, 44)];
+    toolbar.items = listItems;
+    //item.tintColor = [CTB colorWithHexString:@"#2989F2"];
+    [self.view addSubview:toolbar];
 }
 
-- (void)setRightBtnTitle:(NSString *)title
+- (void)addToolBarWithAttributes:(NSDictionary *)attributes
 {
-    UIToolbar *toolbar = [self.view viewWithTag:50];
-    UIBarButtonItem *rightItem = toolbar.items.lastObject;
-    rightItem.title = title;
+    NSArray *listTitle = [attributes objectForKey:@"titles"];
+    NSArray *listSEL = [attributes objectForKey:@"selectors"];
+    NSArray *listStyles = [attributes objectForKey:@"styles"];
+    
+    NSMutableArray *listItems = [NSMutableArray array];
+    for (int i = 0; i < listTitle.count; i++) {
+        NSString *title = [listTitle objectAtIndex:i];
+        UIBarButtonItemStyle style = [[listStyles objectAtIndex:i] integerValue];
+        SEL action = NSSelectorFromString([listSEL objectAtIndex:i]);
+        id target = [self respondsToSelector:action] ? self : nil;
+        action = target ? action : nil;
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithTitle:title style:style target:target action:action];
+        [listItems addObject:item];
+        
+        if (!target) {
+            item.enabled = NO;
+        }
+    }
+    UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 44, self.view.bounds.size.width, 44)];
+    toolbar.items = listItems;
+    //item.tintColor = [CTB colorWithHexString:@"#2989F2"];
+    [self.view addSubview:toolbar];
 }
 
-- (void)viewDidAppear:(BOOL)animated
+- (void)addToolBarWithItems:(NSArray *)items
 {
+    UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 44, self.view.bounds.size.width, 44)];
+    toolbar.items = items;
+    UIBarButtonItem *item = [[toolbar items] objectAtIndex:2];
+    item.enabled = NO;
+    //item.tintColor = [CTB colorWithHexString:@"#2989F2"];
+    [self.view addSubview:toolbar];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+
     [super viewDidAppear:animated];
     [self performSelector:@selector(resetImageAndSize) withObject:nil afterDelay:0.05];
 }
@@ -239,7 +390,7 @@
 #pragma mark - --------工具函数------------------------
 - (UIImage *)fixRotaion:(UIImage *)image
 {
-    if(image.imageOrientation != UIImageOrientationUp) {
+    if(image.imageOrientation!=UIImageOrientationUp) {
         
         UIGraphicsBeginImageContext(image.size);
         [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
@@ -272,48 +423,6 @@
     UIImage *newimage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return newimage;
-}
-
-#pragma mark - --------确定------------------------
-- (void)btnOKPressed:(id)sender
-{
-    UIImage *newImage;
-    if (isCroped) {
-        
-        newImage = [self cropImage];
-    }
-    else {
-        newImage = [self fixRotaion:myImage];
-    }
-    
-    if ([myDelegate respondsToSelector:@selector(photoPreView:didSelectImage:)]) {
-        [myDelegate photoPreView:self didSelectImage:newImage];
-        
-        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7) {
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];//状态栏样式
-        }else{
-            UIColor *color = [UIColor colorWithRed:0 green:32/51.0 blue:0.91 alpha:1.0];
-            [UINavigationBar appearance].tintColor = color;//UIColorFromRGB(0x00A0E9)
-        }
-    }
-}
-
-#pragma mark - --------取消------------------------
-- (void)btnCancelPressed:(id)sender
-{
-    if ([myDelegate respondsToSelector:@selector(imagePickerControllerDidCancel:)]) {
-        [myDelegate imagePickerControllerDidCancel:Tag];
-        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7) {
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];//状态栏样式
-        }else{
-            [UINavigationBar appearance].tintColor = MasterColor;
-        }
-    }
-}
-
-- (void)backLastPage
-{
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - --------设置图片绽放范围----------------
@@ -390,9 +499,8 @@
     return image;
 }
 
-#pragma mark - --------UIScrollViewDelegate------------------------
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
-{
+#pragma mark - UIScrollViewDelegate
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
     //返回的视图尺寸作为scrollView的尺寸
     return myImageView;
 }
@@ -419,10 +527,79 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    CGSize contentSize = scrollView.contentSize;
-    if (contentSize.width > 0 && contentSize.height > 0) {
-        myImageView.center = CGPointMake(contentSize.width/2,contentSize.height/2);
+    myImageView.center = CGPointMake(scrollView.contentSize.width/2,scrollView.contentSize.height/2);
+}
+
+#pragma mark - --------确定------------------------
+- (void)btnOKPressed:(id)sender
+{
+    UIImage *newImage;
+    if (isCroped) {
+        
+        newImage = [self cropImage];
     }
+    else {
+        newImage = [self fixRotaion:myImage];
+    }
+    
+    if ([myDelegate respondsToSelector:@selector(photoPreView:didSelectImage:)]) {
+        [myDelegate photoPreView:self didSelectImage:newImage];
+        
+        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];//状态栏样式
+        }else{
+            UIColor *color = [UIColor colorWithRed:0.16 green:2.2/3 blue:0.61 alpha:1.0];
+            [UINavigationBar appearance].tintColor = color;//UIColorFromRGB(0x29BB9C)
+        }
+    }
+}
+
+#pragma mark - --------取消------------------------
+- (void)btnCancelPressed:(id)sender
+{
+    if ([myDelegate respondsToSelector:@selector(imagePickerControllerDidCancel:)]) {
+        [myDelegate imagePickerControllerDidCancel:Tag];
+        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7) {
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];//状态栏样式
+        }else{
+            [UINavigationBar appearance].tintColor = MasterColor;
+        }
+    }
+}
+
+- (void)btnDeletePressed:(id)sender
+{
+    [self backLastPage];
+    
+    NSURL *url = [_info objectForKey:UIImagePickerControllerReferenceURL];
+    PHFetchResult *result = [PHAsset fetchAssetsWithALAssetURLs:@[url] options:nil];
+    PHAsset *asset = [result lastObject];
+    
+    [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+        if (asset) {
+            [PHAssetChangeRequest deleteAssets:@[asset]];
+        }
+    } completionHandler:^(BOOL success, NSError *error) {
+        if (success) {
+            NSLog(@"删除图片成功,%@",asset.creationDate);
+        }else{
+            NSLog(@"删除图片失败,Error: %@", error);
+        }
+        
+        NSLog(@"删除图片,%@",url);
+        if ([myDelegate respondsToSelector:@selector(photoPreView:didDeleteWithInfo:)]) {
+            NSMutableDictionary *info = [NSMutableDictionary dictionary];
+            info.dictionary = _info;
+            [info setObject:asset.creationDate forKey:@"createDate"];
+            [info setObject:@(success) forKey:@"success"];
+            [myDelegate photoPreView:self didDeleteWithInfo:info];
+        }
+    }];
+}
+
+- (void)backLastPage
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

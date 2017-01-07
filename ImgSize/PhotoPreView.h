@@ -3,7 +3,7 @@
 //  AppCaidan
 //
 //  Created by zzx on 13-10-23.
-//  Copyright (c) 2013年 zzx. All rights reserved.
+//  Copyright © 2013年 zzx. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -25,12 +25,21 @@
     BOOL isOnlyRead;
 }
 
-@property (weak, nonatomic) id Tag;
+@property (nonatomic, weak) id Tag;
+@property (nonatomic, retain) NSDictionary *info;//相册信息
+
++ (void)createGroupAlbumWithName:(NSString *)groupName;
++ (NSDate *)getCreateDateLastPhoto;
++ (void)saveToAlbumWithMetadata:(NSDictionary *)metadata
+                      imageData:(NSData *)imageData
+                      albumName:(NSString *)groupName
+                completionBlock:(void (^)(void))completionBlock
+                   failureBlock:(void (^)(NSError *error))failureBlock;
 
 - (id)init:(UIImage *)image cropSize:(CGSize)size isOnlyRead:(BOOL)onlyRead delegate:(id)delegate;
-
-- (void)setLeftBtnTitle:(NSString *)title;
-- (void)setRightBtnTitle:(NSString *)title;
+- (void)addToolBarWithTitles:(NSArray *)listTitle selStrings:(NSArray *)listSEL;//添加工具栏
+- (void)addToolBarWithAttributes:(NSDictionary *)attributes;
+- (void)addToolBarWithItems:(NSArray *)items;
 
 @end
 
@@ -40,5 +49,6 @@
 @optional
 - (void)photoPreView:(PhotoPreView*)photoPreView didSelectImage:(UIImage *)image;
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;
+- (void)photoPreView:(PhotoPreView *)photoPreView didDeleteWithInfo:(NSDictionary *)info;
 
 @end

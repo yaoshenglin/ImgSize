@@ -2882,8 +2882,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "013c3608-1091-462b-b7ef-12fa6ffba155";
-				PROVISIONING_PROFILE_SPECIFIER = imgSize_Develop;
+				PROVISIONING_PROFILE = "ab1caaf7-097b-4dc9-91df-52b0763daf49";
+				PROVISIONING_PROFILE_SPECIFIER = "iOS_Develop(*)";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
