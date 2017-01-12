@@ -114,7 +114,7 @@
 /**
  *  返回相册,避免重复创建相册引起不必要的错误
  */
-+ (void)saveImageWithImage:(UIImage *)image albumName:(NSString *)title completionHandler:(void(^)(BOOL success, NSError *error))completionHandler
++ (void)saveToAlbumWithImage:(UIImage *)image albumName:(NSString *)title completionHandler:(void(^)(BOOL success, NSError *error))completionHandler
 {
     /*
      PHAsset : 一个PHAsset对象就代表一个资源文件,比如一张图片

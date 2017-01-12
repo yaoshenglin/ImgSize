@@ -100,7 +100,7 @@
          *  void *contextInfo
          */
         //UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
-        [PhotoPreView saveImageWithImage:imgQRCodeView.image albumName:@"二维码图片" completionHandler:^(BOOL success, NSError * _Nullable error) {
+        [PhotoPreView saveToAlbumWithImage:imgQRCodeView.image albumName:@"二维码图片" completionHandler:^(BOOL success, NSError * _Nullable error) {
             if (error) {
                 NSLog(@"添加图片到相册中失败");
                 [self.view makeToast:error.localizedDescription];
@@ -115,6 +115,9 @@
     }
     else if (button.tag == 2) {
         [self MoreOperation];//更多按钮
+        
+        NSDate *createDate = [PhotoPreView getCreateDateLastPhoto];
+        NSLog(@"date, %@",createDate);
     }
 }
 

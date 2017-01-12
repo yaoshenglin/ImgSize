@@ -29,7 +29,7 @@
 @property (nonatomic, retain) NSDictionary *info;//相册信息
 
 + (NSDate *)getCreateDateLastPhoto;
-+ (void)saveImageWithImage:(UIImage *)image albumName:(NSString *)title completionHandler:(void(^)(BOOL success, NSError *error))completionHandler;
++ (void)saveToAlbumWithImage:(UIImage *)image albumName:(NSString *)title completionHandler:(void(^)(BOOL success, NSError *error))completionHandler;
 
 - (id)init:(UIImage *)image cropSize:(CGSize)size isOnlyRead:(BOOL)onlyRead delegate:(id)delegate;
 - (void)addToolBarWithTitles:(NSArray *)listTitle selStrings:(NSArray *)listSEL;//添加工具栏
