@@ -100,13 +100,17 @@
          *  void *contextInfo
          */
         //UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
-        NSData *imgData = UIImagePNGRepresentation(image);
-        [PhotoPreView saveToAlbumWithMetadata:nil imageData:imgData albumName:@"二维码图片" completionBlock:^{
-            NSLog(@"添加成功");
-            [self.view makeToast:@"图片保存成功"];
-        } failureBlock:^(NSError *error) {
-            NSLog(@"添加失败,code = %d, %@",(int)error.code,error.localizedDescription);
-            [self.view makeToast:error.localizedDescription];
+        [PhotoPreView saveImageWithImage:imgQRCodeView.image albumName:@"二维码图片" completionHandler:^(BOOL success, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"添加图片到相册中失败");
+                [self.view makeToast:error.localizedDescription];
+                return;
+            }
+            
+            NSLog(@"成功添加图片到相册中");
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.view makeToast:@"图片保存成功"];
+            }];
         }];
     }
     else if (button.tag == 2) {

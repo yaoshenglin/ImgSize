@@ -8,7 +8,6 @@
 
 #import "PhotoPreView.h"
 #import <Photos/Photos.h>
-#import <AssetsLibrary/AssetsLibrary.h> 
 
 #pragma mark ****************PhotoMaskView********************************
 #pragma ***********************************************************************
@@ -68,44 +67,6 @@
 
 @synthesize Tag;
 
-//创建新相簿(如果不存在)
-+ (void)createGroupAlbumWithName:(NSString *)groupName
-{
-    ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
-    NSMutableArray *groups = [[NSMutableArray alloc] init];
-    ALAssetsLibraryGroupsEnumerationResultsBlock listGroupBlock = ^(ALAssetsGroup *group, BOOL *stop)
-    {
-        if (group)
-        {
-            [groups addObject:group];
-        }
-        else
-        {
-            BOOL haveHDRGroup = NO;
-            for (ALAssetsGroup *gp in groups)
-            {
-                NSString *name =[gp valueForProperty:ALAssetsGroupPropertyName];
-                if ([name isEqualToString:groupName])
-                {
-                    haveHDRGroup = YES;
-                }
-            }
-            if (!haveHDRGroup)
-            {
-                //do add a group
-                [assetsLibrary addAssetsGroupAlbumWithName:groupName
-                                               resultBlock:^(ALAssetsGroup *group) {
-                     [groups addObject:group];
-                 }
-                                              failureBlock:nil];
-                haveHDRGroup = YES;
-            }
-        }
-    };
-    //创建相簿
-    [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum usingBlock:listGroupBlock failureBlock:nil];
-}
-
 //获取对应相簿下最后一张照片的信息(创建日期)
 + (NSDate *)getCreateDateLastPhoto
 {
@@ -120,61 +81,85 @@
     return date;
 }
 
-+ (void)saveToAlbumWithMetadata:(NSDictionary *)metadata
-                      imageData:(NSData *)imageData
-                      albumName:(NSString *)groupName
-                completionBlock:(void (^)(void))completionBlock
-                   failureBlock:(void (^)(NSError *error))failureBlock
+//返回或者创建新相簿(如果不存在)
++ (PHAssetCollection *)collectionWithTitle:(NSString *)title
 {
+    // 列出所有相册智能相册
+    __unused PHFetchResult *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
     
-    ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
-    __weak ALAssetsLibrary *weakSelf = assetsLibrary;
-    void (^AddAsset)(ALAssetsLibrary *, NSURL *) = ^(ALAssetsLibrary *assetsLibrary, NSURL *assetURL) {
-        [assetsLibrary assetForURL:assetURL resultBlock:^(ALAsset *asset) {
-            [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-                
-                if ([[group valueForProperty:ALAssetsGroupPropertyName] isEqualToString:groupName]) {
-                    [group addAsset:asset];//创建相册
-                    if (completionBlock) {
-                        completionBlock();
-                    }
-                }
-            } failureBlock:^(NSError *error) {
-                if (failureBlock) {
-                    failureBlock(error);
-                }
-            }];
-        } failureBlock:^(NSError *error) {
-            if (failureBlock) {
-                failureBlock(error);
-            }
-        }];
-    };
-    [assetsLibrary writeImageDataToSavedPhotosAlbum:imageData metadata:metadata completionBlock:^(NSURL *assetURL, NSError *error) {
-        if (groupName) {
-            [assetsLibrary addAssetsGroupAlbumWithName:groupName resultBlock:^(ALAssetsGroup *group) {
-                if (group) {
-                    [weakSelf assetForURL:assetURL resultBlock:^(ALAsset *asset) {
-                        [group addAsset:asset];
-                        if (completionBlock) {
-                            completionBlock();
-                        }
-                    } failureBlock:^(NSError *error) {
-                        if (failureBlock) {
-                            failureBlock(error);
-                        }
-                    }];
-                } else {
-                    AddAsset(weakSelf, assetURL);//不存在组时先创建相册
-                }
-            } failureBlock:^(NSError *error) {
-                AddAsset(weakSelf, assetURL);
-            }];
-        } else {
-            if (completionBlock) {
-                completionBlock();
-            }
+    // 列出所有用户创建的相册
+    __unused PHFetchResult *topLevelUserCollections = [PHCollectionList fetchTopLevelUserCollectionsWithOptions:nil];
+    
+    // 先获得之前创建过的相册
+    PHFetchResult<PHAssetCollection *> *collectionResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    for (PHAssetCollection *collection in collectionResult) {
+        if ([collection.localizedTitle isEqualToString:title]) {
+            return collection;
         }
+    }
+    
+    // 如果相册不存在,就创建新的相册(文件夹)
+    __block NSString *collectionId = nil; // __block修改block外部的变量的值
+    // 这个方法会在相册创建完毕后才会返回
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        // 新建一个PHAssertCollectionChangeRequest对象, 用来创建一个新的相册
+        PHAssetCollectionChangeRequest *assetCollection = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:title];
+        collectionId = assetCollection.placeholderForCreatedAssetCollection.localIdentifier;
+    } error:nil];
+    
+    return [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[collectionId] options:nil].firstObject;
+}
+
+
+/**
+ *  返回相册,避免重复创建相册引起不必要的错误
+ */
++ (void)saveImageWithImage:(UIImage *)image albumName:(NSString *)title completionHandler:(void(^)(BOOL success, NSError *error))completionHandler
+{
+    /*
+     PHAsset : 一个PHAsset对象就代表一个资源文件,比如一张图片
+     PHAssetCollection : 一个PHAssetCollection对象就代表一个相册
+     */
+    
+    if (!completionHandler) {
+        completionHandler = ^(BOOL success, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"添加图片到相册中失败!");
+                return;
+            }
+            
+            NSLog(@"成功添加图片到相册中!");
+        };
+    }
+    
+    __block NSString *assetId = nil;
+    // 1. 存储图片到"相机胶卷"
+    [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{ // 这个block里保存一些"修改"性质的代码
+        // 新建一个PHAssetCreationRequest对象, 保存图片到"相机胶卷"
+        // 返回PHAsset(图片)的字符串标识
+        PHAssetChangeRequest *newAssetRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+        if (!newAssetRequest.creationDate) {
+            newAssetRequest.creationDate = [NSDate date];
+        }
+        assetId = newAssetRequest.placeholderForCreatedAsset.localIdentifier;
+    } completionHandler:^(BOOL success, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"保存图片到相机胶卷中失败");
+            return;
+        }
+        
+        // 2. 获得相册对象
+        PHAssetCollection *collection = [self collectionWithTitle:title];
+        
+        // 3. 将“相机胶卷”中的图片添加到新的相册
+        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+            
+            // 根据唯一标示获得相片对象
+            PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+            // 添加图片到相册中
+            [request addAssets:@[asset]];
+        } completionHandler:completionHandler];
     }];
 }
 

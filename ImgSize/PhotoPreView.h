@@ -28,13 +28,8 @@
 @property (nonatomic, weak) id Tag;
 @property (nonatomic, retain) NSDictionary *info;//相册信息
 
-+ (void)createGroupAlbumWithName:(NSString *)groupName;
 + (NSDate *)getCreateDateLastPhoto;
-+ (void)saveToAlbumWithMetadata:(NSDictionary *)metadata
-                      imageData:(NSData *)imageData
-                      albumName:(NSString *)groupName
-                completionBlock:(void (^)(void))completionBlock
-                   failureBlock:(void (^)(NSError *error))failureBlock;
++ (void)saveImageWithImage:(UIImage *)image albumName:(NSString *)title completionHandler:(void(^)(BOOL success, NSError *error))completionHandler;
 
 - (id)init:(UIImage *)image cropSize:(CGSize)size isOnlyRead:(BOOL)onlyRead delegate:(id)delegate;
 - (void)addToolBarWithTitles:(NSArray *)listTitle selStrings:(NSArray *)listSEL;//添加工具栏
