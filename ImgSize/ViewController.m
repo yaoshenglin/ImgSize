@@ -25,6 +25,7 @@
 #import "UIImage+GIF.h"
 #import "DB.h"
 #include <sys/sysctl.h>
+#import "OCSqlite.h"
 
 
 extern NSString *CTSettingCopyMyPhoneNumber(void);
@@ -59,6 +60,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     
     MBProgressHUD *hudView;
     SOLStumbler *stumbler;
+    OCSqlite *ocSqlite;
     //NSDate *date;
     UILabel *lblInstantSpeed;
     UILabel *lblPeakSpeed;
@@ -110,6 +112,16 @@ static NSString *const SBStyle2 = @"SBStyle2";
     [self.view addSubview:btnTest];
     
     self.title = @"哈哈";
+    
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"IRCode.db" ofType:@""];
+    ocSqlite = [[OCSqlite alloc] init];
+    [ocSqlite ConnectToDB:path];
+    [ocSqlite query:@"SELECT * FROM device"];
+    OCField *ocField = [ocSqlite.dataset fieldbyname:@"device_name"];
+    NSLog(@"%@",ocField.toString);
+    [ocSqlite.dataset next];
+    ocField = [ocSqlite.dataset fieldbyname:@"device_name"];
+    NSLog(@"%@",ocField.toString);
     
     [self createUI];
     

@@ -27,6 +27,7 @@
 		149AE0981DF6AB1B00AA22AB /* 点击效果.png in Resources */ = {isa = PBXBuildFile; fileRef = 149AE0971DF6AB1B00AA22AB /* 点击效果.png */; };
 		14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 14A0E5E81DA8885400CC08B5 /* Localizable.strings */; };
 		14AA21A61DF693B500A3D380 /* 更多@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14AA21A51DF693B500A3D380 /* 更多@2x.png */; };
+		14B704571E2C7CB3001F5173 /* libEasyTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 14B704561E2C7CB3001F5173 /* libEasyTest.a */; };
 		14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */; };
 		14EB3CC01DBF420E00B1559C /* QRCodeScan_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */; };
 		14EB3CC31DBF423900B1559C /* CustomDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EB3CC21DBF423900B1559C /* CustomDrawView.m */; };
@@ -412,6 +413,8 @@
 		14A0E5E61DA8885400CC08B5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		14A0E5E71DA8885400CC08B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		14AA21A51DF693B500A3D380 /* 更多@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "更多@2x.png"; sourceTree = "<group>"; };
+		14B7041F1E2C5951001F5173 /* OCSqlite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSqlite.h; sourceTree = "<group>"; };
+		14B704561E2C7CB3001F5173 /* libEasyTest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libEasyTest.a; sourceTree = "<group>"; };
 		14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "立即体验按钮点击效果@2x.png"; sourceTree = "<group>"; };
 		14EB3CBE1DBF420E00B1559C /* QRCodeScan_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeScan_ViewController.h; sourceTree = "<group>"; };
 		14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeScan_ViewController.m; sourceTree = "<group>"; };
@@ -1082,6 +1085,7 @@
 				1489C1FF1CFC350E0097E4E0 /* libWeChatSDK.a in Frameworks */,
 				1489C20A1CFC38A70097E4E0 /* TencentOpenAPI.framework in Frameworks */,
 				E2A455B21AC8E9EF00AC7293 /* CFNetwork.framework in Frameworks */,
+				14B704571E2C7CB3001F5173 /* libEasyTest.a in Frameworks */,
 				E2727A6A1A6A59C000CC57D6 /* Security.framework in Frameworks */,
 				E218EBC519480F80002160DC /* AudioToolbox.framework in Frameworks */,
 				E218EBC319480EDF002160DC /* AVFoundation.framework in Frameworks */,
@@ -1916,6 +1920,8 @@
 				14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */,
 				14EB3F8A1DBF495400B1559C /* CreateQRCode_ViewController.h */,
 				14EB3F8B1DBF495400B1559C /* CreateQRCode_ViewController.m */,
+				14B7041F1E2C5951001F5173 /* OCSqlite.h */,
+				14B704561E2C7CB3001F5173 /* libEasyTest.a */,
 				E228DFD7196F7FF200C882E0 /* Test_ViewController.h */,
 				E228DFD8196F7FF200C882E0 /* Test_ViewController.m */,
 				E275EE7C1A08CF4C00483DE5 /* ImgSize-Bridging-Header.h */,
@@ -2874,6 +2880,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ImgSize/WeChat",
+					"$(PROJECT_DIR)/ImgSize",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
@@ -2918,6 +2925,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ImgSize/WeChat",
+					"$(PROJECT_DIR)/ImgSize",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
