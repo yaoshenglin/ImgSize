@@ -164,8 +164,22 @@
     _line.userInteractionEnabled = YES;
     [PaneImgView addSubview:_line];
     
+    CGFloat yOffset = -100;
     hudView = [[MBProgressHUD alloc] initWithView:self.view];
     hudView.labelText = @"正在初始化摄像头...";
+    if (Screen_Height == 736) {
+        yOffset = -100;
+    }
+    else if (Screen_Height == 667) {
+        yOffset = -95;
+    }
+    else if (Screen_Height == 568) {
+        yOffset = -90;
+    }
+    else if (Screen_Height == 480) {
+        yOffset = -30;
+    }
+    hudView.yOffset = yOffset;
     [self.view insertSubview:hudView aboveSubview:PaneImgView];
     [hudView show:YES];
     

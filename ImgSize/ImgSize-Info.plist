@@ -96,8 +96,20 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Allow can be normal use the Media Library</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Allow can be normal use the Bluetooth</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow can be normal use the Camera</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Allow can be normal use the Contacts Usage</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow can be normal locate your city</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>使用相册</string>
+	<key>NSPhotoLibraryUsageDescription - 2</key>
+	<string>Allow can be normal use the Photo Library</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
