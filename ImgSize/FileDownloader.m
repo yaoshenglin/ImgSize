@@ -134,7 +134,7 @@
     NSTimeInterval space = [[NSDate date] timeIntervalSinceDate:sendDate];
     if (space < 0.02 && progress != 1.0) {
         NSString *msg = @"----------接收进度没有更新--------------------";
-        [CTB printDebugMsg:msg];
+        CTBNSLog(@"%@",msg);
         return;
     }
     

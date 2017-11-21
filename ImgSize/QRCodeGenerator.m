@@ -22,35 +22,8 @@
 //
 
 #import "QRCodeGenerator.h"
-#import "qrencode.h"
-
-enum {
-	qr_margin = 3
-};
 
 @implementation QRCodeGenerator
-
-+ (void)drawQRCode:(QRcode *)code context:(CGContextRef)ctx size:(CGFloat)size {
-	unsigned char *data = 0;
-	int width;
-	data = code->data;
-	width = code->width;
-	float zoom = (double)size / (code->width + 2.0 * qr_margin);
-	CGRect rectDraw = CGRectMake(0, 0, zoom, zoom);
-	
-	// draw
-	CGContextSetFillColor(ctx, CGColorGetComponents([UIColor blackColor].CGColor));
-	for(int i = 0; i < width; ++i) {
-		for(int j = 0; j < width; ++j) {
-			if(*data & 1) {
-				rectDraw.origin = CGPointMake((j + qr_margin) * zoom,(i + qr_margin) * zoom);
-				CGContextAddRect(ctx, rectDraw);
-			}
-			++data;
-		}
-	}
-	CGContextFillPath(ctx);
-}
 
 + (UIImage *)qrImageForString:(NSString *)string imageSize:(CGFloat)size
 {
@@ -66,12 +39,9 @@ enum {
 {
 	if (![string length]) {
 		return nil;
-	}
-	
-	QRcode *code = QRcode_encodeString([string UTF8String], 0, QR_ECLEVEL_L, QR_MODE_8, 1);
-	if (!code) {
-		return nil;
-	}
+    }
+    
+    UIImage *image = [self.class createCodeImageWithString:string];
 	
 	// create context
     CGFloat scale = [UIScreen mainScreen].scale;
@@ -85,10 +55,9 @@ enum {
 	CGAffineTransform scaleTransform = CGAffineTransformMakeScale(1, -1);
 	CGContextConcatCTM(ctx, CGAffineTransformConcat(translateTransform, scaleTransform));
 	
-	// draw QR on this context	
-	[QRCodeGenerator drawQRCode:code context:ctx size:size];
-    
     UIGraphicsPushContext(ctx);
+    [image drawInRect:CGRectMake(25, 25, size-50, size-50)];
+    
     //段落格式
     NSMutableParagraphStyle *textStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
     textStyle.lineBreakMode = NSLineBreakByWordWrapping;
@@ -97,7 +66,7 @@ enum {
     //string = @"设置填充文字";
     UIFont  *font = [UIFont boldSystemFontOfSize:11.0*scale];//设置
     NSDictionary *attributes = @{NSFontAttributeName:font, NSParagraphStyleAttributeName:textStyle,NSForegroundColorAttributeName:[UIColor blueColor]};
-    [text drawInRect:CGRectMake(0, 0, size, 25*scale) withAttributes:attributes];
+    [text drawInRect:CGRectMake(0, 5, size, 25*scale) withAttributes:attributes];
     UIGraphicsPopContext();
 	
 	// get image
@@ -107,9 +76,40 @@ enum {
 	// some releases
 	CGContextRelease(ctx);
 	CGImageRelease(qrCGImage);
-	QRcode_free(code);
 	
 	return qrImage;
+}
+
+#pragma mark 生成图片
+/**
+ *  生成一张普通的二维码
+ *
+ *  @param data    传入你要生成二维码的数据
+ *  @param imageViewWidth    图片的宽度
+ */
+
++ (UIImage *)createCodeImageWithString:(NSString *)imgStr
+{
+    CGFloat width = [UIScreen mainScreen].bounds.size.width - 120;
+    NSData *strData = [imgStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO];
+    //创建二维码滤镜
+    CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
+    [qrFilter setDefaults];
+    [qrFilter setValue:strData forKey:@"inputMessage"];
+    [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
+    CIImage *qrImage = qrFilter.outputImage;
+    //颜色滤镜
+//    CIFilter *colorFilter = [CIFilter filterWithName:@"CIFalseColor"];
+//    [colorFilter setDefaults];
+//    [colorFilter setValue:qrImage forKey:kCIInputImageKey];
+//    [colorFilter setValue:[CIColor colorWithRed:0 green:0 blue:0] forKey:@"inputColor0"];
+//
+//    [colorFilter setValue:[CIColor colorWithRed:1 green:1 blue:1] forKey:@"inputColor1"];
+//    qrImage = colorFilter.outputImage;
+    //返回二维码
+    qrImage = [qrImage imageByApplyingTransform:CGAffineTransformMakeScale(width/4, width/4)];
+    UIImage *codeImage = [UIImage imageWithCIImage:qrImage];
+    return codeImage;
 }
 
 @end

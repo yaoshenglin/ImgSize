@@ -3,7 +3,7 @@
 //  ScanQRCode
 //
 //  Created by Yin on 14-4-1.
-//  Copyright © 2014年 caidan. All rights reserved.
+//  Copyright © 2014年 weicontrol. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

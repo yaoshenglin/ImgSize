@@ -76,7 +76,9 @@
 {
     imgViewNormal.hidden = NO;
     imgViewHighlighted.hidden = YES;
-    [self sendAction:actionMethod to:delegate forEvent:UIEventTypeTouches];
+    
+    UIEvent *event = [[UIEvent alloc] init];
+    [self sendAction:actionMethod to:delegate forEvent:event];
 }
 
 // Only override drawRect: if you perform custom drawing.

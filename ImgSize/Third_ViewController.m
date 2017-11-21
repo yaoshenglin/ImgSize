@@ -65,7 +65,7 @@
     [self.view addSubview:iScrollView];
     
     //缩略图
-    x = (Screen_Width-100)/2, y = 80;
+    x = (Screen_Width-100)/2;y = 80;
     UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(x, y, 100, 100)];
     imgView.image = [UIImage imageNamed:@"场景编辑_场景图片"];
     [iScrollView addSubview:imgView];

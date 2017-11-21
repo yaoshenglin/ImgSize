@@ -11,7 +11,6 @@
 #import "CTB.h"
 #import "CustomDrawView.h"
 #import "PhotoPreView.h"
-#import "ZXingObjC.h"   //解析图片二维码
 
 @interface QRCodeScan_ViewController ()<UIAlertViewDelegate>
 {
@@ -183,6 +182,7 @@
     bigV.backgroundColor = [[UIColor grayColor] colorWithAlpha:0.3];
     [baseView addSubview:bigV];
     
+    h = 20;
     UIImage *image = [UIImage imageNamed:@"相册"];
     UIButton *btnPhoto = [CTB buttonType:UIButtonTypeCustom delegate:self to:bigV tag:2 title:@"" img:@"相册"];
     [btnPhoto setNormalBackgroundImage:image];
@@ -190,7 +190,7 @@
     btnPhoto.layer.cornerRadius = GetVWidth(btnPhoto)/2;
     [btnPhoto setCenterX:Screen_Width/3-10 Y:GetVHeight(bigV)/2-10];
     UILabel *lblPhoto = [CTB labelTag:1 toView:bigV text:@"相册" wordSize:-1];
-    lblPhoto.frame = GetRect(GetVMinX(btnPhoto), GetVHeight(bigV)-25, GetVWidth(btnPhoto), 20);
+    lblPhoto.frame = GetRect(GetVMinX(btnPhoto), GetVHeight(bigV)-25, GetVWidth(btnPhoto), h);
     lblPhoto.textColor = [UIColor whiteColor];
     
     UIButton *btnLight = [CTB buttonType:UIButtonTypeCustom delegate:self to:bigV tag:3 title:@"" img:@"开灯"];
@@ -198,7 +198,7 @@
     btnLight.layer.cornerRadius = GetVWidth(btnLight)/2;
     [btnLight setCenterX:Screen_Width*2/3+10 Y:GetVHeight(bigV)/2-10];
     UILabel *lblLight = [CTB labelTag:1 toView:bigV text:@"开灯" wordSize:-1];
-    lblLight.frame = GetRect(GetVMinX(btnLight), GetVHeight(bigV)-25, GetVWidth(btnLight), 20);
+    lblLight.frame = GetRect(GetVMinX(btnLight), GetVMinY(lblPhoto), GetVWidth(btnLight), h);
     lblLight.textColor = [UIColor whiteColor];
 }
 
@@ -219,7 +219,6 @@
 
 - (void)backAction
 {
-    
     [self dismissViewControllerAnimated:YES completion:^{
         if ([timer isValid]) {
             [timer invalidate];
@@ -286,8 +285,8 @@
         if (iPhone >= 6) {
             NSString *mediaType = AVMediaTypeVideo;
             AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:mediaType];
-            if(authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied){
-                
+            if(authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied)
+            {
                 NSLog(@"相机权限受限");
                 NSString *msg = @"请在设置->隐私->相机中设置访问权限";
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:msg delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定",nil];
@@ -342,7 +341,9 @@
     
     if ([metadataObjects count] >0){
         AVMetadataMachineReadableCodeObject *metadataObject = [metadataObjects firstObject];
-        stringValue = metadataObject.stringValue;
+        if ([metadataObject respondsToSelector:@selector(stringValue)]) {
+            stringValue = metadataObject.stringValue;
+        }
     }
 
     if (stringValue && isCanScan) {
@@ -398,12 +399,14 @@
         // Start session configuration
         [session beginConfiguration];
         [device lockForConfiguration:nil];
-        if (!isOnLight) {
-            isOnLight = YES;
-            [device setTorchMode:AVCaptureTorchModeOn];//开打闪光灯
-        }else{
-            isOnLight = NO;
-            [device setTorchMode:AVCaptureTorchModeOff];//关闭闪光灯
+        if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+            if (!isOnLight) {
+                isOnLight = YES;
+                [device setTorchMode:AVCaptureTorchModeOn];//开打闪光灯
+            }else{
+                isOnLight = NO;
+                [device setTorchMode:AVCaptureTorchModeOff];//关闭闪光灯
+            }
         }
         
         [device unlockForConfiguration];
@@ -495,34 +498,28 @@
 #pragma mark 解析图片二维码
 - (NSString *)getContentWith:(UIImage *)image
 {
-    CGImageRef cgImage = image.CGImage;
-    ZXLuminanceSource *source = [[ZXCGImageLuminanceSource alloc] initWithCGImage:cgImage];
-    ZXBinaryBitmap *bitmap = [ZXBinaryBitmap binaryBitmapWithBinarizer:[ZXHybridBinarizer binarizerWithSource:source]];
-    
-    NSError *error = nil;
-    
-    // There are a number of hints we can give to the reader, including
-    // possible formats, allowed lengths, and the string encoding.
-    ZXDecodeHints *hints = [ZXDecodeHints hints];
-    
-    ZXMultiFormatReader *reader = [ZXMultiFormatReader reader];
-    ZXResult *result = [reader decode:bitmap
-                                hints:hints
-                                error:&error];
-    if (result) {
-        // The coded result as a string. The raw data can be accessed with
-        // result.rawBytes and result.length.
-        NSString *contents = result.text;
+    CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
+    // 取得识别结果
+    NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
+    if (features.count) {
         
-        // The barcode format, such as a QR code or UPC-A
-        //ZXBarcodeFormat format = result.barcodeFormat;
+        BOOL isLog = features.count > 1;
         
-        //NSLog(@"format=%d,%@",format,contents);
+        if (isLog) {
+            NSLog(@"扫描结果:");
+        }
         
-        return contents;
-    } else {
-        // Use error to determine why we didn't get a result, such as a barcode
-        // not being found, an invalid checksum, or a format inconsistency.
+        NSString *resultStr = nil;
+        for (int index = 0; index < features.count; index ++) {
+            CIQRCodeFeature *feature = [features objectAtIndex:index];
+            resultStr = feature.messageString;
+            
+            if (isLog) {
+                printf("%s\n",resultStr.UTF8String);
+            }
+        }
+        return resultStr;
+        
     }
     
     return nil;
@@ -534,27 +531,27 @@
     NSString *btnTitle = [alertView buttonTitleAtIndex:buttonIndex];
     if (alertView.tag == 1) {
         if ([btnTitle isEqualToString:@"开关"]) {
-            _content = @"device:switch;id:01000001;tag:3";
+            _content = @"device:switch;id:01000001;tag:3;m:CS23;ver:2.0";
             [self returnResult];
         }
         else if ([btnTitle isEqualToString:@"插座"]) {
-            _content = @"device:plug;id:020000F7;ver:1.0";
+            _content = @"device:plug;id:020000F7;m:CP11;ver:2.0";
             [self returnResult];
         }
         else if ([btnTitle isEqualToString:@"门锁"]) {
             //tag > 0则是蓝牙门锁
-            _content = @"device:doorlock;id:03000001;tag:1;ver:1.0";
+            _content = @"device:doorlock;id:03000001;tag:1;m:DL32;ver:2.0";
             [self returnResult];
         }
         else if ([btnTitle isEqualToString:@"电动窗帘"]){
             //暂时不确定
-            _content = @"device:curtain;id:040000F7;ver:1.0";
+            _content = @"device:curtain;id:040000F7;m:CT61;ver:2.0";
             [self returnResult];
         }
-        else if ([btnTitle isEqualToString:@"红外转发器"]){
+        else if ([btnTitle isEqualToString:@"红外转发器"]) {
             //红外转发器
             //device:ledlamp;id:1A61A7;tag:1;ver:1.0  LED灯  tag是灯光的类型
-            _content = @"device:irrelay;id:06000011;tag:1;ver:1.0";//tag:1为分控器（LED灯，红外）;tag:0 为分控器（红外）
+            _content = @"device:irrelay;id:06000011;tag:1;m:IF53;ver:2.0";//tag:1为分控器（LED灯，红外）;tag:0 为分控器（红外）
             [self returnResult];
         }
         else if ([btnTitle isEqualToString:@"远程视频"]){
@@ -562,16 +559,19 @@
             _content = @"device:remoteVideo;id:097265848;ver:1.0";//摄像头比较特殊,非自制品,故需要分开
             [self returnResult];
         }
+        
+        self.navigationItem.rightBarButtonItem.enabled = YES;
     }
     else if (alertView.tag == 2) {
         [NotificationCenter postNotificationName:@"Scan.isCanScan" object:@YES];
         _line.hidden = NO;
     }
     else if (alertView.tag == 3) {
-        if ([btnTitle isEqualToString:@"确定"]) {
+        if ([btnTitle isEqualToString:CTBLocalizedStr(@"Confirm")]) {
             //[self.navigationController popViewControllerAnimated:YES];
-            NSURL *url = [NSURL URLWithString:@"prefs:root=Privacy&path=CAMERA"];
-            [[UIApplication sharedApplication] openURL:url];
+#ifdef DEBUG
+            [UIApplication openURLString:@"prefs:root=Privacy&path=CAMERA"];
+#endif
         }
     }
 }
@@ -579,12 +579,13 @@
 - (void)returnResult
 {
     //device:gate;sn:9020T20921083  门禁
-    //device:switch;id:00000001  开关
-    //device:plug;id:02000084  插座
-    //device:doorlock;id:03000001  门锁
-    NSString *result = @"device:doorlock;id:03000001";
+    //device:switch;id:00000001;tag:3;m:CS23;ver:2.0  开关
+    //device:plug;id:02000084;m:CP11;ver:2.0  插座
+    //device:doorlock;id:03000001;tag:1;m:DL32;ver:2.0  门锁
+    NSString *result = @"device:doorlock;id:03000001;tag:1;m:DL32;ver:2.0";
     
     if (_tag == 2) {
+        //门禁
         result = @"device:gate;content:KF-9020T20921083";//254
         //result = @"device:gate;content:KF-9020T25020001";//250
         //result = @"device:gate;content:KF-9020T23100005";//150
@@ -642,11 +643,8 @@
     [timer destroy];
     [preview removeFromSuperlayer];
     
-    NSString *className = NSStringFromClass(self.class);
 #if DEBUG
-    NSLog(@"%@ dealloc",className);
-#else
-    Unused(className);
+    NSLog(@"%@ dealloc",self.className);
 #endif
 }
 

@@ -4,23 +4,16 @@
 
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
-    "B5474FA1DBD896828B3E441A0B3A37F8D84464C1" : 9223372036854775807,
-    "9F4750A63F56950F913423BF7EB37043EAAADE22" : 9223372036854775807
+    "B5474FA1DBD896828B3E441A0B3A37F8D84464C1" : 9223372036854775807
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "2E2FC95D-1C9E-4F86-902F-93EA546820DA",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "B5474FA1DBD896828B3E441A0B3A37F8D84464C1" : "ImgSize\/",
-    "9F4750A63F56950F913423BF7EB37043EAAADE22" : "..\/OC%E5%B7%A5%E7%A8%8B\/test"
+    "B5474FA1DBD896828B3E441A0B3A37F8D84464C1" : "ImgSize\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "ImgSize",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
   "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "ImgSize.xcodeproj",
   "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
-    {
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/yaoshenglin\/Test.git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "9F4750A63F56950F913423BF7EB37043EAAADE22"
-    },
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/yaoshenglin\/ImgSize.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",

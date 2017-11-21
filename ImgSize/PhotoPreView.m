@@ -533,8 +533,8 @@
         if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7) {
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];//状态栏样式
         }else{
-            UIColor *color = [UIColor colorWithRed:0.16 green:2.2/3 blue:0.61 alpha:1.0];
-            [UINavigationBar appearance].tintColor = color;//UIColorFromRGB(0x29BB9C)
+            //UIColor *color = [UIColor colorWithRed:41/256.0 green:187/256.0 blue:156/256.0 alpha:1.0];
+            [UINavigationBar appearance].tintColor = MasterColor;//
         }
     }
 }

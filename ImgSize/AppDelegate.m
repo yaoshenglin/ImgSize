@@ -130,12 +130,22 @@
     NSLog(@"请求失败");
 }
 
+#ifdef __IPHONE_11_0
 //在这个函数中检查是否传输已经完成
-- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)(void))completionHandler
 {
-    completionHandler(UIBackgroundFetchResultNewData);
+    //UIBackgroundFetchResultNewData
+    completionHandler();
     NSLog(@"传输已经完成");
 }
+#else
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler
+{
+    //UIBackgroundFetchResultNewData
+    completionHandler();
+    NSLog(@"传输已经完成");
+}
+#endif
 
 #pragma mark - --------QQ------------------------
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation

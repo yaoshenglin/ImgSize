@@ -26,7 +26,7 @@
     // Drawing code
     //在view上面画了一个绿色填充，红色边框的三角形
     //Define a Path
-    CGContextRef context;
+    CGContextRef context = NULL;
     CGContextBeginPath(context);
     //Move around, add lines or arcs to the path
     CGContextMoveToPoint(context, 75, 10);

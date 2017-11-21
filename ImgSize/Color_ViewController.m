@@ -136,7 +136,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         cell.backgroundColor = [UIColor clearColor];
         cell.textLabel.textColor = [UIColor whiteColor];
-        [CTB setBottomLineAtTable:tableView dicData:@{@"indexPath":indexPath,@"cell":cell,@"borderColor":[[UIColor whiteColor] colorWithAlpha:0.5]}];
+        [CTB setBottomLineAtCell:cell dicData:@{@"borderColor":[[UIColor whiteColor] colorWithAlpha:0.5]}];
     }
     
     cell.textLabel.text = [listDevice objAtIndex:indexPath.row];

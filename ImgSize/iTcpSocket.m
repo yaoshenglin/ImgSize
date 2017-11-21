@@ -36,7 +36,7 @@
 
 - (void)connectToHost:(NSString *)host port:(UInt16)port
 {
-    _host = host, _port = port;
+    _host = host;_port = port;
     const char *addr = host.UTF8String;
     server_addr.sin_len = sizeof(struct sockaddr_in);
     server_addr.sin_family = AF_INET;//IP4

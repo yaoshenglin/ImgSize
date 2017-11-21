@@ -40,9 +40,9 @@
 +(void)execInsertTransactionSql:(NSArray *)listSQL;
 
 #pragma mark - --------数据库事务操作-------------------
-int beginTransaction();
-int commitTransaction();
-int rollbackTransaction();
+int beginTransaction(void);
+int commitTransaction(void);
+int rollbackTransaction(void);
 
 #pragma mark - --------绑定数据--------------------
 int bindInt(sqlite3_stmt *stmt,int loc,int value);

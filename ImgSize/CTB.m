@@ -3,7 +3,7 @@
 //  baiduMap
 //
 //  Created by yinhaibo on 14-1-3.
-//  Copyright (c) 2014年 Yinhaibo. All rights reserved.
+//  Copyright © 2014年 Yinhaibo. All rights reserved.
 //
 
 #import "CTB.h"
@@ -11,10 +11,11 @@
 #include <net/if.h>
 #include <ifaddrs.h>
 #include <netdb.h>
+#include <sys/xattr.h>
 #import <objc/runtime.h>//对象转Dic用
 #include <CommonCrypto/CommonDigest.h>
-#import <ImageIO/ImageIO.h>//图片动画
 #import <SystemConfiguration/CaptiveNetwork.h>//获取WiFi信息
+
 
 @interface CTB () <UIAlertViewDelegate,UITableViewDelegate,UIActionSheetDelegate>
 
@@ -67,17 +68,29 @@ id getController(NSString *identifier,NSString *title)
         return NULL;
     }
     
+    if (!identifier) {
+        return nil;
+    }
+    
     UIViewController *viewController = [storyBoard instantiateViewControllerWithIdentifier:identifier];
     return viewController;
+}
+
++ (UIViewController *)viewControllerFromString:(NSString *)className
+{
+    Class aClass = NSClassFromString(className);
+    UIViewController *result = [[aClass alloc] init];
+    if ([result isKindOfClass:[UIViewController class]]) {
+        return result;
+    }
+    
+    return nil;
 }
 
 + (id)NSClassFromString:(NSString *)className
 {
     Class aClass = NSClassFromString(className);
     UIViewController *result = [[aClass alloc] init];
-    if ([result isKindOfClass:[UIViewController class]]) {
-        //result.view.backgroundColor = [UIColor whiteColor];
-    }
     return result;
 }
 
@@ -122,7 +135,7 @@ id getControllerFor(UIViewController *VC,NSString *className)
     
     NSArray *listNav = Nav.viewControllers;
     for (UIViewController *V in listNav) {
-        if ([NSStringFromClass(V.class) hasPrefix:className]) {
+        if ([V.className hasPrefix:className]) {
             //类名相同
             if (V != VC) {
                 //排除自己
@@ -151,13 +164,13 @@ id getParentController(UIViewController *VC,NSString *className)
     return result;
 }
 
-+ (void)hiddenBottomBarWhenPushedFor:(UIViewController *)viewController
+#pragma mark 从导航中移除视图类
++ (void)removeClassWithListName:(NSArray *)listName fromVC:(UIViewController *)VC
 {
-    UIViewController *VC = viewController.navigationController.viewControllers.lastObject;
-    VC.hidesBottomBarWhenPushed = YES;
+    [CTB removeClassWithListName:listName fromNav:VC.navigationController];
 }
 
-+ (void)removeClassWithName:(NSString *)className fromNav:(UINavigationController *)Nav
++ (void)removeClassWithListName:(NSArray *)listName fromNav:(UINavigationController *)Nav
 {
     if (![Nav isKindOfClass:[UINavigationController class]]) {
         return;
@@ -166,7 +179,8 @@ id getParentController(UIViewController *VC,NSString *className)
     NSArray *listNav = Nav.viewControllers;
     NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
     for (UIViewController *V in listNav) {
-        if ([NSStringFromClass(V.class) isEqualToString:className]) {
+        NSString *className = V.className;
+        if ([listName containsObject:className]) {
             [V.view removeFromSuperview];
             [listResult removeObject:V];
         }
@@ -204,24 +218,6 @@ id getParentController(UIViewController *VC,NSString *className)
     [Nav setViewControllers:listResult animated:YES];
 }
 
-+ (void)removeController:(UIViewController *)viewController fromNav:(UINavigationController *)Nav
-{
-    if (![Nav isKindOfClass:[UINavigationController class]]) {
-        return;
-    }
-    
-    NSArray *listNav = Nav.viewControllers;
-    NSMutableArray *listResult = [NSMutableArray arrayWithArray:listNav];
-    for (UIViewController *V in listNav) {
-        if (V == viewController) {
-            [V.view removeFromSuperview];
-            [listResult removeObject:V];
-        }
-    }
-    
-    [Nav setViewControllers:listResult animated:YES];
-}
-
 void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 {
     if (iPhone >= 7) {
@@ -236,15 +232,61 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return [listWindow firstObject];
 }
 
++ (UIWindow *)getValidWindow
+{
+    //活跃的window
+    NSArray *listWindow = [[UIApplication sharedApplication] windows];
+    id obj = listWindow.firstObject;
+    if (listWindow.count > 2) {
+        obj = [listWindow objectAtIndex:1];
+    }
+    
+    return obj;
+}
+
++ (UIWindow *)getLastWindow
+{
+    //活跃的window
+    NSArray *listWindow = [[UIApplication sharedApplication] windows];
+    return [listWindow lastObject];
+}
+
++ (NSArray *)getWindows
+{
+    NSArray *listWindow = [[UIApplication sharedApplication] windows];
+    return listWindow;
+}
+
++ (UIWindow *)getStaticWindow
+{
+    static dispatch_once_t once;
+    static UIWindow *sharedInstance;
+    dispatch_once(&once, ^ {
+        CGRect frame = [UIScreen mainScreen].bounds;
+        sharedInstance = [[UIWindow alloc] initWithFrame:frame];
+    });
+    return sharedInstance;
+}
+
++ (id)getStaticClass:(Class)aClass
+{
+    static dispatch_once_t once;
+    static id sharedInstance;
+    dispatch_once(&once, ^ {
+        sharedInstance = [[aClass alloc] init];
+    });
+    return sharedInstance;
+}
+
 + (void)ButtonEvents:(UIButton *)button
 {
-//    NSLog(@"请注意此方法");
+    //CTBNSLog(@"请注意此方法");
 }
 
 - (void)ButtonEvents:(UIButton *)button
 {
     if (button.tag==1) {
-        [CTB alertWithMessage:@"你确定要退出吗" Delegate:self tag:1];
+        [CTB alertWithMessage:LocalizedSingle(@"AskToQuit") Delegate:self tag:1];//你确定要退出吗
     }
 }
 
@@ -267,7 +309,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     //文字居中
     button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     //设置文字与边框的间距
-    button.contentEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+    button.contentEdgeInsets = UIEdgeInsetsZero;
     
     if (imgName.length>0) {
         NSArray *listSort = [imgName componentsSeparatedByString:@"/"];
@@ -523,7 +565,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     va_end(args);
 }
 
-#pragma mark - ==========UIBarButtonItem===================
+#pragma mark - --------UIBarButtonItem----------------
 + (UIBarButtonItem *)BarButtonWithTitle:(NSString *)title target:(id)target tag:(NSUInteger)tag
 {
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:target action:select(ButtonEvents:)];
@@ -551,8 +593,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return BtnItem;
 }
 
-+ (UIBarButtonItem *)BarButtonWithImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag
-{
++ (UIBarButtonItem *)BarButtonWithImgName:(NSString *)imgName target:(id)target tag:(NSUInteger)tag {
     UIImage *image = [UIImage imageNamed:imgName];
     UIBarButtonItem *BtnItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:target action:select(ButtonEvents:)];
     BtnItem.tag = tag;
@@ -694,7 +735,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     [[UITabBarItem appearance] setTitleTextAttributes:dic forState:UIControlStateSelected];
 }
 
-#pragma mark - ========实用TextField==============================
+#pragma mark - --------实用TextField------------------------
 + (UITextField *)createTextField:(int)tag hintTxt:(NSString *)placeholder V:(UIView *)View
 {
     CGFloat h=tag*80-20;
@@ -718,7 +759,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return textField;
 }
 
-#pragma mark - =========Label=============================
+#pragma mark - --------Label------------------------
 + (UILabel *)labelTag:(int)tag toView:(UIView *)View text:(NSString *)text wordSize:(CGFloat)size
 {
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -744,7 +785,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return label;
 }
 
-#pragma mark - ========TextField==============================
+#pragma mark - --------TextField------------------------
 + (UITextField *)textFieldTag:(int)tag holderTxt:(NSString *)placeholder V:(UIView *)View delegate:(id)delegate
 {
     UITextField *textField = [[UITextField alloc] initWithFrame:CGRectZero];
@@ -768,7 +809,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return textField;
 }
 
-#pragma mark - ========分段控件==============================
+#pragma mark - --------分段控件------------------------
 + (UISegmentedControl *)segmentedTag:(int)tag Itmes:(NSArray *)items toView:(UIView *)View
 {
     UISegmentedControl *segControl = [[UISegmentedControl alloc] initWithItems:items];
@@ -779,7 +820,13 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return segControl;
 }
 
-#pragma mark - ========UITableView==============================
+#pragma mark - --------UITableView------------------------
++ (UITableView *)tableViewWithDelegate:(id)delegate toV:(UIView *)View
+{
+    UITableView *tableView = [self tableViewStyle:UITableViewStylePlain delegate:delegate toV:View];
+    return tableView;
+}
+
 + (UITableView *)tableViewStyle:(UITableViewStyle)style delegate:(id)delegate toV:(UIView *)View
 {
     UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectZero style:style];
@@ -790,12 +837,21 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     tableView.backgroundColor = [UIColor clearColor];
     tableView.backgroundView = nil;
     
+    tableView.delaysContentTouches = NO;
     tableView.separatorColor = [UIColor clearColor];
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
-    tableView.sectionIndexColor = colorWithHex(@"0x29BB9C");//索引文字颜色
+    tableView.estimatedSectionFooterHeight = 0;
+    
+    tableView.sectionIndexColor = [CTB colorWithHexString:@"0x29BB9C"];//索引文字颜色
     if (iPhone >= 7) {
         tableView.sectionIndexBackgroundColor = [UIColor clearColor];//索引栏背景色
+    }
+    
+    if (style == UITableViewStyleGrouped) {
+        CGRect frame = CGRectMake(0, 0, 1, 0.1);
+        tableView.tableHeaderView = [[UIView alloc] initWithFrame:frame];
+        tableView.tableFooterView = [[UIView alloc] initWithFrame:frame];
     }
     
     return tableView;
@@ -809,7 +865,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
     
-    cell.textLabel.text = @"参数错误";
+    cell.textLabel.text = LocalizedSingle(@"ParaError");//@"参数错误";
     
     return cell;
 }
@@ -818,10 +874,10 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 {
     CGSize size = [UIScreen mainScreen].bounds.size;
     UIView *finishView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, 49)];
-    //finishView.backgroundColor = [CTB colorWithHexString:@"#E7E7E7"];
+    //finishView.backgroundColor = [CTB colorWithHexString:CE7E7E7];
     
     UILabel *lblStatus = [[UILabel alloc] initWithFrame:CGRectMake(20, 15, size.width-40, 20)];
-    lblStatus.text = @"已加载全部数据";
+    lblStatus.text = LocalizedSingle(@"AllDataLoaded");//@"已加载全部数据";
     lblStatus.font = [UIFont systemFontOfSize:15];
     lblStatus.textColor = [UIColor grayColor];
     lblStatus.textAlignment = NSTextAlignmentCenter;
@@ -844,7 +900,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return webView;
 }
 
-#pragma mark - ========UIImagePickerController==============================
+#pragma mark - --------UIImagePickerController------------------------
 + (UIImagePickerController *)imagePickerType:(UIImagePickerControllerSourceType)sourceType delegate:(id)delegate
 {
     UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
@@ -862,11 +918,11 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     return imagePicker;
 }
 
-#pragma mark - ========UIAlertView==============================
+#pragma mark - --------UIAlertView------------------------
 + (UIAlertView *)showMsgWithTitle:(NSString *)title msg:(NSString *)msg
 {
-    title = title.length>0 ? title : @"确定";
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+    title = title.length>0 ? title : CTBLocalizedStr(@"Confirm");
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
     alert.tag = 0;
     [alert show];
     return alert;
@@ -877,7 +933,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     if (!msg || ![msg isKindOfClass:[NSString class]]) {
         return nil;
     }
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:CTBLocalizedStr(@"GentleHint") message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
     alert.tag = 0;
     [alert show];
     return alert;
@@ -888,7 +944,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     if (!msg || [msg isKindOfClass:[NSNull class]]) {
         return nil;
     }
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:msg delegate:delegate cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:LocalizedSingle(@"Hint") message:msg delegate:delegate cancelButtonTitle:nil otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
     alert.tag = tag;
     [alert show];
     return alert;
@@ -896,8 +952,8 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 
 + (UIAlertView *)alertWithTitle:(NSString *)title Delegate:(id)delegate tag:(int)tag
 {
-    NSString *cancelTitle = delegate ? @"取消" : nil;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:nil delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:@"确定", nil];
+    NSString *cancelTitle = delegate ? NSLocalizedString(@"Cancel", nil) : nil;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:nil delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
     alert.delegate = delegate;
     alert.tag = tag;
     [alert show];
@@ -906,8 +962,8 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 
 + (UIAlertView *)alertWithMessage:(NSString *)message Delegate:(id)delegate tag:(int)tag
 {
-    NSString *cancelTitle = delegate ? @"取消" : nil;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:@"确定", nil];
+    NSString *cancelTitle = delegate ? NSLocalizedString(@"Cancel", nil) : nil;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:LocalizedSingle(@"Hint") message:message delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
     alert.delegate = delegate;
     alert.tag = tag;
     [alert show];
@@ -916,8 +972,8 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
 
 + (UIAlertView *)alertWithTitle:(NSString *)title msg:(NSString *)message Delegate:(id)delegate tag:(int)tag
 {
-    NSString *cancelTitle = delegate ? @"取消" : nil;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:@"确定", nil];
+    NSString *cancelTitle = delegate ? NSLocalizedString(@"Cancel", nil) : nil;
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:cancelTitle otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
     alert.delegate = delegate;
     alert.tag = tag;
     [alert show];
@@ -997,7 +1053,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     aView.frame = CGRectMake(0, 0, bView.frame.size.width, bView.frame.size.height);
 }
 
-#pragma mark - =============从指定的视图上获取想要的视图类============================
+#pragma mark - --------从指定的视图上获取想要的视图类------------------------
 id getSuperView(Class aClass,UIView *View)
 {
     id obj = nil;
@@ -1015,14 +1071,14 @@ id getSuperView(Class aClass,UIView *View)
 id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 {
     id obj = nil;
-    for (UIView* next = [View superview]; next; next = next.superview) {
+    for (UIView *next = [View superview]; next; next = next.superview) {
         
         if ([next isKindOfClass:aClass]) {
             obj = next;
             break;
         }
         
-        UIResponder* nextResponder = [next nextResponder];
+        UIResponder *nextResponder = [next nextResponder];
         if ([nextResponder isKindOfClass:aClass] && [(UIView *)nextResponder tag] == tag) {
             obj = (UITableViewCell *)nextResponder;
             //NSLog(@"%@",cell);
@@ -1033,7 +1089,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     return obj;
 }
 
-#pragma mark - ============活动指示器============================
+#pragma mark - --------活动指示器------------------------
 + (void)showActivityInView:(UIView *)View
 {
     [self showActivityInView:View style:UIActivityIndicatorViewStyleWhite];
@@ -1115,7 +1171,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 
 
 
-#pragma mark - ===========隐藏键盘============================
+#pragma mark - --------隐藏键盘------------------------
 + (void)HiddenKeyboard:(id)txtField, ...
 {
     va_list args;
@@ -1228,7 +1284,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     va_end(args);
 }
 
-#pragma mark - ============设置Navigation Bar背景图片==========================
+#pragma mark - --------设置Navigation Bar背景图片------------------------
 + (void)setNavigationBarBackground:(NSString *)imgName to:(UIViewController *)viewController
 {
     UIImage *title_bg = [UIImage imageNamed:imgName];  //获取图片
@@ -1545,7 +1601,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     [theView.layer addAnimation:animation forKey:nil];
 }
 
-#pragma mark - ===========重新设置视图的位置和尺寸=========================
+#pragma mark - --------重新设置视图的位置和尺寸------------------------
 + (CGRect)setRectByX:(CGFloat)x Y:(CGFloat)y W:(CGFloat)w H:(CGFloat)h scale:(CGFloat)scale
 {
     CGRect rect = CGRectMake(x*scale, y*scale, w*scale, h*scale);
@@ -1832,17 +1888,19 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     return image;
 }
 
-#pragma mark - ==============根据字体参数计算label的高度==============================
+#pragma mark - --------根据字体参数计算label的高度------------------------
 + (float)heightOfContent:(NSString *)content width:(CGFloat)width fontSize:(CGFloat)size
 {
     UIFont *contentFont = [UIFont systemFontOfSize:size];
-    NSDictionary *tdic = @{NSFontAttributeName:contentFont};
+    NSDictionary *tDic = [NSDictionary dictionaryWithObjectsAndKeys:contentFont, NSFontAttributeName,nil];
     CGSize dateSize = CGSizeZero;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
-    dateSize = [content boundingRectWithSize:CGSizeMake(width, 2000) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tdic context:nil].size;
-#else
-    dateSize = [content sizeWithFont:contentFont constrainedToSize:CGSizeMake(width, 2000) lineBreakMode:NSLineBreakByTruncatingTail];
+    if (iPhone >= 7) {
+        dateSize = [content boundingRectWithSize:CGSizeMake(width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tDic context:nil].size;
+    }else{
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+        dateSize = [content sizeWithFont:contentFont constrainedToSize:CGSizeMake(width, 2000) lineBreakMode:NSLineBreakByTruncatingTail];
 #endif
+    }
     float heightOfContent = MAX(25, dateSize.height);
     return heightOfContent;
 }
@@ -1851,22 +1909,31 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 {
     UIFont *font = [UIFont systemFontOfSize:big];
     CGSize labelsize = CGSizeZero;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
-    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-#else
-    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    if (iPhone >= 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
 #endif
+    }
     return labelsize;
 }
 
 + (CGSize)getSizeWith:(NSString *)content font:(UIFont *)font size:(CGSize)size
 {
+    return [self getSizeWith:content font:font size:size lineBreakMode:NSLineBreakByTruncatingTail];
+}
+
++ (CGSize)getSizeWith:(NSString *)content font:(UIFont *)font size:(CGSize)size lineBreakMode:(NSLineBreakMode)lineBreakMode
+{
     CGSize labelsize = CGSizeZero;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
-    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-#else
-    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    if (iPhone >= 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:lineBreakMode];
 #endif
+    }
     return labelsize;
 }
 
@@ -1874,38 +1941,44 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 {
     UIFont *font = [UIFont systemFontOfSize:label.font.pointSize];
     CGSize labelsize = CGSizeZero;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
-    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-#else
-    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    if (iPhone >= 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
 #endif
+    }
     label.text = content;
     [label setSizeToW:labelsize.width];
 }
 
 + (CGFloat)getLabelHighBy:(NSString *)content wordSize:(CGFloat)big width:(CGFloat)width
 {
-    CGSize size = CGSizeMake(width, 2000);
+    CGSize size = CGSizeMake(width, MAXFLOAT);
     UIFont *font = [UIFont systemFontOfSize:big];
     CGSize labelsize = CGSizeZero;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
-    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-#else
-    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    if (iPhone >= 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
 #endif
+    }
     return labelsize.height;
 }
 
 + (CGFloat)getLabelWidthBy:(NSString *)content wordSize:(CGFloat)big high:(CGFloat)high
 {
-    CGSize size = CGSizeMake(2000, high);
+    CGSize size = CGSizeMake(MAXFLOAT, high);
     UIFont *font = [UIFont systemFontOfSize:big];
     CGSize labelsize = CGSizeZero;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_6_1
-    labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-#else
-    labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+    if (iPhone >= 7) {
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+    }else{
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
 #endif
+    }
     return labelsize.width;
 }
 
@@ -1915,7 +1988,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
     return GBK;
 }
 
-#pragma mark - ========处理字典中的NSNull类数据=====================
+#pragma mark - --------处理字典中的NSNull类数据----------------
 + (NSString *)stringWith:(NSDictionary *)dic key:(NSString *)key
 {
     if (![dic isKindOfClass:[NSDictionary class]]) {
@@ -1984,7 +2057,7 @@ NSString *pooledString(NSString *aString,NSString *bString,NSString *midString)
     return str;
 }
 
-#pragma mark - =========颜色转换=============================
+#pragma mark - --------颜色转换------------------------
 + (UIColor *)colorWithHexString: (NSString *) stringToConvert
 {
     NSString *cString = [[stringToConvert stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];
@@ -2019,11 +2092,11 @@ NSString *pooledString(NSString *aString,NSString *bString,NSString *midString)
     return color;
 }
 
-UIColor *colorWithHex(NSString *stringToConvert)
-{
-    UIColor *color = [CTB colorWithHexString:stringToConvert];
-    return color;
-}
+//UIColor *colorWithHex(NSString *stringToConvert)
+//{
+//    UIColor *color = [CTB colorWithHexString:stringToConvert];
+//    return color;
+//}
 
 UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
 {
@@ -2056,7 +2129,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
         result = [UIColor colorWithRed:cs[0] green:cs[0] blue:cs[0] alpha:opacity];
     }
     if (index==3) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请重新选择颜色" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:LocalizedSingle(@"Hint") message:CTBLocalizedStr(@"Toast_Color_Reselect") delegate:nil cancelButtonTitle:nil otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
         [alert show];
     }
     if (index==4) {
@@ -2083,7 +2156,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     return stringL;
 }
 
-#pragma mark - ========设置背景色===================
+#pragma mark - --------设置背景色----------------
 + (UIColor *)setBackgroundColor:(UIColor *)color opacity:(CGFloat)alpha
 {
     CGFloat opacity = 0;
@@ -2096,7 +2169,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
         result = [UIColor colorWithRed:cs[0] green:cs[0] blue:cs[0] alpha:opacity];
     }
     if (index==3) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请重新选择颜色" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:LocalizedSingle(@"Hint") message:CTBLocalizedStr(@"Toast_Color_Reselect") delegate:nil cancelButtonTitle:nil otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
         [alert show];
     }
     if (index==4) {
@@ -2107,7 +2180,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     return result;
 }
 
-#pragma mark - =============颜色转图片=========================
+#pragma mark - --------颜色转图片------------------------
 + (UIImage *)imgColor:(UIColor *)color
 {
     CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
@@ -2120,7 +2193,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     return theImage;
 }
 
-#pragma mark - =============保存图片到文件=========================
+#pragma mark - --------保存图片到文件------------------------
 + (void)saveImgToFile:(NSString *)FilePath withImg:(UIImage *)image
 {
     NSData *data=nil;
@@ -2259,7 +2332,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     }
 }
 
-#pragma mark - ==========文件,路径======================
+#pragma mark - --------文件,路径----------------
 //判断路径或者文件是否存在
 + (BOOL)isExistWithPath:(NSString *)path
 {
@@ -2270,6 +2343,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     }
 }
 
+//获取沙盒路径
 + (NSString *)getSandboxPath
 {
     NSString *Path = @"~";
@@ -2289,8 +2363,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
 {
     NSString *FilePath = nil;
     NSString *file = [path lastPathComponent];
-    NSRange range = [file rangeOfString:@"."];
-    if (range.location != NSNotFound) {
+    if (file.pathExtension.length > 0) {
         FilePath = path;
     }else{
         path = [path stringByExpandingTildeInPath];//扩展成路径
@@ -2299,7 +2372,8 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     
     NSError *error = nil;
     if (content==NULL) {
-        [CTB alertWithMessage:@"数据为空,写入失败" Delegate:nil tag:0];
+        //数据为空,写入失败
+        [CTB alertWithMessage:LocalizedSingle(@"WriteFailOfNull") Delegate:nil tag:0];
         return;
     }
     if ([content isKindOfClass:[NSString class]]) {
@@ -2320,7 +2394,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     }
     
     if (error) {
-        [CTB PrintString:error.description headName:@"错误:"];
+        [CTB PrintString:error.description headName:LocalizedSingle(@"Error:")];//错误:
     }
 }
 
@@ -2355,7 +2429,7 @@ UIColor *colorWithRGB(CGFloat r,CGFloat g,CGFloat b,CGFloat alpha)
     }
     id josonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&error];
     if (error) {
-        [CTB PrintString:error.localizedDescription headName:@"错误:"];
+        [CTB PrintString:error.localizedDescription headName:LocalizedSingle(@"Error:")];//错误:
         return NULL;
     }
     return josonDic;
@@ -2415,22 +2489,10 @@ NSArray *getDBPath()
     return getDBPath();
 }
 
-+ (void)getContentsAtPath:(NSString *)path inArray:(NSMutableArray *)array
++ (NSString *)pathForResource:(NSString *)name ofType:(NSString *)ext
 {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL isDirectory = NO;
-    if ([fileManager fileExistsAtPath:path isDirectory:&isDirectory]) {
-        if (isDirectory) {
-            NSError *error = nil;
-            NSArray *list = [fileManager contentsOfDirectoryAtPath:path error:&error];
-            for (NSString *subName in list) {
-                NSString *subPath = [path stringByAppendingPathComponent:subName];
-                [self getContentsAtPath:subPath inArray:array];
-            }
-        }else{
-            [array addObject:path];
-        }
-    }
+    NSString *path = [[NSBundle mainBundle] pathForResource:name ofType:ext];
+    return path;
 }
 
 #pragma mark 获取-info.plist中的数据
@@ -2439,6 +2501,22 @@ NSArray *getDBPath()
     //获取APP相关的各项参数信息
     NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
     return infoDict;
+}
+
+#pragma mark 获取App名字
++ (NSString *)getAppName
+{
+    //获取APP相关的各项参数信息
+    NSDictionary *infoDict = [CTB infoDictionary];
+    NSString *versions = [infoDict objectForKey:@"CFBundleDisplayName"];
+    return versions;
+}
+
++ (NSString *)getBundleName
+{
+    NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
+    NSString *bundleName = [infoDict objectForKey:@"CFBundleName"];
+    return bundleName;
 }
 
 #pragma mark 获取App版本号
@@ -2459,7 +2537,79 @@ NSArray *getDBPath()
     return versions;
 }
 
-#pragma mark - =============字符串的编码和解码===================
++ (NSString *)getIdentifier
+{
+    //获取APP相关的各项参数信息
+    NSDictionary *infoDict = [CTB infoDictionary];
+    NSString *identifier = [infoDict objectForKey:@"CFBundleIdentifier"];
+    return identifier;
+}
+
++ (NSDictionary *)getFileAttributesByPath:(NSString *)path
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        NSError *error = nil;
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:path error:&error];
+        return fileAttributes;
+    }
+    return nil;
+}
+
++ (NSDate *)getFileModifyDateWithPath:(NSString *)path
+{
+    NSDictionary *fileAttributes = [self.class getFileAttributesByPath:path];
+    NSDate *fileModifyDate = [fileAttributes valueForKey:NSFileModificationDate];
+    return fileModifyDate;
+}
+
+//为文件增加一个扩展属性
++ (BOOL)addExtendedAttributeWithPath:(NSString *)path key:(NSString *)key value:(NSString *)stringValue
+{
+    NSData *value = [stringValue dataUsingEncoding:NSUTF8StringEncoding];
+    ssize_t writelen = setxattr([path fileSystemRepresentation],
+                                [key UTF8String],
+                                [value bytes],
+                                [value length],
+                                0,
+                                0);
+    return writelen==0?YES:NO;
+}
+
++ (BOOL)addExtendedAttributeWithPath:(NSString *)path attributes:(NSDictionary *)attributes
+{
+    if (attributes.count <= 0) {
+        return NO;
+    }
+    
+    BOOL result = YES;
+    for (NSString *key in attributes) {
+        id value = attributes[key];
+        if (![self addExtendedAttributeWithPath:path key:key value:value]) {
+            result = NO;//有一个失败，则为NO
+        }
+    }
+    
+    return result;
+}
+
+//读取文件扩展属性
++ (NSString *)readExtendedAttributeWithPath:(NSString *)path key:(NSString *)key
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:path error:nil];
+        NSDictionary *fileExtendedAttributes = fileAttributes[@"NSFileExtendedAttributes"];
+        NSData *data = [fileExtendedAttributes objectForKey:key];
+        NSString *result = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        return result;
+    }
+    
+    CTBNSLog(@"%@文件不存在",path.lastPathComponent);
+    return nil;
+}
+
+#pragma mark - --------字符串的编码和解码----------------
 NSString *getUTF8String(NSString *string)
 {
     NSString *result = [string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -2484,7 +2634,7 @@ NSString *StringFromCGRect(UIView *View)
     return result;
 }
 
-#pragma mark - =============从字符串中获取指定某字符到某字符之间的字符串======================
+#pragma mark - --------从字符串中获取指定某字符到某字符之间的字符串----------------
 + (NSString *)scanString:(NSString *)aString Start:(NSString *)a End:(NSString *)b
 {
     NSString *result = nil;
@@ -2497,7 +2647,7 @@ NSString *StringFromCGRect(UIView *View)
     return NULL;
 }
 
-#pragma mark - =============判断是否包含======================
+#pragma mark - --------判断是否包含----------------
 + (BOOL)contain:(NSString *)bString inString:(NSString *)aString
 {
     NSRange range = [aString rangeOfString:bString];
@@ -2518,7 +2668,7 @@ BOOL containString(NSString *string,NSString *aString)
 
 + (CLLocation *)getLocationWith:(NSString *)locationStr
 {
-    NSAssert([locationStr isKindOfClass:[NSString class]], @"locationStr不是字符串");
+    NSAssert([locationStr isKindOfClass:[NSString class]], LocalizedSingle(@"TipLocationStrFail"));//locationStr不是字符串
     
     CLLocationDegrees lat,lng;
     NSArray *list = [locationStr componentsSeparatedByString:@","];
@@ -2532,7 +2682,7 @@ BOOL containString(NSString *string,NSString *aString)
     return location;
 }
 
-#pragma mark - ==============判断是否为手机号========================
+#pragma mark - --------判断是否为手机号------------------------
 + (BOOL)isMobile:(NSString *)mobile
 {
     //手机号以13， 15，18开头，八个 \d 数字字符
@@ -2551,7 +2701,7 @@ BOOL containString(NSString *string,NSString *aString)
     return isValid;
 }
 
-#pragma mark - ===========设置状态栏字体颜色=========================
+#pragma mark - --------设置状态栏字体颜色------------------------
 + (void)setStatusBarStyleWith:(UIApplication *)application
 {
     //[application setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
@@ -2559,12 +2709,11 @@ BOOL containString(NSString *string,NSString *aString)
 }
 
 #pragma mark - ----------tableView添加底部线条(分隔线)------------------
-+ (UIView *)setBottomLineAt:(UITableView *)tableView cell:(UITableViewCell *)cell cellH:(CGFloat)cellH
++ (UIView *)setBottomLineAtCell:(UITableViewCell *)cell
 {
-    CGFloat w = tableView.frame.size.width;
     UIView *View = [cell.contentView viewWithTag:200];
     if (!View) {
-        View = [[UIView alloc] initWithFrame:CGRectMake(10, cellH-0.6, w-20, 0.6)];
+        View = [[UIView alloc] initWithFrame:CGRectZero];
         [cell.contentView addSubview:View];
     }
     View.tag = 200;
@@ -2573,78 +2722,48 @@ BOOL containString(NSString *string,NSString *aString)
     View.layer.borderWidth = 0.3;
     View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
     
+    //添加边界约束
+    UIView *contentView = cell.contentView;
+    View.translatesAutoresizingMaskIntoConstraints = NO;
+    NSDictionary *viewsDic = NSDictionaryOfVariableBindings(View);
+    [contentView addConstraintsWithFormat:@"|-10-[View]-10-|" views:viewsDic];
+    [contentView addConstraintsWithFormat:@"V:[View(0.6)]|" views:viewsDic];
+    
     return View;
 }
 
-+ (UIView *)setBottomLineAtTable:(UITableView *)tableView cell:(UITableViewCell *)cell delegate:(id)delegate
++ (UIView *)setBottomLineAtCell:(UITableViewCell *)cell visualFormat:(NSArray *)formats
 {
-    NSIndexPath *indexPath = [tableView indexPathForCell:cell];
-    NSDictionary *dic = nil;
-    if (indexPath)
-        dic = @{@"indexPath":indexPath,@"cell":cell};
-    else
-        dic = @{@"cell":cell};
-    return [[self class] setBottomLineAtTable:tableView dicData:dic];
+    UIView *View = [cell.contentView viewWithTag:200];
+    if (!View) {
+        View = [[UIView alloc] initWithFrame:CGRectZero];
+        [cell.contentView addSubview:View];
+    }
+    View.tag = 200;
+    View.backgroundColor = [UIColor clearColor];
+    View.layer.masksToBounds = YES;
+    View.layer.borderWidth = 0.3;
+    View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
+    
+    //添加边界约束
+    UIView *contentView = cell.contentView;
+    View.translatesAutoresizingMaskIntoConstraints = NO;
+    NSDictionary *viewsDic = NSDictionaryOfVariableBindings(View);
+    for (NSString *format in formats) {
+        [contentView addConstraintsWithFormat:format views:viewsDic];
+    }
+    
+    return View;
 }
 
-+ (UIView *)setBottomLineAtTable:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath delegate:(id)delegate
++ (UIView *)setBottomLineAtCell:(UITableViewCell *)cell dicData:(NSDictionary *)dicData
 {
-    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    NSDictionary *dic = nil;
-    if (cell)
-        dic = @{@"indexPath":indexPath,@"cell":cell};
-    else
-        dic = @{@"indexPath":indexPath};
-    return [[self class] setBottomLineAtTable:tableView dicData:dic];
-}
-
-+ (UIView *)setBottomLineAtTable:(UITableView *)tableView cell:(UITableViewCell *)cell
-{
-    NSIndexPath *indexPath = [tableView indexPathForCell:cell];
-    NSDictionary *dic = nil;
-    if (indexPath)
-        dic = @{@"indexPath":indexPath,@"cell":cell};
-    else
-        dic = @{@"cell":cell};
-    return [[self class] setBottomLineAtTable:tableView dicData:dic];
-}
-
-+ (UIView *)setBottomLineAtTable:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    NSDictionary *dic = nil;
-    if (cell)
-        dic = @{@"indexPath":indexPath,@"cell":cell};
-    else
-        dic = @{@"indexPath":indexPath};
-    return [[self class] setBottomLineAtTable:tableView dicData:dic];
-}
-
-+ (UIView *)setBottomLineAtTable:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
-{
-    return [[self class] setBottomLineAtTable:tableView dicData:@{@"indexPath":indexPath,@"cell":cell}];
-}
-
-+ (UIView *)setBottomLineAtTable:(UITableView *)tableView dicData:(NSDictionary *)dicData
-{
-    NSIndexPath *indexPath = dicData[@"indexPath"];
-    UITableViewCell *cell = dicData[@"cell"];
     UIColor *borderColor = dicData[@"borderColor"];
     borderColor = borderColor ?: [UIColor colorWithWhite:0.5 alpha:0.2];
-    //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
-    CGFloat w = tableView.frame.size.width;
-    CGFloat h = cell.contentView.frame.size.height;
-    id delegate = dicData[@"delegate"];
-    if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
-        h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
-    }else{
-        if (indexPath) {
-            h = [tableView rectForRowAtIndexPath:indexPath].size.height;
-        }
-    }
+    
     UIView *View = [cell.contentView viewWithTag:200];;
     if (!View) {
-        View = [[UIView alloc] initWithFrame:CGRectMake(10, h-0.6, w-20, 0.6)];
+        View = [[UIView alloc] initWithFrame:CGRectZero];
         [cell.contentView addSubview:View];
     }
     View.tag = 200;
@@ -2653,40 +2772,16 @@ BOOL containString(NSString *string,NSString *aString)
     View.layer.borderWidth = 0.3;
     View.layer.borderColor = borderColor.CGColor;
     
-    return View;
-}
-
-
-+ (UIView *)setBottomLineAtTables:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
-{
-    return [[self class] setBottomLineAtTables:tableView dicData:@{@"indexPath":indexPath,@"cell":cell}];
-}
-
-+ (UIView *)setBottomLineAtTables:(UITableView *)tableView dicData:(NSDictionary *)dicData
-{
-    NSIndexPath *indexPath = dicData[@"indexPath"];
-    UITableViewCell *cell = dicData[@"cell"];
-    //CGFloat w = [tableView rectForRowAtIndexPath:indexPath].size.width;
-    CGFloat w = tableView.frame.size.width;
-    CGFloat h = cell.contentView.frame.size.height;
-    id delegate = dicData[@"delegate"];
-    if ([delegate respondsToSelector:select(tableView:heightForRowAtIndexPath:)]) {
-        h = [delegate tableView:tableView heightForRowAtIndexPath:indexPath];
-    }else{
-        if (indexPath) {
-            h = [tableView rectForRowAtIndexPath:indexPath].size.height;
-        }
-    }
-    UIView *View = [cell.contentView viewWithTag:200];;
-    if (!View) {
-        View = [[UIView alloc] initWithFrame:CGRectMake(0, h-0.6, w, 0.6)];
-        [cell.contentView addSubview:View];
-    }
-    View.tag = 200;
-    View.backgroundColor = [UIColor clearColor];
-    View.layer.masksToBounds = YES;
-    View.layer.borderWidth = 0.3;
-    View.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.2].CGColor;
+    //添加边界约束
+    UIView *contentView = cell.contentView;
+    View.translatesAutoresizingMaskIntoConstraints = NO;
+    NSDictionary *viewsDic = NSDictionaryOfVariableBindings(View);
+    [contentView addConstraintsWithFormat:@"|-10-[View]-10-|" views:viewsDic];
+    [contentView addConstraintsWithFormat:@"V:[View(0.6)]|" views:viewsDic];
+    //[contentView addConstraintsWithItem:View attribute:NSLayoutAttributeLeft constant:10];
+    //[contentView addConstraintsWithItem:View attribute:NSLayoutAttributeRight constant:10];
+    //[contentView addConstraintsWithItem:View attribute:NSLayoutAttributeBottom constant:0];
+    //[contentView addConstraintsViewWithItem:View attribute:NSLayoutAttributeHeight constant:0.6];
     
     return View;
 }
@@ -2719,7 +2814,7 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
     [nav setNavigationBarHidden:hidden animated:animaion];
 }
 
-#pragma mark - ============隐藏tabBar========================
+#pragma mark - --------隐藏tabBar------------------------
 + (void)hiddenTabbar:(BOOL)hidden delegate:(id)delegate
 {
     [UIView beginAnimations:nil context:NULL];
@@ -2754,11 +2849,50 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
     [UIView commitAnimations];
 }
 
+#pragma mark 获取系统语言和地区
++ (NSDictionary *)getLocaleLangArea
+{
+    NSLocale *usLocale = [NSLocale currentLocale];
+    NSArray *languages = [usLocale.localeIdentifier componentsSeparatedByString:@"_"];
+    if (languages.count > 1) {
+        NSString *lang = iPhone>=10 ? usLocale.languageCode : languages.firstObject;
+        NSDictionary *dicValue = @{@"lang":lang,
+                                   @"area":languages[1]};
+        return dicValue;
+    }
+    
+    [NSLocale preferredLanguages];
+    
+    return nil;
+}
+
+#pragma mark 获取日期格式
++ (NSString *)getDateFormat
+{
+    NSLocale *usLocale = [NSLocale currentLocale];
+    
+    NSString *dateFormat;
+    NSString *dateComponents = @"yyyyMMdd";
+    
+    NSString *localeIdentifier = usLocale.localeIdentifier;
+    if ([localeIdentifier hasPrefix:@"zh"]) {
+        usLocale = [NSLocale localeWithLocaleIdentifier:@"zh_CN"];
+    }else{
+        usLocale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
+    }
+    
+    dateFormat = [NSDateFormatter dateFormatFromTemplate:dateComponents options:0 locale:usLocale];
+    CTBNSLog(@"Date format for %@: %@",
+          [usLocale displayNameForKey:NSLocaleIdentifier value:localeIdentifier], dateFormat);
+    
+    return dateFormat;
+}
+
 #pragma mark 获取系统时间
 + (NSString *)getDateWithFormat:(NSString *)format
 {
     NSDateFormatter *data_time = [[NSDateFormatter alloc]init];
-    [data_time setDateFormat:format];//@"yyyy-MM-dd HH:mm:ss"
+    [data_time setDateFormat:format];//"yyyy-MM-dd HH:mm:ss"
     return [data_time stringFromDate:[NSDate date]];
 }
 
@@ -2768,13 +2902,8 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
         date = [NSDate date];
     }
     NSDateFormatter *data_time = [[NSDateFormatter alloc]init];
-    [data_time setDateFormat:format];//@"yyyy-MM-dd HH:mm:ss"
+    [data_time setDateFormat:format];//"yyyy-MM-dd HH:mm:ss"
     return [data_time stringFromDate:date];
-}
-
-+ (void)reSetPoint:(UIView *)View withHigh:(CGFloat)high
-{
-    View.frame = CGRectMake(View.frame.origin.x, View.frame.origin.y+high, View.frame.size.width, View.frame.size.height);
 }
 
 + (BOOL)isExistSelf:(UIViewController *)VC
@@ -2854,7 +2983,7 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         NSString *IP = @"0.0.0.0";
-        //@"http://ifconfig.me/ip",@"http://yrip.co",@"https://cgi1.apnic.net/cgi-bin/my-ip.php"
+        //"http://ifconfig.me/ip",@"http://yrip.co",@"https://cgi1.apnic.net/cgi-bin/my-ip.php"
         NSURL *url = [NSURL URLWithString:@"http://yrip.co"];
         NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0];
         
@@ -2864,7 +2993,11 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
         if (error) {
             NSLog(@"Failed to get WAN IP Address!(%@)", error.localizedDescription);
         } else {
-            NSString *responseStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            NSString *textEncodingName = response.textEncodingName ?: @"utf-8";
+            CFStringRef textEncode = (__bridge CFStringRef)textEncodingName;
+            CFStringEncoding enc = CFStringConvertIANACharSetNameToEncoding(textEncode);
+            NSStringEncoding encoding = CFStringConvertEncodingToNSStringEncoding (enc);
+            NSString *responseStr = [[NSString alloc] initWithData:data encoding:encoding];
             responseStr = [responseStr stringByReplacingOccurrencesOfString:@"\r" withString:@""];
             responseStr = [responseStr stringByReplacingOccurrencesOfString:@"\n" withString:@""];
             
@@ -2881,7 +3014,7 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
     });
 }
 
-#pragma mark - =========UIViewController======================
+#pragma mark - --------UIViewController----------------
 + (void)UIControllerEdgeNone:(UIViewController *)VC
 {
     if (iPhone >= 7) {
@@ -2890,13 +3023,6 @@ void hiddenNavBarBy(UINavigationController *nav,BOOL hidden,BOOL animaion)
 }
 
 #pragma mark 打印调试信息
-+ (void)printDebugMsg:(NSString *)msg
-{
-#if DEBUG
-    NSLog(@"%@",msg);
-#endif
-}
-
 void CTBNSLog(NSString *format, ...)
 {
     va_list arglist;
@@ -2905,32 +3031,80 @@ void CTBNSLog(NSString *format, ...)
     va_end(arglist);
     
     outStr = [NSString stringWithString:outStr];
+#if DEBUG
     NSLog(@"%@",outStr);
+#endif
 }
 
-#pragma mark - ======其它=======================
+void CNSLog(NSString *format, ...)
+{
+    va_list arglist;
+    va_start(arglist, format);
+    NSString *outStr = [[NSString alloc] initWithFormat:format arguments:arglist];
+    va_end(arglist);
+    
+    outStr = [NSString stringWithString:outStr];
+#if DEBUG
+    NSLog(@"%@",outStr);
+#endif
+}
+
+void CharLog(NSString *format, ...)
+{
+    va_list arglist;
+    va_start(arglist, format);
+    NSString *outStr = [[NSString alloc] initWithFormat:format arguments:arglist];
+    va_end(arglist);
+    
+    outStr = [NSString stringWithString:outStr];
+#if DEBUG
+    printf("%s",outStr.UTF8String);
+#endif
+}
+
+#pragma mark - --------其它------------------------
 + (void)duration:(NSTimeInterval)dur block:(dispatch_block_t)block
 {
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    if (block)
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(dur * NSEC_PER_SEC)), queue, block);
+    if (block) {
+        dispatch_queue_t queue = dispatch_get_main_queue();
+        int64_t delta = (int64_t)(dur * NSEC_PER_SEC);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delta), queue, block);
+    }
 }
 
-//异步
+/**
+ 异步
+
+ @param block 异步执行
+ */
 + (void)asyncWithBlock:(dispatch_block_t)block
 {
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    //queue = dispatch_queue_create("com.icf.serialqueue", nil);//用于异步顺序执行
-    if (block) dispatch_async(queue, block);
+    if (block) {
+        long identifier = DISPATCH_QUEUE_PRIORITY_DEFAULT;
+        dispatch_queue_t queue = dispatch_get_global_queue(identifier, 0);
+        //queue = dispatch_queue_create("com.icf.serialqueue", nil);//用于异步顺序执行
+        dispatch_async(queue, block);
+    }
 }
 
-//同步
+/**
+ 同步
+ 
+ @param block 同步执行
+ */
 + (void)syncWithBlock:(dispatch_block_t)block
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
     if (block) dispatch_sync(queue, block);
 }
 
+
+/**
+ 异步执行完成后，同步执行
+
+ @param block 异步执行
+ @param nextBlock 同步执行
+ */
 + (void)async:(dispatch_block_t)block complete:(dispatch_block_t)nextBlock
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^{
@@ -2953,6 +3127,10 @@ NSUserDefaults *getUserDefaults()
 void setUserData(id obj,NSString *key)
 {
     if (!key) return;
+    if (![key isKindOfClass:[NSString class]]) {
+        NSLog(@"key错误,%@",key);
+        return;
+    }
     if (obj) {
         [[NSUserDefaults standardUserDefaults] setObject:obj forKey:key];
     }else{
@@ -2963,14 +3141,82 @@ void setUserData(id obj,NSString *key)
 
 void removeObjectForKey(NSString *key)
 {
+    if (![key isKindOfClass:[NSString class]]) {
+        NSLog(@"key错误,%@",key);
+        return;
+    }
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
 }
 
 id getUserData(NSString *key)
 {
     if (!key) return nil;
+    if (![key isKindOfClass:[NSString class]]) {
+        NSLog(@"key错误,%@",key);
+        return nil;
+    }
     id obj = [[NSUserDefaults standardUserDefaults] objectForKey:key];
     return obj;
+}
+
+NSString *CTBLocalizedString(NSString *key, NSString *value, NSString *table)
+{
+    NSString *result = [[NSBundle mainBundle] localizedStringForKey:key value:value table:table];
+    return result;
+}
+
+NSString *CTBLocalizedStr(NSString *key)
+{
+    NSString *result = NSLocalizedString(key, nil);
+    //NSDictionary *localizedInfoDictionary = [[NSBundle mainBundle] localizedInfoDictionary];
+    //result = [localizedInfoDictionary objectForKey:key];
+    return result;
+}
+
+NSString *LocalizedSingle(NSString *key)
+{
+    NSString *result = NSLocalizedString(key, nil);
+    result = result ?: key;//如果不存在则返回key
+    return result;
+}
+
+NSString *LocalizedFormatSingle(NSString *key, NSString *value)
+{
+    //格式化%@
+    NSString *result = NSLocalizedString(key, nil);
+    result = result ?: key;//如果不存在则返回key
+    result = [result replaceString:@"%@" withString:value];
+    return result;
+}
+
+NSString *LocalizedSingles(NSArray *listKey)
+{
+    NSString *result = @"";
+    for (NSString *key in listKey) {
+        NSString *value = LocalizedSingle(key);
+        value = value ?: @"";
+        result = [result stringByAppendingString:value];
+    }
+    
+    return result;
+}
+
++ (NSString *)getUsersPath
+{
+    NSString *path = NSHomeDirectory();
+    NSArray *listPath = [path componentSeparatedByString:@"/Library"];
+    if (listPath.count > 0) {
+        path = listPath.firstObject;
+        //path = [path stringByAppendingPathComponent:@"Desktop/tmp/智能家居/QQ登录信息.plist"];
+    }
+    
+    return path;
+}
+
++ (NSString *)expandingTildeWithPath:(NSString *)path
+{
+    NSString *rootPath = NSHomeDirectory();
+    return [rootPath stringByAppendingPathComponent:path];
 }
 
 + (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName
@@ -2986,6 +3232,11 @@ id getUserData(NSString *key)
 + (void)postNoticeName:(NSString *)aName object:(id)anObject
 {
     [NotificationCenter postNotificationName:aName object:anObject];
+}
+
++ (void)postNoticeName:(NSString *)aName userInfo:(NSDictionary *)aUserInfo
+{
+    [NotificationCenter postNotificationName:aName object:nil userInfo:aUserInfo];
 }
 
 + (void)postNoticeName:(NSString *)aName object:(id)anObject userInfo:(NSDictionary *)aUserInfo
@@ -3038,18 +3289,18 @@ id getUserData(NSString *key)
     }else{
         IP = nil;
         int result = h_errno;
-        NSString *errMsg = @"域名解析失败";
+        NSString *errMsg = LocalizedSingle(@"ResolveDomainFail");//域名解析失败
         if (result == HOST_NOT_FOUND) {
-            errMsg = @"找不到指定的主机";
+            errMsg = LocalizedSingle(@"HostNotFound");//找不到指定的主机
         }
         else if (result == NO_ADDRESS) {
-            errMsg = @"该主机有名称却无IP地址";
+            errMsg = LocalizedSingle(@"TipHostNoIp");//该主机有名称却无IP地址
         }
         else if (result == NO_RECOVERY) {
-            errMsg = @"域名服务器有错误发生";
+            errMsg = LocalizedSingle(@"SomeErrorHappenInDomain");//域名服务器有错误发生
         }
         else if (result == TRY_AGAIN) {
-            errMsg = @"请再调用一次";
+            errMsg = LocalizedSingle(@"CallAgain");//请再调用一次
         }
         
         NSLog(@"%@",errMsg);
@@ -3082,7 +3333,7 @@ id getUserData(NSString *key)
         //推送声音
         noti.soundName = UILocalNotificationDefaultSoundName;
         //内容
-        NSString *content = [NSString stringWithFormat:@"时间:%@",[CTB getSystemTime:nil format:@"yyyy-MM-dd HH:mm"]];
+        NSString *content = [NSString stringWithFormat:@"%@:%@",LocalizedSingle(@"Time"),[CTB getSystemTime:nil format:@"yyyy-MM-dd HH:mm"]];//时间
         noti.alertBody = content;
         noti.hasAction = YES;
         noti.alertAction = @"测试你的通知能力";
@@ -3100,11 +3351,12 @@ id getUserData(NSString *key)
         //添加推送到uiapplication
         UIApplication *app = [UIApplication sharedApplication];
         BOOL isRegisteredNotification = NO;
-        if (iPhone < 8) {
-            isRegisteredNotification = app.registeredForRemoteNotifications;
-        }else{
-            isRegisteredNotification = [app isRegisteredForRemoteNotifications];
-        }
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_8_0
+        UIRemoteNotificationType type = [app enabledRemoteNotificationTypes];
+        isRegisteredNotification = type != UIRemoteNotificationTypeNone;
+#else
+        isRegisteredNotification = [app isRegisteredForRemoteNotifications];
+#endif
         if (isRegisteredNotification) {
             //只有注册了通知才能使用通知
             [app scheduleLocalNotification:noti];
@@ -3122,7 +3374,26 @@ id getUserData(NSString *key)
     [[NSNotificationCenter defaultCenter] addObserver:observer selector:aSelector name:UIKeyboardWillHideNotification object:nil];
 }
 
-#pragma mark ==========APP核对==========================
+//获取组沙盒路径
++ (NSString *)pathWithAppGroupIdentifier:(NSString *)groupIdentifier
+{
+    NSURL *appGroupContainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:groupIdentifier];
+    NSString *directoryPath = [appGroupContainer path];
+    return directoryPath;
+}
+
++ (void)addQQGroup:(NSString *)groupID
+{
+    //加入QQ群
+    NSString *key = @"626a9c0f72a1d877a6dc7f286db0098375436993cd22c323f5934566acc3ca8c";
+    NSString *urlStr = [NSString stringWithFormat:@"mqqapi://card/show_pslcard?src_type=internal&version=1&uin=%@&key=%@&card_type=group&source=external", groupID,key];
+    NSURL *url = [NSURL URLWithString:urlStr];
+    if([[UIApplication sharedApplication] canOpenURL:url]){
+        [[UIApplication sharedApplication] openURL:url];
+    }
+}
+
+#pragma mark --------APP核对------------------------
 + (NSArray *)checkHasOwnApp
 {
     NSArray *mapSchemeArr = @[@"comgooglemaps://",@"iosamap://navi",@"baidumap://map/",@"sosomap://map/"];
@@ -3193,12 +3464,35 @@ id getUserData(NSString *key)
     
 }
 
+BOOL isZH()
+{
+    NSString *lang = [CTB getLocaleLangArea][@"lang"];
+    if ([lang hasPrefix:@"zh"]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
++ (void)Try:(dispatch_block_t)try
+{
+    @try {
+        try();
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@,%@",exception.name,exception.reason);
+    }
+    @finally {
+    }
+}
+
 + (void)Try:(dispatch_block_t)try Catch:(dispatch_block_t)catch Finally:(dispatch_block_t)finally
 {
     @try {
         try();
     }
     @catch (NSException *exception) {
+        NSLog(@"%@,%@",exception.name,exception.reason);
         catch();
     }
     @finally {
@@ -3216,8 +3510,10 @@ id getUserData(NSString *key)
     }
     NSString *result = @"";
     NSString *mStr = string;
+    u_int32_t bounds = (u_int32_t)mStr.length;//取值范围
     for (int i = 0; i <length; i ++) {
-        int ran = arc4random() % mStr.length;
+        int ran = arc4random() % bounds;
+        //ran = arc4random_uniform(bounds);
         NSString *charStr = [mStr substringWithRange:NSMakeRange(ran, 1)];
         result = [result stringByAppendingString:charStr];
     }
@@ -3234,24 +3530,79 @@ id getUserData(NSString *key)
 + (NSDictionary *)currentWiFiSSID
 {
     NSDictionary *result = nil;
-    NSArray *ifs = (__bridge_transfer id)CNCopySupportedInterfaces();
+    NSArray *ifs = (__bridge_transfer id)CNCopySupportedInterfaces();//获取支持的端口
     //NSLog(@"Supported interfaces: %@", ifs);
     for (NSString *ifnam in ifs) {
         NSDictionary *info = (__bridge_transfer id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
         //NSLog(@"dici：%@",[info  allKeys]);
         if (info && [info count]) {
-            result = info;//BSSID,SSID
+            result = info;//BSSID是WiFi的mac地址,SSID是WiFi名字
             break;
         }
     }
     return result;
 }
 
+#pragma mark 是否打开了WiFi开关
++ (BOOL) isWiFiEnabled
+{
+    NSCountedSet * cset = [NSCountedSet new];
+    
+    struct ifaddrs *interfaces;
+    
+    if( ! getifaddrs(&interfaces) ) {
+        for( struct ifaddrs *interface = interfaces; interface; interface = interface->ifa_next) {
+            if ( (interface->ifa_flags & IFF_UP) == IFF_UP ) {
+                [cset addObject:[NSString stringWithUTF8String:interface->ifa_name]];
+            }
+        }
+    }
+    
+    return [cset countForObject:@"awdl0"] > 1 ? YES : NO;
+}
+
 @end
 
-#pragma mark - ===========类扩展======================
+#pragma mark - --------类扩展----------------
 #pragma mark - --------NSString------------------------
 @implementation NSString (NSObject)
+
+//十六进制字符串转二进制
++ (NSString *)getBinaryByhex:(NSString *)hex
+{
+    NSMutableDictionary  *hexDic = [[NSMutableDictionary alloc] init];
+    
+    hexDic = [[NSMutableDictionary alloc] initWithCapacity:16];
+    [hexDic setObject:@"0000" forKey:@"0"];
+    [hexDic setObject:@"0001" forKey:@"1"];
+    [hexDic setObject:@"0010" forKey:@"2"];
+    [hexDic setObject:@"0011" forKey:@"3"];
+    [hexDic setObject:@"0100" forKey:@"4"];
+    [hexDic setObject:@"0101" forKey:@"5"];
+    [hexDic setObject:@"0110" forKey:@"6"];
+    [hexDic setObject:@"0111" forKey:@"7"];
+    [hexDic setObject:@"1000" forKey:@"8"];
+    [hexDic setObject:@"1001" forKey:@"9"];
+    [hexDic setObject:@"1010" forKey:@"A"];
+    [hexDic setObject:@"1011" forKey:@"B"];
+    [hexDic setObject:@"1100" forKey:@"C"];
+    [hexDic setObject:@"1101" forKey:@"D"];
+    [hexDic setObject:@"1110" forKey:@"E"];
+    [hexDic setObject:@"1111" forKey:@"F"];
+    NSString *binaryString=[[NSString alloc] init];
+    
+    for (int i=0; i<[hex length]; i++) {
+        
+        NSRange rage;
+        rage.length = 1;
+        rage.location = i;
+        NSString *key = [hex substringWithRange:rage];
+        
+        binaryString = [NSString stringWithFormat:@"%@%@",binaryString,[NSString stringWithFormat:@"%@",[hexDic objectForKey:key]]];
+    }
+    
+    return binaryString;
+}
 
 + (NSString *)stringWith:(NSString *)string
 {
@@ -3349,6 +3700,29 @@ id getUserData(NSString *key)
     return outStr;
 }
 
+//浮点型数据保留有效位
++ (NSString *)formatWithFloat:(CGFloat)num length:(int)l
+{
+    if (l <= 0) {
+        return nil;
+    }
+    
+    int n = 1;
+    NSString *content = [NSString format:@"%%-%d.%df",l-n,n];
+    while (1) {
+        if (num > pow(10, l-n)) {
+            n--;
+            break;
+        }
+        n++;
+    }
+    
+    content = [NSString format:@"%%-%d.%df",l-n,n];
+    NSString *result = [NSString format:content,num];
+    
+    return result;
+}
+
 + (NSString *)readFile:(NSString *)path encoding:(NSStringEncoding)enc
 {
     NSError *error = nil;
@@ -3360,6 +3734,11 @@ id getUserData(NSString *key)
     return content;
 }
 
+- (BOOL)writeToFile:(NSString *)path
+{
+    return [self writeToFile:path encoding:NSUTF8StringEncoding];
+}
+
 - (BOOL)writeToFile:(NSString *)path encoding:(NSStringEncoding)enc
 {
     NSError *error = nil;
@@ -3369,6 +3748,43 @@ id getUserData(NSString *key)
     }
     
     return result;
+}
+
+//写入文件结尾
+- (void)writeToEndOfFileAtPath:(NSString *)path headContent:(WriteBlock)block
+{
+    BOOL isExit = [[NSFileManager defaultManager] fileExistsAtPath:path];
+    
+    if (!isExit) {
+        
+        NSLog(@"文件不存在");
+        NSString *s = block();
+        [s writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        
+    }
+    
+    NSFileHandle  *outFile;
+    NSData *buffer;
+    
+    outFile = [NSFileHandle fileHandleForWritingAtPath:path];
+    
+    if(outFile == nil)
+    {
+        NSLog(@"Open of file for writing failed");
+    }
+    
+    //找到并定位到outFile的末尾位置(在此后追加文件)
+    [outFile seekToEndOfFile];
+    
+    //读取inFile并且将其内容写到outFile中
+    NSString *timeStr = [CTB getDateWithFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSString *bs = [NSString stringWithFormat:@"\n\n%@\n%@",timeStr,self];
+    buffer = [bs dataUsingEncoding:NSUTF8StringEncoding];
+    
+    [outFile writeData:buffer];
+    
+    //关闭读写文件
+    [outFile closeFile];
 }
 
 - (NSString *)AppendString:(NSString *)aString
@@ -3384,9 +3800,48 @@ id getUserData(NSString *key)
     NSString *outStr = [[NSString alloc] initWithFormat:format arguments:arglist];
     va_end(arglist);
     
-    outStr = [self stringByAppendingString:outStr];
+    if (outStr) {
+        outStr = [self stringByAppendingString:outStr];
+    }
     
     return outStr;
+}
+
+//去掉文件路径中多余的//字符
+- (NSString *)stringByAddPathExtension:(NSString *)str
+{
+    if (!str || ![str isKindOfClass:[NSString class]]) return self;
+    
+    NSString *urlStr = [self replaceString:@"//" withString:@"🚗"];
+    str = [str replaceString:@"//" withString:@"🚗"];
+    
+    urlStr = [urlStr stringByAppendingPathComponent:str];
+    urlStr = [urlStr replaceString:@"🚗" withString:@"//"];
+    
+    return urlStr;
+}
+
+- (NSMutableAttributedString *)attributedStringWithFont:(UIFont *)txtFont range:(NSRange)range
+{
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:self];
+    [str addAttribute:NSFontAttributeName value:txtFont range:range];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor grayColor] range:range];
+    return str;
+}
+
+- (NSMutableAttributedString *)attributedStringWithSize:(CGFloat )txtSize range:(NSRange)range
+{
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:self];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:txtSize] range:range];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor grayColor] range:range];
+    return str;
+}
+
+- (NSMutableAttributedString *)attributedStringWithAttributes:(NSDictionary *)attributes range:(NSRange)range
+{
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:self];
+    [str addAttributes:attributes range:range];
+    return str;
 }
 
 #pragma mark 日期字符串转成日期
@@ -3420,6 +3875,70 @@ id getUserData(NSString *key)
     return data;
 }
 
+#pragma mark 截取字符串方法封装
+- (NSString *)subStringFrom:(NSString *)startString to:(NSString *)endString
+{
+    if (!startString) {
+        return nil;
+    }
+    NSRange startRange = [self rangeOfString:startString];
+    
+    if (startRange.location == NSNotFound) {
+        return nil;
+    }
+    
+    NSInteger startIndex = startRange.location+startRange.length;
+    NSString *value = [self substringFromIndex:startIndex];
+    
+    if (!endString) {
+        return value;
+    }
+    
+    NSRange endRange = [value rangeOfString:endString];
+    
+    if (endRange.location == NSNotFound) {
+        return nil;
+    }
+    
+    value = [value substringToIndex:endRange.location];
+    return value;
+}
+
+#pragma mark - 16进制字符串转2进制字符串
+- (NSString *)stringByHexString
+{
+    //先将16进制转10进制字符串
+    NSString *interString = [NSString stringWithFormat:@"%ld",strtoul([self UTF8String], 0, 16)];
+    //10进制转2进制
+    NSMutableArray *mul = [NSMutableArray array];
+    NSInteger realInter = [interString integerValue];
+    NSMutableString *bitString = [NSMutableString string];
+    while (1) {
+        NSInteger remainder = realInter % 2;//余数
+        NSInteger discuss = realInter / 2;//商
+        realInter = discuss;
+        [mul addObject:@(remainder)];
+        if (!discuss){
+            break;
+        }
+    }
+    
+    if (mul.count){
+        for (int i = (int)mul.count - 1; i>=0; --i) {
+            NSString *seperateString = i==0?@"":@"|";
+            NSString *string = [NSString stringWithFormat:@"%@%@",mul[i],seperateString];
+            [bitString appendString:string];
+        }
+        return bitString;
+    }
+    return @"";
+}
+
+- (NSString *)realStringByHexString
+{
+    return [[self stringByHexString] stringByReplacingOccurrencesOfString:@"|" withString:@""];
+}
+
 - (NSString *)uppercaseByHexString
 {
     NSString *str = [self stringByReplacingOccurrencesOfString:@" " withString:@""];
@@ -3427,14 +3946,45 @@ id getUserData(NSString *key)
     return str;
 }
 
+- (NSString *)stringUsingASCIIEncoding
+{
+    const char *cString = [self cStringUsingEncoding:NSUTF8StringEncoding];
+    NSString *desc = [NSString stringWithCString:cString encoding:NSNonLossyASCIIStringEncoding];
+    return desc;
+}
+
+- (NSString *)stringForFormat
+{
+    NSString *tempStr1 = [self stringByReplacingOccurrencesOfString:@"\\u" withString:@"\\U"];
+    NSString *tempStr2 = [tempStr1 stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+    NSString *tempStr3 = [[@"\"" stringByAppendingString:tempStr2] stringByAppendingString:@"\""];
+    NSData *tempData = [tempStr3 dataUsingEncoding:NSUTF8StringEncoding];
+    
+    NSError *error = nil;
+    NSString *str = [NSPropertyListSerialization propertyListWithData:tempData options:NSPropertyListImmutable format:NULL error:&error];
+    if (error) {
+        NSLog(@"format : %@",error.localizedDescription);
+    }
+    
+    return str;
+}
+
 //字符串转化成字典
 - (NSDictionary *)convertToDic
 {
+    if (self.length <= 0) {
+        return nil;
+    }
+    else if (![self containsString:@"{"] || ![self containsString:@"}"]) {
+        NSLog(@"非JSON字符串，%@",self);
+        return nil;
+    }
+    
     NSError *error = nil;
     NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&error];
+    NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
     if (error) {
-        NSLog(@"字符串转换成字典失败,error : %@",error.localizedDescription);
+        NSLog(@"字符串转换成字典失败,content:%@,error : %@",self,error.localizedDescription);
     }
     
     return jsonDic;
@@ -3494,9 +4044,25 @@ id getUserData(NSString *key)
     return self;
 }
 
+- (NSString *)objectAtIndex:(NSInteger)index
+{
+    if (self.length > index) {
+        NSString *result = [self substringWithRange:NSMakeRange(index, 1)];
+        return result;
+    }
+    return nil;
+}
+
 - (NSData *)dataUsingUTF8
 {
     return [self dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+- (id)NSClass
+{
+    Class class = NSClassFromString(self);
+    id result = [[class alloc] init];
+    return result;
 }
 
 #pragma mark 使用MD5加密
@@ -3504,7 +4070,8 @@ id getUserData(NSString *key)
 {
     const char *cStr = [self UTF8String];
     unsigned char result[16];
-    CC_MD5(cStr, (int)strlen(cStr), result); // This is the md5 call
+    // This is the md5 call
+    CC_MD5(cStr, (int)strlen(cStr), result); // CommonCrypto/CommonDigest.h
     NSString *value = [NSString stringWithFormat:
             @"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
             result[0], result[1], result[2], result[3],
@@ -3581,6 +4148,15 @@ id getUserData(NSString *key)
     return result;
 }
 
+- (NSString *)replaceStrings:(NSArray *)targets withString:(NSString *)replacement
+{
+    NSString *result = self;
+    for (NSString *target in targets) {
+        result = [result stringByReplacingOccurrencesOfString:target withString:replacement];
+    }
+    return result;
+}
+
 //移除前缀
 - (NSString *)removePrefix:(NSString *)aString
 {
@@ -3601,33 +4177,68 @@ id getUserData(NSString *key)
     return self;
 }
 
-- (BOOL)isNull
-{
-    if ([self isKindOfClass:[NSNull class]]) {
-        return YES;
-    }
-    else if ([[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length]==0) {
-        return YES;
-    }
-    
-    return NO;
-}
-
+//不为空而且至少有一个不是空格的字符则返回YES
 - (BOOL)isNonEmpty
 {
     if ([self isKindOfClass:[NSNull class]]) {
-        return NO;
+        return NO;//为NSNull对象
     }
     else if ([[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length]==0) {
-        return NO;
+        return NO;//字符长度为0或者纯空格字符
     }
     
-    return YES;
+    return YES;//
+}
+
+- (int)countTheStr
+{
+    NSString *strtemp = self;
+    int strlength = 0 ;
+    NSStringEncoding encode = NSUnicodeStringEncoding;
+    char *p = (char *)[strtemp cStringUsingEncoding:encode];
+    NSInteger len = [strtemp lengthOfBytesUsingEncoding:encode];
+    for (int i=0; i<len; i++) {
+        
+        if (*p) {
+            
+            p ++ ;
+            strlength ++ ;
+            
+        }
+        else {
+            p ++ ;
+        }
+    }
+    
+    return strlength;
+}
+
+- (NSString *)getCStringWithLen:(int)len
+{
+    if (len <= 0) return nil;
+    NSMutableString *string = [NSMutableString string];
+    for (int i=0; i<self.length; i++) {
+        NSString *s = [self substringWithRange:NSMakeRange(i, 1)];
+        int currentLen = string.countTheStr + s.countTheStr;
+        if (currentLen <= len) {
+            [string appendString:s];
+        }else{
+            break;
+        }
+    }
+    
+    return string;
 }
 
 - (long)parseInt:(int)type
 {
-    long value = strtoul([self UTF8String],nil,type);
+    long value = strtol([self UTF8String],nil,type);
+    return value;
+}
+
+long parseStrtol(NSString *str)
+{
+    long value = strtol([str UTF8String],nil,16);
     return value;
 }
 
@@ -3645,7 +4256,7 @@ id getUserData(NSString *key)
     NSMutableArray *array = [NSMutableArray array];
     
     NSError *error = nil;
-    NSString *regulaStr = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)";
+    NSString *regulaStr = @"((http[s]{0,1}|ftp|itms-apps)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^&*+?:_/=<>]*)?)";
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regulaStr
                                                                            options:NSRegularExpressionCaseInsensitive
                                                                              error:&error];
@@ -3681,6 +4292,37 @@ id getUserData(NSString *key)
     }
     
     return value;
+}
+
+- (NSArray *)regularExpressionWithPattern:(NSString *)regulaStr
+{
+    NSMutableArray *array = [NSMutableArray array];
+    NSError *error = nil;
+    //格式
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regulaStr
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:&error];
+    
+    if (error == nil)
+    {
+        //解析
+        NSMatchingOptions options = NSMatchingReportProgress;
+        NSArray *listResult = [regex matchesInString:self options:options range:NSMakeRange(0, [self length])];
+        for (NSTextCheckingResult *result in listResult) {
+            NSMutableDictionary *dicValue = [NSMutableDictionary dictionary];
+            NSUInteger numberOfRanges = result.numberOfRanges;
+            for (int i=0; i<numberOfRanges; i++) {
+                NSRange range = [result rangeAtIndex:i];
+                NSString *value = [self substringWithRange:range];
+                NSString *key = [NSString format:@"%d",i];
+                [dicValue setObject:value forKey:key];
+            }
+            
+            [array addObject:dicValue];
+        }
+    }
+    
+    return [NSArray arrayWithArray:array];
 }
 
 @end
@@ -3734,16 +4376,53 @@ id getUserData(NSString *key)
     if (!self) {
         return nil;
     }
-    NSInteger count = self.length - start - end;
-    NSData *data = [self subdataWithRange:NSMakeRange(start, count)];
+    NSInteger len = self.length - start - end;
+    if (len < 0) {
+        return nil;
+    }else{
+        return [self subdataWithRange:NSMakeRange(start, len)];
+    }
+}
+
+- (Byte *)bytesWithRange:(NSRange)range
+{
+    NSData *data = [self subdataWithRanges:range];
+    return (Byte *)[data bytes];
+}
+
+- (Byte )bytesWithLocation:(NSInteger)location
+{
+    if (location < self.length) {
+        Byte *bytes = (Byte *)[self bytes];
+        return bytes[location];
+    }
     
-    return data;
+    return '\0';
 }
 
 - (id)unarchiveData
 {
+    if (iPhone <= 9) {
+        id obj;
+        @try {
+            obj = [NSKeyedUnarchiver unarchiveObjectWithData:self];
+        } @catch (NSException *exception) {
+            return nil;
+        } @finally {
+            return obj;
+        }
+    }
     id obj = [NSKeyedUnarchiver unarchiveObjectWithData:self];
     return obj;
+}
+
+- (NSDictionary *)unarchiveToDictionary
+{
+    id obj = [self unarchiveData];
+    if ([obj isKindOfClass:[NSDictionary class]]) {
+        return obj;
+    }
+    return nil;
 }
 
 - (NSString *)stringUsingUTF8
@@ -3766,10 +4445,56 @@ id getUserData(NSString *key)
     return GBK;
 }
 
+//判断数据对应文件类型
+- (NSString *)getDtataType
+{
+    NSDictionary *dicType = @{@"255216":@"jpg",
+                              @"7173":@"gif",
+                              @"6677":@"bmp",
+                              @"13780":@"png",
+                              @"6787":@"swf",
+                              @"7790":@"exe dll",
+                              @"8297":@"rar",
+                              @"8075":@"zip",
+                              @"55122":@"7z",
+                              @"6063":@"xml",
+                              @"6033":@"html",
+                              @"239187":@"aspx",
+                              @"117115":@"cs",
+                              @"119105":@"js",
+                              @"102100":@"txt",
+                              @"255254":@"sql",
+                              @"254239":@"bin"};
+    if (self.length<2) {
+        NSLog(@"NOT FILE");
+    }else{
+        int char1 = 0 ,char2 =0 ; //必须这样初始化
+        [self getBytes:&char1 range:NSMakeRange(0, 1)];
+        [self getBytes:&char2 range:NSMakeRange(1, 1)];
+        NSString *numStr = [NSString stringWithFormat:@"%i%i",char1,char2];
+        NSString *type = [dicType objectForKey:numStr];
+        if (type) {
+            NSLog(@"下载文件类型,%@",type);
+        }else{
+            NSLog(@"未知文件类型,参数:%@",numStr);
+        }
+        
+        return type;
+    }
+    
+    return nil;
+}
+
 - (NSData *)subdataWithRanges:(NSRange)range
 {
-    if (range.location + range.length <= self.length) {
+    if (range.length > UINT_MAX) {
+        return nil;
+    }
+    else if (NSMaxRange(range) <= self.length) {
         return [self subdataWithRange:range];
+    }
+    else if (self.length < range.location) {
+        return nil;
     }
     
     NSInteger length = self.length - range.location;
@@ -3779,12 +4504,51 @@ id getUserData(NSString *key)
 
 - (long)parseInt:(int)type
 {
+    long value = 0;
     NSString *str = [self hexString];
-    str = [str uppercaseByHexString];
-    long value = strtoul([str UTF8String],nil,type);
+    value = [str parseInt:type];
+    //[self getBytes:&value range:NSMakeRange(0, self.length)];
     return value;
 }
 
+//十六进制转化成十进制
+- (long)parseIntWithRange:(NSRange)range
+{
+    long value = 0;
+    NSData *data = [self subdataWithRanges:range];
+    NSString *str = [data hexString];
+    value = [str parseInt:16];
+    //[self getBytes:&value range:NSMakeRange(0, data.length)];
+    return value;
+}
+
+//将16进制的字符串转换成NSData
++ (NSMutableData *)convertHexStrToData:(NSString *)str {
+    if (!str || [str length] == 0) {
+        return nil;
+    }
+    
+    NSMutableData *hexData = [[NSMutableData alloc] initWithCapacity:8];
+    NSRange range;
+    if ([str length] %2 == 0) {
+        range = NSMakeRange(0,2);
+    } else {
+        range = NSMakeRange(0,1);
+    }
+    for (NSInteger i = range.location; i < [str length]; i += 2) {
+        unsigned int anInt;
+        NSString *hexCharStr = [str substringWithRange:range];
+        NSScanner *scanner = [[NSScanner alloc] initWithString:hexCharStr];
+        
+        [scanner scanHexInt:&anInt];
+        NSData *entity = [[NSData alloc] initWithBytes:&anInt length:1];
+        [hexData appendData:entity];
+        range.location += range.length;
+        range.length = 2;
+    }
+    
+    return hexData;
+}
 
 @end
 
@@ -3798,6 +4562,28 @@ id getUserData(NSString *key)
     }
     
     return nil;
+}
+
+- (id)objectWithClass:(Class)aClass
+{
+    id result = nil;
+    if (self.count) {
+        for (id obj in self) {
+            if ([obj isKindOfClass:aClass]) {
+                result = obj;
+                break;
+            }
+        }
+    }
+    
+    return result;
+}
+
+- (NSArray *)reverseAllObjects
+{
+    NSEnumerator *enumerator = [self reverseObjectEnumerator];//逆向遍历
+    NSArray *list = [enumerator allObjects];
+    return list;
 }
 
 - (void)perExecute:(SEL)aSelector
@@ -3828,10 +4614,22 @@ id getUserData(NSString *key)
         if (![dic isKindOfClass:[NSDictionary class]]) {
             continue;
         }
-        [list addObject:[dic objectForKey:key]];
+        [list addObject:[dic valueForKey:key]];
     }
     
     return list;
+}
+
+- (NSArray *)valuesWithKey:(id)key
+{
+    NSMutableArray *list = [NSMutableArray array];
+    for (id obj in self) {
+        if ([obj respondsToSelector:@selector(valueForKey:)]) {
+            [list addObject:[obj valueForKey:key]];
+        }
+    }
+    
+    return [NSArray arrayWithArray:list];
 }
 
 //根据对象中的键值和值找到对象
@@ -3886,7 +4684,13 @@ id getUserData(NSString *key)
     return result;
 }
 
-//根据对象中的键和值删除对象
+- (NSArray *)removeRepeat
+{
+    NSArray *list = [self valueForKeyPath:@"@distinctUnionOfObjects.self"];
+    return list;
+}
+
+//根据对象中的键删除值为value的对象
 - (NSArray *)removeObjByKey:(NSString *)key value:(id)value
 {
     NSMutableArray *list = [self mutableCopy];
@@ -3916,6 +4720,29 @@ id getUserData(NSString *key)
     return list;
 }
 
+//获取数组中不包含array的部分
+- (NSArray *)compareFrom:(NSArray *)array
+{
+    NSPredicate * filterPredicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)",self];
+    NSArray * filter = [array filteredArrayUsingPredicate:filterPredicate];
+    return filter;
+}
+
+- (NSArray *)removeAnObject:(id)anObject
+{
+    NSMutableArray *list = [NSMutableArray arrayWithArray:self];
+    [list removeObject:anObject];
+    return [NSArray arrayWithArray:list];
+}
+
+- (NSArray *)removeForIndex:(NSInteger)index
+{
+    NSMutableArray *list = [NSMutableArray array];
+    list.array = self;
+    [list removeForIndex:index];
+    return [NSArray arrayWithArray:list];
+}
+
 @end
 
 #pragma mark - --------NSDictionary------------------------
@@ -3937,12 +4764,51 @@ id getUserData(NSString *key)
     return result;
 }
 
+- (NSDictionary *)AppendDictionary:(NSDictionary *)dict forKeys:(NSArray *)listKey
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithDictionary:self];
+    for (NSString *key in listKey) {
+        id value = [dict objectForKey:key];
+        if (value) {
+            [dic setObject:value forKey:key];
+        }
+    }
+    
+    NSDictionary *result = [NSDictionary dictionaryWithDictionary:dic];
+    
+    return result;
+}
+
+- (NSDictionary *)removeObjForKey:(id)key
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    dic.dictionary = self;
+    [dic removeObjectForKey:key];
+    
+    return [NSDictionary dictionaryWithDictionary:dic];
+}
+
+- (NSDictionary *)removeObjForKeys:(NSArray *)keyArray
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    dic.dictionary = self;
+    [dic removeObjectsForKeys:keyArray];
+    
+    return [NSDictionary dictionaryWithDictionary:dic];
+}
+
 - (NSString *)convertToString
 {
     NSError *error = nil;
-    NSData  *jsonData = [NSJSONSerialization dataWithJSONObject:self options:NSJSONWritingPrettyPrinted error:&error];
-    if (error) {
-        NSLog(@"NSDictionary转NSString出错,%@",error.localizedDescription);
+    NSData  *jsonData = nil;
+    
+    if ([NSJSONSerialization isValidJSONObject:self]) {
+        jsonData = [NSJSONSerialization dataWithJSONObject:self options:NSJSONWritingPrettyPrinted error:&error];
+        if (error) {
+            NSLog(@"NSDictionary转NSString出错,%@",error.localizedDescription);
+        }
+    }else{
+        NSLog(@"该数据不是有效的JSON对象，%@",self);
     }
     
     if (!jsonData) return nil;
@@ -3950,9 +4816,40 @@ id getUserData(NSString *key)
     NSString *result = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     result = [result stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     
-    getUserData(nil);
-    
     return result;
+}
+
+- (NSString *)stringUsingASCIIEncoding
+{
+    NSString *desc = self.description;
+    desc = [desc stringUsingASCIIEncoding];
+    return desc;
+}
+
+- (NSString *)stringForFormat
+{
+    NSString *str = [self.description stringForFormat];
+    
+    return str;
+}
+
+- (NSDictionary *)valueToString
+{
+    NSArray *listKey = self.allKeys;
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    for (NSString *key in listKey) {
+        id value = [self objectForKey:key];
+        if ([value isKindOfClass:[NSData class]]) {
+            value = [value hexString];
+        }
+        else if (![value isKindOfClass:[NSString class]]) {
+            value = [NSString format:@"%@",value];
+        }
+        
+        [dic setObject:value forKey:key];
+    }
+    
+    return [NSDictionary dictionaryWithDictionary:dic];
 }
 
 - (id)checkClass:(Class)aClass key:(id)key
@@ -3983,7 +4880,24 @@ id getUserData(NSString *key)
     return nil;
 }
 
+- (BOOL)isEqualToDictionary:(NSDictionary *)otherDictionary forKey:(id)key
+{
+    id value1 = [self objectForKey:key];
+    id value2 = [otherDictionary objectForKey:key];
+    return [value1 isEqual:value2];
+}
+
 #pragma mark 根据关键字获取对应数据
+- (BOOL)existsForKey:(id)key
+{
+    id value = [self objectForKey:key];
+    if (!value || [value isKindOfClass:[NSNull class]]) {
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (int)intForKey:(id)key
 {
     id value = [self checkClasses:@[NSNumber.class,NSString.class] key:key];
@@ -4064,6 +4978,34 @@ id getUserData(NSString *key)
 
 @end
 
+#pragma mark - --------NSMutableDictionary------------------------
+@implementation NSMutableDictionary (NSObject)
+
++ (id)dictionaryWithValidContentsOfFile:(NSString *)path
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    dic.dictionary = [NSDictionary dictionaryWithContentsOfFile:path];
+    return dic;
+}
+
+- (NSMutableDictionary *)initWithValidContentsOfFile:(NSString *)path
+{
+    NSMutableDictionary *dic = [self initWithDictionary:@{}];
+    dic.dictionary = [NSDictionary dictionaryWithContentsOfFile:path];
+    return dic;
+}
+
+- (void)setValidObject:(id)anObject forKey:(id)aKey
+{
+    if (anObject && aKey) {
+        [self setObject:anObject forKey:aKey];
+    }else{
+        NSLog(@"key: %@,\nanObject: %@",aKey,anObject);
+    }
+}
+
+@end
+
 #pragma mark - --------NSTimer------------------------
 @implementation NSTimer (NSObject)
 + (NSTimer *)scheduled:(NSTimeInterval)ti target:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo repeats:(BOOL)yesOrNo
@@ -4078,6 +5020,24 @@ id getUserData(NSString *key)
     }
 }
 
+- (NSDate *)getFireDate
+{
+    if (self.isValid) {
+        return self.fireDate;
+    }
+    
+    return nil;
+}
+
+- (id)getUserInfo
+{
+    if (self.isValid) {
+        return self.userInfo;
+    }
+    
+    return nil;
+}
+
 @end
 
 #pragma mark - --------NSDate------------------------
@@ -4086,7 +5046,7 @@ id getUserData(NSString *key)
 {
     format = format ?: @"yyyy-MM-dd HH:mm:ss";
     NSDateFormatter *data_time = [[NSDateFormatter alloc] init];
-    [data_time setDateFormat:format];//@"yyyy-MM-dd HH:mm:ss"
+    [data_time setDateFormat:format];//"yyyy-MM-dd HH:mm:ss"
     return [data_time stringFromDate:[NSDate date]];
 }
 
@@ -4094,14 +5054,48 @@ id getUserData(NSString *key)
 {
     format = format ?: @"yyyy-MM-dd HH:mm:ss";
     NSDateFormatter *data_time = [[NSDateFormatter alloc] init];
-    [data_time setDateFormat:format];//@"yyyy-MM-dd HH:mm:ss"
+    [data_time setDateFormat:format];//"yyyy-MM-dd HH:mm:ss"
     return [data_time stringFromDate:self];
+}
+
+- (BOOL)isSameDayWith:(NSDate *)date
+{
+    NSString *dateStr1 = [self stringWithFormat:@"yyyy-MM-dd"];
+    NSString *dateStr2 = [date stringWithFormat:@"yyyy-MM-dd"];
+    if ([dateStr1 isEqualToString:dateStr2]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (BOOL)compare:(NSDate *)date format:(NSString *)format
+{
+    NSString *dateStr1 = [self stringWithFormat:format];
+    NSString *dateStr2 = [date stringWithFormat:format];
+    if ([dateStr1 isEqualToString:dateStr2]) {
+        return YES;
+    }
+    
+    return NO;
 }
 
 @end
 
 #pragma mark - --------UIColor------------------------
 @implementation UIColor (NSObject)
+
++ (UIColor *)colorWithHue:(CGFloat)hue
+{
+    UIColor *color = [UIColor colorWithHue:hue saturation:1.0 brightness:1.0 alpha:1.0];
+    return color;
+}
+
++ (UIColor *)colorWithHue:(CGFloat)hue alpha:(CGFloat)alpha
+{
+    UIColor *color = [UIColor colorWithHue:hue saturation:1.0 brightness:1.0 alpha:1.0];
+    return color;
+}
 
 - (UIColor *)colorWithAlpha:(CGFloat)alpha
 {
@@ -4120,14 +5114,13 @@ id getUserData(NSString *key)
         result[3] = cs[1];
     }
     else if (index == 3) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请重新选择颜色" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:LocalizedSingle(@"Hint") message:CTBLocalizedStr(@"Toast_Color_Reselect") delegate:nil cancelButtonTitle:nil otherButtonTitles:CTBLocalizedStr(@"Confirm"), nil];
         [alert show];
     }
     else if (index == 4) {
         result[0] = cs[0];
         result[1] = cs[1];
         result[2] = cs[2];
-        
         result[3] = cs[3];
     }
     
@@ -4144,18 +5137,62 @@ id getUserData(NSString *key)
     return [self sizeWithString:aString forWidth:width lineBreakMode:NSLineBreakByTruncatingTail];
 }
 
++ (void)sizeWithString:(NSString *)aString forRect:(CGRect)rect
+{
+    UIFont *font = [UIFont systemFontOfSize:Screen_Width*1.1];
+    [aString drawInRect:rect withAttributes:@{NSFontAttributeName: font}];
+}
+
 + (CGFloat)sizeWithString:(NSString *)aString forWidth:(CGFloat)width lineBreakMode:(NSLineBreakMode)lineBreakMode
 {
+    if (!aString) {
+        return 0;
+    }
     CGFloat fontSize;
-    UIFont *font = [UIFont systemFontOfSize:Screen_Width*1.1];
+    UIFont *font = [UIFont systemFontOfSize:width*1.1];
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
     [aString sizeWithFont:font minFontSize:1.0f actualFontSize:&fontSize forWidth:width lineBreakMode:lineBreakMode];
 #else
     SEL action = NSSelectorFromString(@"drawAtPoint:forWidth:withFont:minFontSize:actualFontSize:lineBreakMode:baselineAdjustment:");
+    //action = @selector(drawAtPoint:forWidth:withFont:minFontSize:actualFontSize:lineBreakMode:baselineAdjustment:);
     IMP imp = [aString methodForSelector:action];
     CGSize (*func)(id, SEL,CGPoint,CGFloat,UIFont *,CGFloat,CGFloat *,NSLineBreakMode,UIBaselineAdjustment) = (void *)imp;
     func(aString, action,CGPointZero,width,font,1.0f,&fontSize,lineBreakMode,UIBaselineAdjustmentAlignBaselines);
+    //[aString drawAtPoint:CGPointZero forWidth:width withFont:font minFontSize:1.0f actualFontSize:&fontSize lineBreakMode:lineBreakMode baselineAdjustment:UIBaselineAdjustmentAlignBaselines];
 #endif
+    
+    /*
+    NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+    paragraph.alignment = NSTextAlignmentCenter;
+    paragraph.lineBreakMode = lineBreakMode;
+    */
+    
+    NSDictionary *textAttributes =
+    @{NSFontAttributeName: [UIFont systemFontOfSize:18.0],// 设置字体
+      NSParagraphStyleAttributeName: [NSParagraphStyle defaultParagraphStyle],// 设置段落样式
+      NSForegroundColorAttributeName: [UIColor blackColor],// 设置文字颜色
+      NSBackgroundColorAttributeName: [UIColor clearColor],// 设置背景颜色
+      NSLigatureAttributeName: @(NO),// 设置连体属性(0:无,1:默认连体)
+      NSKernAttributeName: @(0.5f),// 设定字符间距
+      NSStrikethroughStyleAttributeName: @(NO),// 设置删除线
+      NSUnderlineStyleAttributeName: @(NO),// 设置下划线
+      NSStrokeColorAttributeName: [UIColor clearColor],// 设置文字描边颜色
+      NSStrokeWidthAttributeName: @(0.5f),// 设置描边宽度
+      NSShadowAttributeName: [NSShadow alloc],// 设置阴影
+      NSTextEffectAttributeName: @"",// 设置文本特殊效果
+      NSAttachmentAttributeName: [NSTextAttachment alloc],// 设置文本附件
+      NSLinkAttributeName: @"",// 设置链接属性(NSString或NSURL)
+      NSBaselineOffsetAttributeName: @(0.0f),// 设置基线偏移值
+      NSUnderlineColorAttributeName: [UIColor clearColor],// 设置下划线颜色
+      NSStrikethroughColorAttributeName: [UIColor clearColor],// 设置删除线颜色
+      NSObliquenessAttributeName: @(0.0f),// 设置字体倾斜(正右负左)
+      NSExpansionAttributeName: @(0.0f),// 设置文本横向拉伸属性(横向拉伸或者压缩)
+      NSWritingDirectionAttributeName: @(NSWritingDirectionRightToLeft),// 设置文字书写方向(从左向右书写或者从右向左书写)
+      NSVerticalGlyphFormAttributeName: @(0)};// 设置文字排版方向(0:横，1:竖)
+    
+    [aString drawInRect:CGRectZero withAttributes:textAttributes];
+
+    
     return fontSize;
 }
 
@@ -4166,14 +5203,19 @@ id getUserData(NSString *key)
 
 - (UIImage *)imageWithCapInsets:(UIEdgeInsets)capInsets
 {
-    CGFloat top = 0.0;
-    CGFloat left = 0.0;
-    CGFloat bottom = 0.0;
-    CGFloat right = 0.0;
-    UIEdgeInsetsMake(top, left, bottom, right);//示例
-    return [self resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];
+    //UIEdgeInsetsMake(0, 0, 0, 0);延伸
+    UIImage *image = [self resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];
+    return image;
 }
 
+- (UIImage *)tileImageWithCapInsets:(UIEdgeInsets)capInsets
+{
+    //填充
+    UIImage *image = [self resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeTile];
+    return image;
+}
+
+#pragma mark 本地保存的图片
 + (UIImage *)imageFromLibrary:(NSString *)imgName
 {
     NSString *filePath = [imgName getFilePath];
@@ -4257,64 +5299,103 @@ id getUserData(NSString *key)
 
 - (void)setOriginX:(CGFloat)x
 {
-    self.frame = CGRectMake(x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+    CGRect frame = self.frame;
+    frame.origin.x = x;
+    self.frame = frame;
 }
 
 - (void)setOriginY:(CGFloat)y
 {
-    self.frame = CGRectMake(self.frame.origin.x, y, self.frame.size.width, self.frame.size.height);
+    CGRect frame = self.frame;
+    frame.origin.y = y;
+    self.frame = frame;
 }
 
 - (void)setOriginX:(CGFloat)x Y:(CGFloat)y
 {
-    self.frame = CGRectMake(x, y, self.frame.size.width, self.frame.size.height);
+    CGRect frame = self.frame;
+    frame.origin = CGPointMake(x, y);
+    self.frame = frame;
+}
+
+- (void)setMaxX:(CGFloat)maxX
+{
+    CGRect frame = self.frame;
+    frame.origin.x = maxX - CGRectGetWidth(frame);
+    self.frame = frame;
+}
+
+- (void)setMaxY:(CGFloat)maxY
+{
+    CGRect frame = self.frame;
+    frame.origin.y = maxY - CGRectGetHeight(frame);
+    self.frame = frame;
 }
 
 - (void)setSizeToW:(CGFloat)w
 {
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, w, self.frame.size.height);
+    CGRect frame = self.frame;
+    frame.size.width = w;
+    self.frame = frame;
 }
 
 - (void)setSizeToH:(CGFloat)h
 {
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, h);
+    CGRect frame = self.frame;
+    frame.size.height = h;
+    self.frame = frame;
 }
 
 - (void)setSizeToW:(CGFloat)w height:(CGFloat)h
 {
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, w, h);
+    CGRect frame = self.frame;
+    frame.size = CGSizeMake(w, h);
+    self.frame = frame;
 }
 
 - (void)setSizeWithCenterToW:(CGFloat)w height:(CGFloat)h
 {
     CGPoint center = self.center;
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, w, h);
+    [self setSizeToW:w height:h];
     self.center = center;
 }
 
 - (void)setOriginX:(CGFloat)x width:(CGFloat)w
 {
-    self.frame = CGRectMake(x, self.frame.origin.y, w, self.frame.size.height);
+    CGRect frame = self.frame;
+    frame.origin.x = x;
+    frame.size.width = w;
+    self.frame = frame;
 }
 
 - (void)setOriginY:(CGFloat)y height:(CGFloat)h
 {
-    self.frame = CGRectMake(self.frame.origin.x, y, self.frame.size.width, h);
+    CGRect frame = self.frame;
+    frame.origin.y = y;
+    frame.size.height = h;
+    self.frame = frame;
 }
 
 - (void)setOrigin:(CGPoint)origin
 {
-    self.frame = CGRectMake(origin.x, origin.y, self.frame.size.width, self.frame.size.height);
+    CGRect frame = self.frame;
+    frame.origin = origin;
+    self.frame = frame;
 }
 
 - (void)setSize:(CGSize)size
 {
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, size.width, size.height);
+    CGRect frame = self.frame;
+    frame.size = size;
+    self.frame = frame;
 }
 
 - (void)setOrigin:(CGPoint)origin size:(CGSize)size
 {
-    self.frame = CGRectMake(origin.x, origin.y, size.width, size.height);
+    CGRect frame = self.frame;
+    frame.origin = origin;
+    frame.size = size;
+    self.frame = frame;
 }
 
 - (void)setCenterX:(CGFloat)x
@@ -4352,6 +5433,12 @@ id getUserData(NSString *key)
     self.center = center;
 }
 
+- (CGPoint)boundsCenter
+{
+    CGPoint center = CGPointMake(CGRectGetWidth(self.frame)/2, CGRectGetHeight(self.frame)/2);
+    return center;
+}
+
 - (void)rotation:(CGFloat)angle
 {
     self.layer.transform = CATransform3DMakeRotation(angle, 0, 0, 1);//旋转angle度
@@ -4360,7 +5447,15 @@ id getUserData(NSString *key)
 
 - (id)viewWITHTag:(NSInteger)tag
 {
-    return [self viewWithTag:tag];
+    NSArray *listView = self.subviews;
+    NSMutableArray *list = [NSMutableArray array];
+    for (UIView *v in listView) {
+        if (v.tag == tag) {
+            [list addObject:v];
+        }
+    }
+    
+    return list.firstObject;
 }
 
 - (id)viewWithClass:(Class)aClass
@@ -4402,6 +5497,44 @@ id getUserData(NSString *key)
     return list;
 }
 
+- (id)subviewWithClass:(Class)aClass
+{
+    NSArray *listView = self.subviews;
+    NSMutableArray *list = [NSMutableArray array];
+    for (UIView *v in listView) {
+        if ([v isKindOfClass:[aClass class]]) {
+            [list addObject:v];
+        }
+        else if (v.subviews > 0) {
+            UIView *subview = [v subviewWithClass:aClass];
+            if (subview) {
+                [list addObject:subview];
+            }
+        }
+    }
+    
+    return list.firstObject;
+}
+
+- (id)subviewWithClass:(Class)aClass tag:(NSInteger)tag
+{
+    NSArray *listView = self.subviews;
+    NSMutableArray *list = [NSMutableArray array];
+    for (UIView *v in listView) {
+        if ([v isKindOfClass:[aClass class]] && v.tag == tag) {
+            [list addObject:v];
+        }
+        else if (v.subviews > 0) {
+            UIView *subview = [v subviewWithClass:aClass tag:tag];
+            if (subview) {
+                [list addObject:subview];
+            }
+        }
+    }
+    
+    return list.firstObject;
+}
+
 /*
  使用规则
  
@@ -4414,23 +5547,66 @@ id getUserData(NSString *key)
  == :表示视图间距、宽度或者高度必须等于某个值
  @  :>=、<=、==  限制   最大为  1000
  
- 1.|-[view]-|:  视图处在父视图的左右边缘内
- 2.|-[view]  :   视图处在父视图的左边缘
- 3.|[view]   :   视图和父视图左边对齐
- 4.-[view]-  :  设置视图的宽度高度
- 5.|-30.0-[view]-30.0-|:  表示离父视图 左右间距  30
+ 1.|-[view]-| : 视图处在父视图的左右边缘内
+ 2.|-[view]  : 视图处在父视图的左边缘
+ 3.|[view]   : 视图和父视图左边对齐
+ 4.-[view]-  : 设置视图的宽度高度
+ 5.|-30.0-[view]-30.0-| :  表示离父视图 左右间距  30
  6.[view(200.0)] : 表示视图宽度为 200.0
- 7.|-[view(view1)]-[view1]-| :表示视图宽度一样，并且在父视图左右边缘内
- 8. V:|-[view(50.0)] : 视图高度为  50
- 9: V:|-(==padding)-[imageView]->=0-[button]-(==padding)-| : 表示离父视图的距离
+ 7. [_btnEdit]-5-| : 视图处与父视图的左边缘距离为5
+ 8.|-[view(view1)]-[view1]-| : 表示视图宽度一样，并且在父视图左右边缘内
+ 9. V:|-[view(50.0)] : 视图高度为  50
+ 10: V:|-(==padding)-[imageView]->=0-[button]-(==padding)-| : 表示离父视图的距离
+ 11. V:|-15-[view] : 离父视图顶部高度的距离
  为Padding,这两个视图间距必须大于或等于0并且距离底部父视图为 padding。
  10:  [wideView(>=60@700)]  :视图的宽度为至少为60 不能超过  700
  11: 如果没有声明方向默认为  水平  H:
  */
 - (void)addConstraintsWithFormat:(NSString *)format views:(NSDictionary *)views
 {
-    NSArray *list = [NSLayoutConstraint constraintsWithVisualFormat:format options:0 metrics:nil views:views];
+    NSLayoutFormatOptions options = NSLayoutFormatDirectionLeadingToTrailing;
+    [self addConstraintsWithFormat:format views:views options:options];
+}
+
+- (void)addConstraintsWithFormat:(NSString *)format views:(NSDictionary *)views options:(NSLayoutFormatOptions)options
+{
+    if (format.length <= 0 || !views) {
+        return;
+    }
+    
+    NSDictionary *metrics = nil;
+    NSArray *list = [NSLayoutConstraint constraintsWithVisualFormat:format options:options metrics:metrics views:views];
     [self addConstraints:list];
+}
+
+- (void)addConstraintsWithItem:(UIView *)view attribute:(NSLayoutAttribute)attr
+{
+    if (view.translatesAutoresizingMaskIntoConstraints) {
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:view attribute:attr relatedBy:NSLayoutRelationEqual toItem:self attribute:attr multiplier:1.0 constant:0]];
+}
+
+- (void)addConstraintsWithItem:(UIView *)view attribute:(NSLayoutAttribute)attr constant:(CGFloat)c
+{
+    if (view.translatesAutoresizingMaskIntoConstraints) {
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:view attribute:attr relatedBy:NSLayoutRelationEqual toItem:self attribute:attr multiplier:1.0 constant:c]];
+}
+
+- (void)addConstraintsViewWithItem:(UIView *)view attribute:(NSLayoutAttribute)attr constant:(CGFloat)c
+{
+    if (view.translatesAutoresizingMaskIntoConstraints) {
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:view attribute:attr relatedBy:NSLayoutRelationEqual toItem:nil attribute:attr multiplier:1.0 constant:c]];
+}
+
+- (void)addConstraintsToCenterWithItem:(id)view
+{
+    [self addConstraintsWithItem:view attribute:NSLayoutAttributeCenterX];
+    [self addConstraintsWithItem:view attribute:NSLayoutAttributeCenterY];
 }
 
 - (void)addAnimationType:(NSString *)type subType:(NSString *)subType duration:(CFTimeInterval)duration
@@ -4439,6 +5615,16 @@ id getUserData(NSString *key)
     [animation setDuration:duration];
     [animation setType:type];
     [animation setSubtype:subType];
+    [self.layer addAnimation:animation forKey:@"Reveal"];
+}
+
+- (void)addAnimationSetDuration:(CFTimeInterval)duration
+{
+    //UIImageView切换图片动画
+    CATransition *animation = [CATransition animation];
+    animation.duration = duration;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [self.layer addAnimation:animation forKey:@"Reveal"];
 }
 
@@ -4467,10 +5653,10 @@ id getUserData(NSString *key)
 
 - (UIActivityIndicatorView *)addActivityIndicatorStyle:(UIActivityIndicatorViewStyle)style
 {
-    UIActivityIndicatorView *activity = getSuperView([UIActivityIndicatorView class], self);
+    UIActivityIndicatorView *activity = [self viewWithClass:[UIActivityIndicatorView class]];
     if (!activity) {
         activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:style];
-        activity.center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
+        activity.center = CGPointMake(CGRectGetWidth(self.frame)/2, CGRectGetHeight(self.frame)/2);
         activity.hidesWhenStopped = YES;
         [self addSubview:activity];
     }
@@ -4500,6 +5686,14 @@ id getUserData(NSString *key)
     }
 }
 
+- (void)removeAllSubViews
+{
+    NSArray *list = self.subviews;
+    for (UIView *view in list) {
+        [view removeFromSuperview];
+    }
+}
+
 //添加虚线边框
 - (void)dashLineForBorderWithRadius:(CGFloat)radius
 {
@@ -4511,6 +5705,19 @@ id getUserData(NSString *key)
     UIColor *lineColor = [UIColor whiteColor];//虚线颜色
     
     [self dashLineWithRadius:cornerRadius borderWidth:borderWidth dashPattern:dashPattern spacePattern:spacePattern lineColor:lineColor];
+}
+
+//添加虚线边框
+- (void)dashLineWithAttributes:(NSDictionary *)attributes
+{
+    //border definitions,  lineDashPattern属性可以设定为实线还是虚线
+    CGFloat cornerRadius = [attributes floatForKey:@"Radius"];//圆角半径
+    CGFloat borderWidth = [attributes floatForKey:@"Width"];//边框宽
+    CGFloat dashLen = [attributes floatForKey:@"dashLen"];//虚线长度
+    CGFloat spaceLen = [attributes floatForKey:@"spaceLen"];//空白区长度(如果为0则为实线)
+    UIColor *lineColor = [attributes objectForKey:@"Color"];//虚线颜色
+    
+    [self dashLineWithRadius:cornerRadius borderWidth:borderWidth dashPattern:dashLen spacePattern:spaceLen lineColor:lineColor];
 }
 
 - (void)dashLineWithRadius:(CGFloat)radius borderWidth:(CGFloat)borderWidth dashPattern:(CGFloat)dashPattern spacePattern:(CGFloat)spacePattern lineColor:(UIColor *)lineColor
@@ -4578,54 +5785,43 @@ id getUserData(NSString *key)
     return image;
 }
 
-- (void)playGifImgWithPath:(NSString *)imagePath
++ (float)distanceFromPoint:(CGPoint)start toPoint:(CGPoint)end
 {
-    NSURL *url = [NSURL fileURLWithPath:imagePath];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    CGImageSourceRef cImageSource = CGImageSourceCreateWithData((CFDataRef)data,
-                                                NULL);
-    // Make sure the image source exists before continuing.
-    if (cImageSource == NULL){
-        fprintf(stderr, "Image source is NULL.");
-        return;
-    }
+    float distance;
+    //下面就是高中的数学，不详细解释了
+    CGFloat xDist = (end.x - start.x);
+    CGFloat yDist = (end.y - start.y);
+    distance = sqrt((xDist * xDist) + (yDist * yDist));
+    return distance;
+}
+
+#pragma mark 获取UIView上某个点的颜色
+- (UIColor *)colorOfPoint:(CGPoint)point
+{
+    unsigned char pixel[4] = {0};
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(pixel, 1, 1, 8, 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
     
-    size_t imageCount = CGImageSourceGetCount(cImageSource);//
-    NSMutableArray *images = [NSMutableArray array];
-    NSMutableArray *times = [NSMutableArray array];
-    NSMutableArray *keyTimes = [NSMutableArray array];
+    CGContextTranslateCTM(context, -point.x, -point.y);
     
-    CGSize _size;
-    float totalTime = 0;
-    for (size_t i = 0; i < imageCount; i++) {
-        CGImageRef cgimage = CGImageSourceCreateImageAtIndex(cImageSource, i, NULL);
-        [images addObject:(__bridge id)cgimage];
-        CGImageRelease(cgimage);
-        
-        NSDictionary *properties = (__bridge NSDictionary *)CGImageSourceCopyPropertiesAtIndex(cImageSource, i, NULL);
-        NSDictionary *gifProperties = [properties valueForKey:(__bridge NSString *)kCGImagePropertyGIFDictionary];
-        NSString *gifDelayTime = [gifProperties valueForKey:(__bridge NSString* )kCGImagePropertyGIFDelayTime];
-        [times addObject:gifDelayTime];
-        totalTime += [gifDelayTime floatValue];
-        
-        _size.width = [[properties valueForKey:(NSString*)kCGImagePropertyPixelWidth] floatValue];
-        _size.height = [[properties valueForKey:(NSString*)kCGImagePropertyPixelHeight] floatValue];
-    }
+    [self.layer renderInContext:context];
     
-    float currentTime = 0;
-    for (size_t i = 0; i < times.count; i++) {
-        float keyTime = currentTime / totalTime;
-        [keyTimes addObject:[NSNumber numberWithFloat:keyTime]];
-        currentTime += [[times objectAtIndex:i] floatValue];
-    }
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
     
-    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
-    [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]];
-    [animation setValues:images];
-    [animation setKeyTimes:keyTimes];
-    animation.duration = totalTime;
-    animation.repeatCount = HUGE_VALF;
-    [self.layer addAnimation:animation forKey:@"gifAnimation"];
+    UIColor *color = [UIColor colorWithRed:pixel[0]/255.0 green:pixel[1]/255.0 blue:pixel[2]/255.0 alpha:pixel[3]/255.0];
+    
+    return color;
+}
+
+- (void)printAllSubViews
+{
+    SEL action = NSSelectorFromString(@"recursiveDescription");
+    
+    IMP imp = [self methodForSelector:action];
+    id (*func)(id, SEL) = (void *)imp;
+    id obj = func(self, action);
+    NSLog(@"%@ recursive description:\n\n%@\n\n", self.className, obj);
 }
 
 @end
@@ -4646,6 +5842,16 @@ id getUserData(NSString *key)
 - (void)addUpInsideTarget:(id)target action:(SEL)action
 {
     [self addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (NSString *)btnTitle
+{
+    NSString *title = nil;
+    if ([self isKindOfClass:[UIButton class]]) {
+        title = ((UIButton *)self).currentTitle;
+    }
+    
+    return title;
 }
 
 @end
@@ -4678,6 +5884,11 @@ id getUserData(NSString *key)
     [self setImage:image forState:UIControlStateNormal];
 }
 
+- (void)setSelectedImage:(UIImage *)image
+{
+    [self setImage:image forState:UIControlStateSelected];
+}
+
 - (void)setHighlightedImage:(UIImage *)image
 {
     [self setImage:image forState:UIControlStateHighlighted];
@@ -4696,6 +5907,11 @@ id getUserData(NSString *key)
 - (void)setNormalBackgroundImage:(UIImage *)image
 {
     [self setBackgroundImage:image forState:UIControlStateNormal];
+}
+
+- (void)setSelectedBGImage:(UIImage *)image
+{
+    [self setBackgroundImage:image forState:UIControlStateSelected];
 }
 
 - (void)setHighlightedBGImage:(UIImage *)image
@@ -4727,7 +5943,12 @@ id getUserData(NSString *key)
 {
     self.contentHorizontalAlignment = alignment;
     //设置文字与边框的间距
-    self.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 0);
+    if (alignment == UIControlContentHorizontalAlignmentLeft) {
+        self.titleEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 0);
+    }
+    else if (alignment == UIControlContentHorizontalAlignmentRight) {
+        self.contentEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 10);
+    }
 }
 
 - (void)setContentAlignment:(UIControlContentHorizontalAlignment)alignment left:(CGFloat)left
@@ -4742,6 +5963,34 @@ id getUserData(NSString *key)
     self.contentHorizontalAlignment = alignment;
     //设置文字与边框的间距
     self.contentEdgeInsets = edgeInsets;
+}
+
+- (void)setWidthToFitFont
+{
+    CGPoint center = self.center;
+    
+    CGSize size = {MAXFLOAT,self.frame.size.height};
+    NSString *content = self.currentTitle;
+    size = [CTB getSizeWith:content font:self.titleLabel.font size:size lineBreakMode:self.titleLabel.lineBreakMode];
+    if (size.width > CGRectGetWidth(self.frame)) {
+        [self setSizeToW:size.width+5];
+        self.center = center;
+    }
+}
+
+- (void)setWidthToFitText
+{
+    [self setWidthToFitTextInWidth:CGRectGetWidth(self.frame)];
+}
+
+- (void)setWidthToFitTextInWidth:(CGFloat)width
+{
+    CGSize size = {MAXFLOAT,self.frame.size.height};
+    NSString *content = self.currentTitle;
+    size = [CTB getSizeWith:content font:self.titleLabel.font size:size lineBreakMode:self.titleLabel.lineBreakMode];
+    if (size.width+5 < width) {
+        [self setSizeToW:size.width+5];
+    }
 }
 
 @end
@@ -4777,6 +6026,175 @@ id getUserData(NSString *key)
     self.attributedText = str;
 }
 
+- (void)textLeftTopAlign
+{
+    self.textAlignment = NSTextAlignmentLeft;
+    CGSize size = [CTB getSizeWith:self.text font:self.font size:CGSizeMake(GetVWidth(self), MAXFLOAT)];
+    size.height = MAX(size.height, self.font.pointSize);
+    [self setSizeToH:size.height];
+    
+    UIView *baseView = self.superview;
+    if (CGRectGetHeight(baseView.frame) < CGRectGetMaxY(self.frame)) {
+        [baseView setSizeToH:size.height+10];
+    }
+}
+
+- (void)setFontToFitWidth
+{
+    //设置字体自适应宽度
+    //self.font = nil;
+    //self.adjustsFontSizeToFitWidth = YES;
+    
+    CGFloat width = self.frame.size.width;
+    
+    CGSize size = [self.text sizeWithAttributes:@{NSFontAttributeName:self.font}];
+    if (size.width <= CGRectGetWidth(self.frame)) {
+        return;
+    }
+    
+    CGFloat fontSize = [UIFont sizeWithString:self.text forWidth:width lineBreakMode:self.lineBreakMode];
+    self.font = [self.font fontWithSize:fontSize];
+}
+
+- (void)setFontToFitWidthWithText:(NSString *)text
+{
+    self.text = text;
+    [self setFontToFitWidth];
+}
+
+- (void)setWidthToFitText
+{
+    //设置宽度自适应text
+    CGSize size = [self.text sizeWithAttributes:@{NSFontAttributeName:self.font}];
+    [self setSizeToW:size.width];
+}
+
+- (void)setHeightToFitText
+{
+    //设置宽度自适应text
+    CGSize size = {CGRectGetWidth(self.frame), MAXFLOAT};
+    size = [CTB getSizeWith:self.text font:self.font size:size lineBreakMode:self.lineBreakMode];
+    [self setSizeToH:size.height];
+}
+
+@end
+
+#pragma mark - --------UISwitch------------------------
+@implementation UISwitch (NSObject)
+
+- (void)setIsOn:(BOOL)on
+{
+    [CTB duration:0.1 block:^{
+        [self setOn:on];
+    }];
+}
+
+- (void)setIsOn:(BOOL)on animated:(BOOL)animated
+{
+    [CTB duration:0.1 block:^{
+        [self setOn:on animated:animated];
+    }];
+}
+
+@end
+
+#pragma mark - --------UITextField------------------------
+@implementation UITextField (NSObject)
+
++ (id)leftViewWithFrame:(CGRect)frame text:(NSString *)text
+{
+    UILabel *lblLeftView = [[UILabel alloc] initWithFrame:frame];
+    lblLeftView.text = text;
+    [lblLeftView setTextAlignment:NSTextAlignmentCenter];
+    [lblLeftView setTextColor:[UIColor blackColor]];
+    
+    return lblLeftView;
+}
+
+- (void)setAlwaysLeftView:(UIView *)leftView
+{
+    self.leftViewMode = UITextFieldViewModeAlways;
+    self.leftView = leftView;
+}
+
+- (UILabel *)setAlwaysLeftViewWithSize:(CGSize)size text:(NSString *)text
+{
+    CGRect frame = CGGetRect(CGPointZero, size);
+    UILabel *lblLeftView = [UITextField leftViewWithFrame:frame text:text];
+    [self setAlwaysLeftView:lblLeftView];
+    return lblLeftView;
+}
+
+- (BOOL)textFieldShouldChangeInRange:(NSRange)range replaceString:(NSString *)string limit:(int)limit
+{
+    if (string.length == 0) return YES;
+    
+    [string length];
+    
+    NSInteger existedLength = self.text.length;
+    NSInteger selectedLength = range.length;
+    NSInteger replaceLength = string.length;
+    if (existedLength - selectedLength + replaceLength > limit) {
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)textFieldDidChangeToLimit:(int)limit
+{
+    NSString *content = self.text;
+    
+    if (content.countTheStr > limit) {
+        content = [content getCStringWithLen:limit];
+        self.text = content;
+        return NO;
+    }
+    
+    UITextField *textField = self;
+    NSString *toBeString = textField.text;
+    
+    //获取高亮部分
+    UITextRange *selectedRange = [textField markedTextRange];
+    UITextPosition *position = [textField positionFromPosition:selectedRange.start offset:0];
+    
+    // 没有高亮选择的字，则对已输入的文字进行字数统计和限制
+    if (!position)
+    {
+        if (toBeString.length > limit)
+        {
+            NSRange rangeIndex = [toBeString rangeOfComposedCharacterSequenceAtIndex:limit];
+            if (rangeIndex.length == 1)
+            {
+                textField.text = [toBeString substringToIndex:limit];
+            }
+            else
+            {
+                NSRange rangeRange = [toBeString rangeOfComposedCharacterSequencesForRange:NSMakeRange(0, limit)];
+                textField.text = [toBeString substringWithRange:rangeRange];
+            }
+        }
+    }
+    
+    return YES;
+}
+
+@end
+
+#pragma mark - --------UICollectionView------------------------
+@implementation UICollectionView (NSObject)
+
+- (id)cellAtIndexPath:(NSIndexPath *)indexPath
+{
+    id cell = [self cellForItemAtIndexPath:indexPath];
+    return cell;
+}
+
+@end
+
+#pragma mark - --------UIScrollView------------------------
+@implementation UIScrollView (NSObject)
+
 @end
 
 #pragma mark - --------UITableView------------------------
@@ -4792,6 +6210,52 @@ id getUserData(NSString *key)
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
     id cell = [self cellForRowAtIndexPath:indexPath];
     return cell;
+}
+
+- (NSInteger)sectionForHeaderView:(UIView *)footerView
+{
+    UITableViewHeaderFooterView *View = (UITableViewHeaderFooterView *)footerView;
+    NSInteger section = -1;
+    NSInteger sectionCount = self.numberOfSections;
+    for (int i=0; i<sectionCount; i++) {
+        UIView *v = [self headerViewForSection:i];
+        if ([v isEqual:View]) {
+            section = i;
+            break;
+        }
+    }
+    
+    return section;
+}
+
+- (NSInteger)sectionForFooterView:(UIView *)footerView
+{
+    UITableViewHeaderFooterView *View = (UITableViewHeaderFooterView *)footerView;
+    NSInteger section = -1;
+    NSInteger sectionCount = self.numberOfSections;
+    for (int i=0; i<sectionCount; i++) {
+        UIView *v = [self footerViewForSection:i];
+        if ([v isEqual:View]) {
+            section = i;
+            break;
+        }
+    }
+    
+    return section;
+}
+
+- (CGFloat)heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGRect rect = [self rectForRowAtIndexPath:indexPath];
+    CGFloat h = rect.size.height;
+    return h;
+}
+
+- (CGFloat)widthForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGRect rect = [self rectForRowAtIndexPath:indexPath];
+    CGFloat w = rect.size.width;
+    return w;
 }
 
 - (void)deleteAtIndexPath:(NSIndexPath *)indexPath rowCount:(NSInteger)rowCount
@@ -4850,6 +6314,12 @@ id getUserData(NSString *key)
     return [NSIndexPath indexPathForRow:row inSection:section];
 }
 
+- (NSIndexPath *)addRow:(NSInteger)row addSection:(NSInteger)section
+{
+    NSIndexPath *indexPath = [NSIndexPath inRow:self.row+row inSection:self.section+section];
+    return indexPath;
+}
+
 @end
 
 @implementation NSUserDefaults (NSObject)
@@ -4857,6 +6327,38 @@ id getUserData(NSString *key)
 + (NSUserDefaults *)defaults
 {
     return [NSUserDefaults standardUserDefaults];
+}
+
+@end
+
+@implementation CustomSlider
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        _trackRect = CGRectMake(1.5, CGRectGetHeight(self.frame)/3, CGRectGetWidth(self.frame)-3, CGRectGetHeight(self.frame)/3);
+    }
+    
+    return self;
+}
+
+- (CGRect)trackRectForBounds:(CGRect)bounds
+{
+    return _trackRect;
+}
+
+@end
+
+#pragma mark - UIViewController
+@implementation UIViewController (NSObject)
+
+- (void)enablePopGesture:(BOOL)enabled
+{
+    //手势返回动作启用
+    if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+        self.navigationController.interactivePopGestureRecognizer.enabled = enabled;
+    }
 }
 
 @end
@@ -4884,6 +6386,22 @@ id getUserData(NSString *key)
 + (id)sharedApplicationDelegate
 {
     return [[UIApplication sharedApplication] delegate];
+}
+
++ (BOOL)openURLString:(NSString *)urlString
+{
+    NSURL *url = [NSURL URLWithString:urlString];
+    UIApplication *application = [UIApplication sharedApplication];
+    if ([application canOpenURL:url]) {
+        return [application openURL:url];
+    }else{
+        url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+        if ([urlString hasPrefix:@"prefs:"]) {
+            return [application openURL:url];
+        }
+    }
+    
+    return NO;
 }
 
 @end
@@ -4985,6 +6503,14 @@ id getUserData(NSString *key)
     [self performSelector:action withObject:anArgument afterDelay:dur];
 }
 
+- (void)perform:(SEL)aSelector withObject:(id)object1 withObject:(id)object2
+{
+    //[self performSelector:aSelector withObject:nil withObject:nil];
+    IMP lsa = [self methodForSelector:aSelector];
+    id (*func)(id, SEL, id, id) = (void *)lsa;
+    func(self, aSelector, object1, object2);
+}
+
 - (NSData *)archivedData
 {
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self];
@@ -4995,6 +6521,92 @@ id getUserData(NSString *key)
 {
     if (self == nil) {
     }
+}
+
+- (BOOL)isBelongTo:(NSArray *)list
+{
+    if ([list containsObject:self]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (NSString *)className
+{
+    NSString *result = NSStringFromClass([self class]);
+    return result;
+}
+
+- (BOOL)classNameIsEqual:(id)aClass
+{
+    if (!aClass) {
+        return NO;
+    }
+    
+    if ([self.className isEqualToString:NSStringFromClass([aClass class])]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+#pragma mark - 通过对象获取全部属性
+- (NSArray *)getObjectPropertyList
+{
+    NSArray *list = nil;
+    unsigned int propsCount;
+    objc_property_t *props = class_copyPropertyList([self class], &propsCount);
+    list = propsCount>0 ? @[] : nil;
+    for(int i = 0;i < propsCount; i++)
+    {
+        objc_property_t prop = props[i];
+        
+        const char *name = property_getName(prop);
+        NSString *propName = [NSString stringWithUTF8String:name];
+        propName = [propName replaceString:@"_" withString:@""];
+        list = [list arrayByAddingObject:propName];
+    }
+    
+    return list;
+}
+
+- (NSArray *)getObjectIvarList
+{
+    NSArray *list = nil;
+    unsigned int propsCount;
+    Ivar *ivar = class_copyIvarList([self class], &propsCount);
+    list = propsCount>0 ? @[] : nil;
+    for(int i = 0;i < propsCount; i++) {
+        Ivar var = ivar[i];
+        const char *name = ivar_getName(var);
+        NSString *propName = [NSString stringWithUTF8String:name];
+        propName = [propName replaceString:@"_" withString:@""];
+        list = [list arrayByAddingObject:propName];
+    }
+    
+    return list;
+}
+
+- (BOOL)containPropertyName:(NSString *)name
+{
+    SEL action = NSSelectorFromString(name);
+    if ([self respondsToSelector:action]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (id)copyObject
+{
+    id obj = [[self.class alloc] init];
+    NSArray *listPro = [self getObjectIvarList];
+    for (NSString *key in listPro) {
+        id value = [self valueForKey:key];
+        [obj setValue:value forKey:key];
+    }
+    
+    return obj;
 }
 
 #pragma mark - 通过对象返回一个NSDictionary，键是属性名称，值是属性值。
@@ -5053,6 +6665,45 @@ id getUserData(NSString *key)
         return dic;
     }
     return [self getObjectData];
+}
+
+- (NSString *)customDescription
+{
+    if ([self isKindOfClass:[NSDictionary class]]) {
+        return [(NSDictionary *)self stringForFormat];
+    }
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    unsigned int propsCount;
+    objc_property_t *props = class_copyPropertyList([self class], &propsCount);
+    for(int i = 0;i < propsCount; i++)
+    {
+        objc_property_t prop = props[i];
+        
+        NSString *propName = [NSString stringWithUTF8String:property_getName(prop)];
+        id value = [self valueForKey:propName];
+        if(value == nil)
+        {
+            value = [NSNull null];
+        }
+        
+        [dic setObject:value forKey:propName];
+    }
+    NSString *content = [dic stringForFormat];
+    return content;
+}
+
+- (NSString *)logDescription
+{
+    NSMutableDictionary *dicDes = [NSMutableDictionary dictionary];
+    NSArray *list = [self getObjectPropertyList];
+    for (NSString *key in list) {
+        id value = [self valueForKey:key];
+        if (value) {
+            [dicDes setObject:value forKey:key];
+        }
+    }
+    NSString *string = [dicDes stringForFormat] ?: [NSString format:@"%@",dicDes];
+    return string;
 }
 
 @end
