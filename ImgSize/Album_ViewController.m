@@ -10,6 +10,7 @@
 #import "PhotoPreView.h"
 #import "MBProgressHUD.h"
 #import "Toast/Toast+UIView.h"
+#import "UIImage+Tint.h"
 #import "CTB.h"
 
 @interface Album_ViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UINavigationControllerDelegate, UIImagePickerControllerDelegate>
@@ -62,6 +63,14 @@
         [_collectionView reloadData];
         [hudView hide:YES];
     }];
+    
+    NSString *imgName = @"iface-主机@2x.png";
+    UIImage *image = [UIImage imageNamed:imgName];
+    UIColor *color = [CTB colorWithHexString:@"00A0E9"];
+    image = [image imageWithReplaceColor:color];
+    path = [@"~/Library" stringByExpandingTildeInPath];
+    path = [path stringByAppendingPathComponent:imgName];
+    [UIImagePNGRepresentation(image) writeToFile:path atomically:YES];
 }
 
 - (void)setupSubViews
