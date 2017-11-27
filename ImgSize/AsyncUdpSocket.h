@@ -47,7 +47,7 @@ typedef enum AsyncUdpSocketError AsyncUdpSocketError;
 	AsyncReceivePacket *theCurrentReceive;
 	NSTimer *theReceiveTimer;
 	
-	id theDelegate;
+	__weak id theDelegate;
 	UInt16 theFlags;
 	
 	long theUserData;

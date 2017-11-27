@@ -6,6 +6,12 @@
 //  Copyright (c) 2014年 caidan. All rights reserved.
 //
 
+typedef NS_ENUM(NSInteger, SearchType) {
+    SearchType_Access       = 1,        //门禁
+    SearchType_Host         = 2,        //主机
+    SearchType_Other        = 3,        //其它
+};
+
 #import "Second_ViewController.h"
 #import "CTB.h"
 #import "Tools.h"
@@ -92,13 +98,13 @@
     Type = _tag;
     udpSocket = [[UdpSocket alloc] init];
     udpSocket.delegate = self;
-    if (Type == 1) {
+    if (Type == SearchType_Access) {
         [self searchAccessDevice];
     }
-    else if (Type == 2) {
+    else if (Type == SearchType_Host) {
         [self searchHostDevice];
     }
-    else if (Type == 3) {
+    else if (Type == SearchType_Other) {
         [self getHeadList];
         [myTableView reloadData];
     }
@@ -131,6 +137,7 @@
     udpSocket.port = 8101;
     [udpSocket sendData:buffer];
     [udpSocket receiveWithTimeout:20.0 tag:0];
+    NSLog(@"发送数据: %@",[buffer hexString]);
 }
 
 - (void)getHostList:(NSTimer *)timer
@@ -146,6 +153,7 @@
     udpSocket.port = 8003;
     [udpSocket sendData:data];
     [udpSocket receiveWithTimeout:20.0 tag:0];
+    NSLog(@"发送数据: %@",[data hexString]);
 }
 
 - (void)getHeadList
@@ -201,23 +209,23 @@
         return NO;
     }
     
-    if (Type == 1 && data.length < 28) {
+    if (Type == SearchType_Access && data.length < 28) {
         //门禁
         return NO;
     }
-    else if (Type == 2 && data.length < 12) {
+    else if (Type == SearchType_Host && data.length < 12) {
         //主机
         return NO;
     }
     
-    if (Type == 1) {
+    if (Type == SearchType_Access) {
         NSString *lenString = [data stringWithRange:NSMakeRange(25, 3)];
         if (![lenString isEqualToString:@"31FE00"]) {
             //如果不是读取门禁IP信息
             return NO;
         }
     }
-    else if (Type == 2) {
+    else if (Type == SearchType_Host) {
         Byte *data_bytes = (Byte*)[data bytes];
         Byte data_byte = data_bytes[0];
         if (data_byte == 0xE6) {
@@ -239,39 +247,37 @@
         return NO;
     }
     
-    Access *door = [[Access alloc] init];
-    NSString *result = @"";
-    long len = -1;
-    BOOL isSuccess = YES;
-    @try {
+    if (Type == SearchType_Access) {
+        Access *door = [[Access alloc] init];
+        NSString *result = @"";
+        long len = -1;
         [door parseData:data];
-        NSData *value = [data subdataWithRange:NSMakeRange(59, 2)];
-        NSString *lenString = [value hexString];
-        len = strtoul([lenString UTF8String],nil,16);//TCP端口
-        NSDictionary *dic = @{@"SN":door.SN,
-                              @"PWD":door.PWD,
-                              @"IP":host,
-                              @"Port":@(len)};
-        result = [dic convertToString];
-        if (![listData containsObject:result]) {
-            [listData addObject:result];
-            [myTableView reloadData];
-        }
-    }
-    @catch (NSException *exception) {
-        isSuccess = NO;
-        NSString *errMsg = [NSString format:@"IP信息解析失败,%@,%@,%@",host,exception.name,exception.reason];
-        hudView = [MBProgressHUD showRuningView:self.view];
-        [hudView showDetailMsg:errMsg delay:1.8f];
-        NSLog(@"********************");
-        NSLog(@"%@",errMsg);
-    }
-    @finally {
-        if (isSuccess) {
+        if (door.SN && door.PWD) {
+            NSData *value = [data subdataWithRange:NSMakeRange(59, 2)];
+            NSString *lenString = [value hexString];
+            len = strtoul([lenString UTF8String],nil,16);//TCP端口
+            NSDictionary *dic = @{@"SN":door.SN,
+                                  @"PWD":door.PWD,
+                                  @"IP":host,
+                                  @"Port":@(len)};
+            result = [dic convertToString];
+            if (![listData containsObject:result]) {
+                [listData addObject:result];
+                [myTableView reloadData];
+            }
+            
             NSLog(@"--------------");
             NSLog(@"%@",result);
         }
+        else {
+            NSString *errMsg = [NSString format:@"IP信息解析失败,%@",host];
+            hudView = [MBProgressHUD showRuningView:self.view];
+            [hudView showDetailMsg:errMsg delay:1.8f];
+            NSLog(@"********************");
+            NSLog(@"%@",errMsg);
+        }
     }
+    
     return YES;
 }
 

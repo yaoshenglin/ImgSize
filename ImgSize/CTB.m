@@ -4362,6 +4362,13 @@ long parseStrtol(NSString *str)
 
 - (NSString *)stringWithRange:(NSRange)range
 {
+    NSInteger lastLocation = range.location + range.length;
+    if (range.location > self.length) {
+        return nil;
+    }
+    else if (lastLocation > self.length) {
+        range.length = self.length - range.location;
+    }
     NSData *data = [self subdataWithRange:range];
     
     NSString *result = [data hexString];

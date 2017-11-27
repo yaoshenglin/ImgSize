@@ -28,6 +28,10 @@
 		14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 14A0E5E81DA8885400CC08B5 /* Localizable.strings */; };
 		14AA21A61DF693B500A3D380 /* 更多@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14AA21A51DF693B500A3D380 /* 更多@2x.png */; };
 		14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */; };
+		14DEB04D1FC96A6700D7D7C1 /* 按钮点击效果.png in Resources */ = {isa = PBXBuildFile; fileRef = 14DEB04C1FC96A6700D7D7C1 /* 按钮点击效果.png */; };
+		14DEB04F1FC96DAE00D7D7C1 /* QQ20170922-0.gif in Resources */ = {isa = PBXBuildFile; fileRef = 14DEB04E1FC96DAE00D7D7C1 /* QQ20170922-0.gif */; };
+		14DEB0521FC9711500D7D7C1 /* UIImage+Tint.m in Sources */ = {isa = PBXBuildFile; fileRef = 14DEB0511FC9711500D7D7C1 /* UIImage+Tint.m */; };
+		14DEB0541FC9724A00D7D7C1 /* iface-主机@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14DEB0531FC9724A00D7D7C1 /* iface-主机@2x.png */; };
 		14EB3CC01DBF420E00B1559C /* QRCodeScan_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */; };
 		14EB3CC31DBF423900B1559C /* CustomDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EB3CC21DBF423900B1559C /* CustomDrawView.m */; };
 		14EB3F8C1DBF495400B1559C /* CreateQRCode_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EB3F8B1DBF495400B1559C /* CreateQRCode_ViewController.m */; };
@@ -188,6 +192,11 @@
 		14AA21A51DF693B500A3D380 /* 更多@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "更多@2x.png"; sourceTree = "<group>"; };
 		14B7041F1E2C5951001F5173 /* OCSqlite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSqlite.h; sourceTree = "<group>"; };
 		14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "立即体验按钮点击效果@2x.png"; sourceTree = "<group>"; };
+		14DEB04C1FC96A6700D7D7C1 /* 按钮点击效果.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "按钮点击效果.png"; sourceTree = "<group>"; };
+		14DEB04E1FC96DAE00D7D7C1 /* QQ20170922-0.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "QQ20170922-0.gif"; sourceTree = "<group>"; };
+		14DEB0501FC9711500D7D7C1 /* UIImage+Tint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Tint.h"; sourceTree = "<group>"; };
+		14DEB0511FC9711500D7D7C1 /* UIImage+Tint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Tint.m"; sourceTree = "<group>"; };
+		14DEB0531FC9724A00D7D7C1 /* iface-主机@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iface-主机@2x.png"; sourceTree = "<group>"; };
 		14EB3CBE1DBF420E00B1559C /* QRCodeScan_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeScan_ViewController.h; sourceTree = "<group>"; };
 		14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeScan_ViewController.m; sourceTree = "<group>"; };
 		14EB3CC11DBF423900B1559C /* CustomDrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomDrawView.h; sourceTree = "<group>"; };
@@ -571,6 +580,8 @@
 				E21A88341946A9BD00BF3164 /* iButton.m */,
 				1489C2001CFC387C0097E4E0 /* Share.h */,
 				1489C2011CFC387C0097E4E0 /* Share.m */,
+				14DEB0501FC9711500D7D7C1 /* UIImage+Tint.h */,
+				14DEB0511FC9711500D7D7C1 /* UIImage+Tint.m */,
 				E24D35FD1B7B2DFC00991739 /* NSData+Base64.h */,
 				E24D35FE1B7B2DFC00991739 /* NSData+Base64.m */,
 				E218EBB51947E73A002160DC /* ChatBottomView.h */,
@@ -773,6 +784,8 @@
 		E2B3B8A71B1D42EE004ED953 /* Image */ = {
 			isa = PBXGroup;
 			children = (
+				14DEB04E1FC96DAE00D7D7C1 /* QQ20170922-0.gif */,
+				14DEB0531FC9724A00D7D7C1 /* iface-主机@2x.png */,
 				144DE2B41CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png */,
 				14AA21A51DF693B500A3D380 /* 更多@2x.png */,
 				145EFB8A1CDDF5F500EB7320 /* 向下图标.png */,
@@ -789,6 +802,7 @@
 				E24D35F31B7B26A200991739 /* 单选_未选中@2x.png */,
 				E24D35F41B7B26A200991739 /* 单选_选中@2x.png */,
 				E2B3B8B11B1D4590004ED953 /* 选中背景图@2x.png */,
+				14DEB04C1FC96A6700D7D7C1 /* 按钮点击效果.png */,
 				E24D35F11B7B252400991739 /* 按钮-选中效果@2x.png */,
 				149AE0971DF6AB1B00AA22AB /* 点击效果.png */,
 				E2B3B8B21B1D4590004ED953 /* 叶子大@2x.png */,
@@ -936,6 +950,7 @@
 				E24D35F61B7B26A200991739 /* 单选_选中@2x.png in Resources */,
 				E2B3B8BD1B1D4590004ED953 /* 叶子大@2x.png in Resources */,
 				1489C20B1CFC38A70097E4E0 /* TencentOpenApi_IOS_Bundle.bundle in Resources */,
+				14DEB0541FC9724A00D7D7C1 /* iface-主机@2x.png in Resources */,
 				E2B3B8A91B1D456C004ED953 /* msg1@2x.png in Resources */,
 				14EB3F931DBF4D4100B1559C /* 相册@2x.png in Resources */,
 				E2B3B8BC1B1D4590004ED953 /* 选中背景图@2x.png in Resources */,
@@ -944,6 +959,8 @@
 				E2B3B8BE1B1D4590004ED953 /* 语音-红@2x.png in Resources */,
 				14EF59F71DC19884009C9EF1 /* 扫描条@2x.png in Resources */,
 				14531B7F1D8138D5000466C6 /* IRCode.db in Resources */,
+				14DEB04D1FC96A6700D7D7C1 /* 按钮点击效果.png in Resources */,
+				14DEB04F1FC96DAE00D7D7C1 /* QQ20170922-0.gif in Resources */,
 				E22073631B95B7CA00DBB8D4 /* ContentType.plist in Resources */,
 				14AA21A61DF693B500A3D380 /* 更多@2x.png in Resources */,
 				E24D35F21B7B252400991739 /* 按钮-选中效果@2x.png in Resources */,
@@ -1035,6 +1052,7 @@
 				E228DFD9196F7FF200C882E0 /* Test_ViewController.m in Sources */,
 				1489C2091CFC38A70097E4E0 /* sdkCall.m in Sources */,
 				E22C944219CC351F00D9EAC1 /* AddressBook.m in Sources */,
+				14DEB0521FC9711500D7D7C1 /* UIImage+Tint.m in Sources */,
 				E21EE5F419270DBF0051408C /* main.m in Sources */,
 				E24D35F91B7B2BD900991739 /* StringEncryption.m in Sources */,
 				E24D35EC1B7B231100991739 /* IQBarButtonItem.m in Sources */,
@@ -1252,7 +1270,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Guangzhou Wei Control Electronic Technology Co., Ltd (24UPQ796CD)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				DEVELOPMENT_TEAM = 24UPQ796CD;
+				DEVELOPMENT_TEAM = 9D3GVQFWSP;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1275,8 +1293,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2c6e0a01-aa43-4327-a8af-a76bcf8b0a51";
-				PROVISIONING_PROFILE_SPECIFIER = "XC Ad Hoc: *";
+				PROVISIONING_PROFILE = "2e884f95-1908-47f0-afc2-dcc1e002a15c";
+				PROVISIONING_PROFILE_SPECIFIER = weicontrol.XXX.AdHoc;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "ImgSize/ImgSize-Bridging-Header.h";
 				VALID_ARCHS = "armv7 armv7s arm64";

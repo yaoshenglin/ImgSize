@@ -173,7 +173,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
     gameView = [[UIImageView alloc] initWithImage:image];
     [baseView addSubview:gameView];
     gameView.clipsToBounds = YES;
-    gameView.layer.cornerRadius = GetVWidth(gameView)/2;
+    //gameView.layer.cornerRadius = MIN(GetVWidth(gameView)/2, GetVHeight(gameView)/2);
     gameView.center = GetPoint(GetVWidth(baseView)/2, GetVHeight(gameView)/2);
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:baseView];
