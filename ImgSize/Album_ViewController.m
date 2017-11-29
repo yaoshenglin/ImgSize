@@ -64,13 +64,26 @@
         [hudView hide:YES];
     }];
     
-    NSString *imgName = @"iface-主机@2x.png";
-    UIImage *image = [UIImage imageNamed:imgName];
-    UIColor *color = [CTB colorWithHexString:@"00A0E9"];
-    image = [image imageWithReplaceColor:color];
-    path = [@"~/Library" stringByExpandingTildeInPath];
-    path = [path stringByAppendingPathComponent:imgName];
-    [UIImagePNGRepresentation(image) writeToFile:path atomically:YES];
+    NSArray *listName = @[@"LaunchImage-568h_en@2x.png",@"LaunchImage-568h_zh@2x.png",@"LaunchImage-800-667h_en@2x.png",@"LaunchImage-800-667h_zh@2x.png",@"LaunchImage-800-Portrait-736h_en@3x.png",@"LaunchImage-800-Portrait-736h_zh@3x.png",@"LaunchImage_en@2x.png",@"LaunchImage_zh@2x.png"];
+    for (int i=0; i<listName.count; i++) {
+        if (i >= 0) {
+            continue;
+        }
+        NSString *imgName = listName[i];
+        UIImage *image = [UIImage imageNamed:imgName];
+        UIColor *color = [CTB colorWithHexString:@"00A0E9"];
+        image = [image imageWithReplaceColor:color];
+        path = [@"~/Library" stringByExpandingTildeInPath];
+        path = [path stringByAppendingPathComponent:imgName];
+        NSData *data = UIImagePNGRepresentation(image);
+        if (data) {
+            if (![data writeToFile:path atomically:YES]) {
+                NSLog(@"写入失败,%ld,%@",(long)data.length,path);
+            }
+        }else{
+            NSLog(@"操作失败");
+        }
+    }
 }
 
 - (void)setupSubViews
