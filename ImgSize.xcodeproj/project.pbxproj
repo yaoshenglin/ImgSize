@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		140DFC5A1FE0C3C700166C5B /* baseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 140DFC591FE0C3C700166C5B /* baseViewController.m */; };
+		140DFC5D1FE114E200166C5B /* ExportGather.m in Sources */ = {isa = PBXBuildFile; fileRef = 140DFC5C1FE114E200166C5B /* ExportGather.m */; };
 		144DE2B21CFD5E5500BE43B9 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 144DE2B11CFD5E5500BE43B9 /* Toast+UIView.m */; };
 		144DE2B51CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 144DE2B41CFD66E100BE43B9 /* 场景编辑_场景图片@2x.png */; };
 		14531B7F1D8138D5000466C6 /* IRCode.db in Resources */ = {isa = PBXBuildFile; fileRef = 14531B7E1D8138D5000466C6 /* IRCode.db */; };
@@ -27,6 +29,7 @@
 		149AE0981DF6AB1B00AA22AB /* 点击效果.png in Resources */ = {isa = PBXBuildFile; fileRef = 149AE0971DF6AB1B00AA22AB /* 点击效果.png */; };
 		14A0E5E91DA8885400CC08B5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 14A0E5E81DA8885400CC08B5 /* Localizable.strings */; };
 		14AA21A61DF693B500A3D380 /* 更多@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14AA21A51DF693B500A3D380 /* 更多@2x.png */; };
+		14C2FE951FDFABED008DA0CE /* HttpRequest_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14C2FE941FDFABED008DA0CE /* HttpRequest_ViewController.m */; };
 		14D74F7A1CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */; };
 		14DD11581FCE4EDD00D66DB1 /* LaunchImage_en@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14DD114E1FCE4EDD00D66DB1 /* LaunchImage_en@2x.png */; };
 		14DD11591FCE4EDD00D66DB1 /* LaunchImage_zh@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 14DD114F1FCE4EDD00D66DB1 /* LaunchImage_zh@2x.png */; };
@@ -168,6 +171,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		140DFC581FE0C3C700166C5B /* baseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baseViewController.h; sourceTree = "<group>"; };
+		140DFC591FE0C3C700166C5B /* baseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = baseViewController.m; sourceTree = "<group>"; };
+		140DFC5B1FE114DC00166C5B /* ExportGather.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExportGather.h; sourceTree = "<group>"; };
+		140DFC5C1FE114E200166C5B /* ExportGather.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExportGather.m; sourceTree = "<group>"; };
 		144DE2B01CFD5E5500BE43B9 /* Toast+UIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Toast+UIView.h"; sourceTree = "<group>"; };
 		144DE2B11CFD5E5500BE43B9 /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		144DE2B31CFD5F0D00BE43B9 /* Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
@@ -201,6 +208,8 @@
 		14A0E5E71DA8885400CC08B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		14AA21A51DF693B500A3D380 /* 更多@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "更多@2x.png"; sourceTree = "<group>"; };
 		14B7041F1E2C5951001F5173 /* OCSqlite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSqlite.h; sourceTree = "<group>"; };
+		14C2FE931FDFABED008DA0CE /* HttpRequest_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HttpRequest_ViewController.h; sourceTree = "<group>"; };
+		14C2FE941FDFABED008DA0CE /* HttpRequest_ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HttpRequest_ViewController.m; sourceTree = "<group>"; };
 		14D74F791CC756B80070E7F0 /* 立即体验按钮点击效果@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "立即体验按钮点击效果@2x.png"; sourceTree = "<group>"; };
 		14DD114E1FCE4EDD00D66DB1 /* LaunchImage_en@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LaunchImage_en@2x.png"; sourceTree = "<group>"; };
 		14DD114F1FCE4EDD00D66DB1 /* LaunchImage_zh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LaunchImage_zh@2x.png"; sourceTree = "<group>"; };
@@ -519,6 +528,8 @@
 				E21EE5F719270DBF0051408C /* AppDelegate.m */,
 				E21EE5FC19270DBF0051408C /* ViewController.h */,
 				E21EE5FD19270DBF0051408C /* ViewController.m */,
+				140DFC581FE0C3C700166C5B /* baseViewController.h */,
+				140DFC591FE0C3C700166C5B /* baseViewController.m */,
 				E216DD3E192B352A00B17105 /* Second_ViewController.h */,
 				E216DD3F192B352A00B17105 /* Second_ViewController.m */,
 				E216DD41192B398D00B17105 /* Third_ViewController.h */,
@@ -527,6 +538,8 @@
 				E264915B1A651ED8009910C5 /* Color_ViewController.m */,
 				147ED3F71DFFA5C50060E5B5 /* Album_ViewController.h */,
 				147ED3F81DFFA5C50060E5B5 /* Album_ViewController.m */,
+				14C2FE931FDFABED008DA0CE /* HttpRequest_ViewController.h */,
+				14C2FE941FDFABED008DA0CE /* HttpRequest_ViewController.m */,
 				14EB3CBE1DBF420E00B1559C /* QRCodeScan_ViewController.h */,
 				14EB3CBF1DBF420E00B1559C /* QRCodeScan_ViewController.m */,
 				14EB3F8A1DBF495400B1559C /* CreateQRCode_ViewController.h */,
@@ -616,6 +629,8 @@
 				E24D35FB1B7B2C8700991739 /* QRCodeGenerator.m */,
 				E22C944019CC351F00D9EAC1 /* AddressBook.h */,
 				E22C944119CC351F00D9EAC1 /* AddressBook.m */,
+				140DFC5B1FE114DC00166C5B /* ExportGather.h */,
+				140DFC5C1FE114E200166C5B /* ExportGather.m */,
 				E218EBC61948101C002160DC /* Tools.h */,
 				E218EBC71948101C002160DC /* Tools.m */,
 				E295DC181B0194FD0012DE19 /* Access.h */,
@@ -1039,6 +1054,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E24D35E81B7B231100991739 /* IQKeyboardManager.m in Sources */,
+				140DFC5A1FE0C3C700166C5B /* baseViewController.m in Sources */,
 				1489C2021CFC387C0097E4E0 /* Share.m in Sources */,
 				E2727A771A6A59EA00CC57D6 /* GesturePasswordButton.m in Sources */,
 				14EB3CC31DBF423900B1559C /* CustomDrawView.m in Sources */,
@@ -1052,6 +1068,7 @@
 				E24D35E31B7B231100991739 /* IQNSArray+Sort.m in Sources */,
 				E24D35EB1B7B231100991739 /* IQTextView.m in Sources */,
 				E21EE5FE19270DBF0051408C /* ViewController.m in Sources */,
+				14C2FE951FDFABED008DA0CE /* HttpRequest_ViewController.m in Sources */,
 				E28EBFA319FA00ED007753E5 /* MyDrawView.m in Sources */,
 				E264915C1A651ED8009910C5 /* Color_ViewController.m in Sources */,
 				E21EE62019270E240051408C /* CTB.m in Sources */,
@@ -1077,6 +1094,7 @@
 				E24D35ED1B7B231100991739 /* IQTitleBarButtonItem.m in Sources */,
 				E2727A7A1A6A59EA00CC57D6 /* KeychainItemWrapper.m in Sources */,
 				E23410A4195BAA560086AE54 /* PhotoPreView.m in Sources */,
+				140DFC5D1FE114E200166C5B /* ExportGather.m in Sources */,
 				E24D35EE1B7B231100991739 /* IQToolbar.m in Sources */,
 				E295DC1A1B0194FD0012DE19 /* Access.m in Sources */,
 				E24D35E51B7B231100991739 /* IQUIView+Hierarchy.m in Sources */,

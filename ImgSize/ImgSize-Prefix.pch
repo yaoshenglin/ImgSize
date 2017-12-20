@@ -15,11 +15,12 @@
     #import <Foundation/Foundation.h>
     #import "AppDelegate.h"
 
-    #define k_action @"api"                         //默认动作根目录
-    #define k_host @"http://121.201.17.130:8100"       //http://121.201.17.130:8100
-    #define k_res_host @"http://121.201.17.130:8100"
-    //#define k_res_host @"http://res.weicontrol.cn"   //http://res.weicontrol.cn
+    #define k_action @"api_V2"                      //默认动作根目录
+    #define k_host @"https://api.weicontrol.cn"      //http://121.201.17.130:8100
+    #define k_res_host @"http://res.happyeasy.cc"   //http://res.weicontrol.cn
 #endif
+
+#define KIFaceApikey @"873CAE6EEEF6484C89B19256C9AF8327"
 
 #define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 

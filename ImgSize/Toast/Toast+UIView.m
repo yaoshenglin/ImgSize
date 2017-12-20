@@ -62,9 +62,17 @@ static const NSString * CSToastActivityViewKey  = @"CSToastActivityViewKey";
 
 - (void)makeToast:(NSString *)message
 {
-    UIView *toast = [self viewWithTag:450];
-    [toast removeFromSuperview];
-    [self makeToast:message duration:CSToastDefaultDuration position:CSToastDefaultPosition];
+    dispatch_block_t block = ^{
+        UIView *toast = [self viewWithTag:450];
+        [toast removeFromSuperview];
+        [self makeToast:message duration:CSToastDefaultDuration position:CSToastDefaultPosition];
+    };
+    if ([NSThread currentThread] != [NSThread mainThread]) {
+        dispatch_queue_t queue = dispatch_get_main_queue();
+        dispatch_sync(queue, block);
+    }else{
+        block();
+    }
 }
 
 - (void)makeToast:(NSString *)message duration:(CGFloat)interval position:(id)position

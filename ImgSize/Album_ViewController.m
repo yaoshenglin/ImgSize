@@ -64,7 +64,7 @@
         [hudView hide:YES];
     }];
     
-    NSArray *listName = @[@"LaunchImage-568h_en@2x.png",@"LaunchImage-568h_zh@2x.png",@"LaunchImage-800-667h_en@2x.png",@"LaunchImage-800-667h_zh@2x.png",@"LaunchImage-800-Portrait-736h_en@3x.png",@"LaunchImage-800-Portrait-736h_zh@3x.png",@"LaunchImage_en@2x.png",@"LaunchImage_zh@2x.png"];
+    NSArray *listName = @[@"LaunchImage_en@2x.png",@"LaunchImage_zh@2x.png",@"iface-主机@2x.png"];
     for (int i=0; i<listName.count; i++) {
         if (i >= 0) {
             continue;
@@ -82,6 +82,12 @@
             }
         }else{
             NSLog(@"操作失败");
+        }
+        
+        if (i == listName.count-1) {
+            UIImageView *imgView = [[UIImageView alloc] initWithImage:image];
+            [self.view addSubview:imgView];
+            imgView.center = self.view.center;
         }
     }
 }

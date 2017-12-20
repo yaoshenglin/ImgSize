@@ -178,15 +178,12 @@ static NSString *const SBStyle2 = @"SBStyle2";
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:baseView];
     _animator.delegate = self;
-
+    
     lblTime = [CTB labelTag:1 toView:baseView text:@"00:00:00" wordSize:48];
     lblTime.textColor = [UIColor blueColor];
     lblTime.frame = GetRect(30, 50, GetVWidth(baseView)-60, 38);
     
     [NSTimer scheduled:0.5 target:self selector:@selector(updateTime:) userInfo:nil repeats:YES];
-        
-    //CGSize size = CGSizeMake(320, 480); // size of view in popover
-    //self.preferredContentSize = size;
 }
 
 - (void)PrintWord
@@ -227,9 +224,11 @@ static NSString *const SBStyle2 = @"SBStyle2";
         
         //[self.view bringSubviewToFront:ViewBlue];
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择设备" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"门禁", @"主机",@"系统设置",@"相册", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择设备" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"门禁", @"主机",@"网络请求",@"相册", nil];
         alert.tag = 2;
         [alert show];
+        
+        //[self scanWifis];
     }
     if (button.tag == 3) {
         //NSString *urlString = @"http://dldir1.qq.com/qqfile/qq/QQ2013/QQ2013SP5/9050/QQ2013SP5.exe";
@@ -571,6 +570,10 @@ static NSString *const SBStyle2 = @"SBStyle2";
             UIViewController *Album = [CTB NSClassFromString:@"Album_ViewController"];
             [self.navigationController pushViewController:Album animated:YES];
         }
+        else if ([btnTitle isEqualToString:@"网络请求"]) {
+            UIViewController *HttpRequest = [CTB getControllerWithIdentity:@"HttpRequest" storyboard:nil];
+            [self.navigationController pushViewController:HttpRequest animated:YES];
+        }
         self.hidesBottomBarWhenPushed = NO;
     }
     else if (alertView.tag == 3) {
@@ -578,6 +581,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
         textLabel.text = txtName.text;
         CGFloat fontSize = [UIFont sizeWithString:textLabel.text forWidth:GetVWidth(textLabel)];
         textLabel.font = [UIFont systemFontOfSize:fontSize];
+        [textLabel customDescription];
     }
 }
 
