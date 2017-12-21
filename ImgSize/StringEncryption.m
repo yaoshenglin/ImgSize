@@ -5,7 +5,7 @@
 #import "Tools.h"
 
 typedef CF_ENUM(NSStringEncoding, CFStringBuilt) {
-    GBEncoding = 0x80000632 /* kTextEncodingUnicodeDefault + kUnicodeUTF32LEFormat */
+    GBEncoding = 0x80000632 /* CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000) */
 };
 
 #define kEncryptKey @"w8lKEw3ADAX#0gA8" // 加密用的key

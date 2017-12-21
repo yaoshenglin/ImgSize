@@ -7,7 +7,7 @@
 //
 
 #import "HTTPRequest.h"
-//#import "GDataXMLNode.h"
+#import "GDataXMLNode.h"
 
 //#import "CTB.h"
 
@@ -18,6 +18,7 @@ NSString *const FileDownload = @"fileDownload";
     int64_t currentLen;
     NSDate *sendDate;//发送时间
     NSDate *receiveDate;//接收时间
+    NSString *uploadFilePath;//上传文件路径
 }
 
 @end
@@ -220,8 +221,12 @@ NSString *const FileDownload = @"fileDownload";
     NSData *data = nil;
     
     NSString *fileName = [dic objectForKey:@"fileName"];
-    
     id file = [dic objectForKey:@"file"];
+    //如果路径存在,直接拿取
+    NSString *Path = dic[@"path"];
+    if (Path) {
+        uploadFilePath = Path;
+    }
     
     if ([file isKindOfClass:[UIImage class]]) {
         UIImage *image = (UIImage *)file;
@@ -259,7 +264,6 @@ NSString *const FileDownload = @"fileDownload";
         //fileType = @"image/jpg";
         
         //如果路径存在,直接拿取
-        NSString *Path = dic[@"path"];
         if (Path) {
             data = [NSData dataWithContentsOfFile:Path];
         }
@@ -275,6 +279,10 @@ NSString *const FileDownload = @"fileDownload";
         if ([fileName hasSuffix:@".txt"]) {
             //fileType = @"text/plain";
         }
+    }
+    else if (!file && Path) {
+        uploadFilePath = Path;
+        data = [NSData dataWithContentsOfFile:Path];
     }
     
     return data;
@@ -341,8 +349,26 @@ NSString *const FileDownload = @"fileDownload";
     _session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     
     // 由系统直接返回一个dataTask任务
-
-    _myDataTask = [_session dataTaskWithRequest:request];
+    switch (_taskType) {
+        case SessionTaskType_Upload:
+        {
+            NSURL *fileURL = [NSURL URLWithString:uploadFilePath];
+            if (fileURL) {
+                _myDataTask = [_session uploadTaskWithRequest:request fromFile:fileURL];
+            }else{
+                _myDataTask = [_session uploadTaskWithRequest:request fromData:request.HTTPBody];
+            }
+        }
+            break;
+        case SessionTaskType_Download:
+            _myDataTask = [_session downloadTaskWithRequest:request];
+            break;
+            
+        default:
+            _myDataTask = [_session dataTaskWithRequest:request];
+            break;
+    }
+    
     [self resume];
 }
 
@@ -519,10 +545,11 @@ NSString *const FileDownload = @"fileDownload";
         NSStringEncoding encoding = CFStringConvertEncodingToNSStringEncoding (enc);
         NSString *stringL = [[NSString alloc] initWithData:activeDownload encoding: encoding];
         if (!stringL) {
-            printf("/////////%s////////\n",_response.textEncodingName.UTF8String);
-            printf("自动获取编码失败\n");
-            NSStringEncoding encoding = NSUTF8StringEncoding;
-            stringL = [[NSString alloc] initWithData:activeDownload encoding: encoding];
+            if (![textEncodingName isEqualToString:@"utf-8"]) {
+                encoding = NSUTF8StringEncoding;
+                printf("/////////%s////////\n",textEncodingName.UTF8String);
+                stringL = [[NSString alloc] initWithData:activeDownload encoding: encoding];
+            }
             
             if (!stringL) {
                 encoding = 0x80000632;
@@ -548,38 +575,41 @@ NSString *const FileDownload = @"fileDownload";
             }
             return;
         }
-        NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&error1];
-        //NSLog(@"%@",resultsDictionary);
         
-        BOOL isSuccess = [[jsonDic objectForKey:@"flag"] boolValue];
-        if (isSuccess && !error1) {
-            _jsonDic = jsonDic;
-            if ([_delegate respondsToSelector:@selector(wsOK:)]) {
-                @try {
-                    [_delegate wsOK:self];
-                }
-                @catch (NSException *ex) {
-                    NSString *result = [NSString stringWithFormat:@"RequestOK,%@,%@,%@",_method,ex.name,ex.reason];
-                    _errMsg = @"解析错误";//解析错误
-                    NSLog(@"%@",result);
-                    [self wsFailedWithDelegate:_delegate];
-                    
-                    NSString *path = [@"~/Documents/HttpException.txt" stringByExpandingTildeInPath];
-                    [self.class writeToEndOfFileAtPaths:path content:result];
-                }
-                @finally {
+        if ([_dataType hasSuffix:@"/json"]) {
+            NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&error1];
+            //NSLog(@"%@",resultsDictionary);
+            
+            BOOL isSuccess = [[jsonDic objectForKey:@"flag"] boolValue];
+            if (isSuccess && !error1) {
+                _jsonDic = jsonDic;
+                if ([_delegate respondsToSelector:@selector(wsOK:)]) {
+                    @try {
+                        [_delegate wsOK:self];
+                    }
+                    @catch (NSException *ex) {
+                        NSString *result = [NSString stringWithFormat:@"RequestOK,%@,%@,%@",_method,ex.name,ex.reason];
+                        _errMsg = @"解析错误";//解析错误
+                        NSLog(@"%@",result);
+                        [self wsFailedWithDelegate:_delegate];
+                        
+                        NSString *path = [@"~/Documents/HttpException.txt" stringByExpandingTildeInPath];
+                        [self.class writeToEndOfFileAtPaths:path content:result];
+                    }
+                    @finally {
+                    }
                 }
             }
-        }
-        else if (jsonDic) {
-            NSString *msg = [jsonDic objectForKey:@"msg"];
-            msg = (msg && [msg isKindOfClass:[NSString class]]) ? msg : @"请求错误";//请求错误
-            _jsonDic = jsonDic;
-            _errMsg = msg;
-            [self wsFailedWithDelegate:_delegate];
+            else if (jsonDic) {
+                NSString *msg = [jsonDic objectForKey:@"msg"];
+                msg = (msg && [msg isKindOfClass:[NSString class]]) ? msg : @"请求错误";//请求错误
+                _jsonDic = jsonDic;
+                _errMsg = msg;
+                [self wsFailedWithDelegate:_delegate];
+            }
         }else{
             NSString *msg = nil;
-            //msg = [GDataXMLNode getBody:stringL];
+            msg = [GDataXMLNode getBody:stringL];
             msg = msg ?: @"服务暂时不可用";//服务暂时不可用
             _errMsg = msg;
             [self wsFailedWithDelegate:_delegate];

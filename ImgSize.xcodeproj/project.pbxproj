@@ -1308,6 +1308,7 @@
 					"-D",
 					FOR_DEBUG,
 				);
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "013c3608-1091-462b-b7ef-12fa6ffba155";
@@ -1349,6 +1350,7 @@
 					"$(PROJECT_DIR)/ImgSize/WeChat",
 					"$(PROJECT_DIR)/ImgSize",
 				);
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.weicontrol.imgSize;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "2e884f95-1908-47f0-afc2-dcc1e002a15c";

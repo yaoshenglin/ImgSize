@@ -84,7 +84,7 @@
 
 typedef NSString * (^WriteBlock)(void);//写入操作
 typedef CF_ENUM(NSStringEncoding, CFStringBuilt) {
-    GBEncoding = 0x80000632 /* kTextEncodingUnicodeDefault + kUnicodeUTF32LEFormat */
+    GBEncoding = 0x80000632 /* CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000) */
 };
 
 NS_INLINE CGFloat GetMinX(CGRect rect) { return CGRectGetMinX(rect); }

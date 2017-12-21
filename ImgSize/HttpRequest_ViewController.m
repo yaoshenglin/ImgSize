@@ -100,11 +100,16 @@
     NSDictionary *userInfo = getUserData(@"userInfo");
     NSString *token = [userInfo stringForKey:@"token"];
     token = token ?: @"301|E21CA9946944987340C1DA235AC2A73C";
-    NSString *imgName = @"msg2";
-    UIImage *image = [UIImage imageNamed:imgName];
+    NSString *imgName = @"QQ_V6.2.0.dmg";
+    NSString *dirPath = [@"~/Library" stringByExpandingTildeInPath];
+    dirPath = [dirPath stringByAppendingPathComponent:@"Downloads"];
+    NSString *path = [dirPath stringByAppendingPathComponent:imgName];
+    NSData *data = [NSData dataWithContentsOfFile:path];
+//    UIImage *image = [UIImage imageNamed:imgName];
     
-    NSDictionary *body = @{@"file":image,@"fileName":imgName};
+    NSDictionary *body = @{@"file":data,@"fileName":imgName,@"path":path};
     request = [[HTTPRequest alloc] initWithDelegate:self];
+    request.urlString = @"http://www.freeimagehosting.net/upl.php";
     request.taskType = SessionTaskType_Upload;
     [request run:UpdateSceneImg body:body delegate:self];
     [request setValue:token forHeader:@"token" encoding:NSUTF8StringEncoding];
@@ -197,16 +202,21 @@
     }
     else if ([iWS.method isEqualToString:FileDownload]) {
         NSString *fileName = iWS.response.suggestedFilename;
-        NSString *dirPath = [[[NSBundle mainBundle] resourcePath] stringByDeletingLastPathComponent];
+        NSString *dirPath = [@"~/Library" stringByExpandingTildeInPath];
         dirPath = [dirPath stringByAppendingPathComponent:@"Downloads"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         if (![fileManager fileExistsAtPath:dirPath]) {
-            [fileManager createDirectoryAtPath:dirPath withIntermediateDirectories:YES attributes:nil error:nil];
+            NSError *error = nil;
+            [fileManager createDirectoryAtPath:dirPath withIntermediateDirectories:YES attributes:nil error:&error];
+            if (error) {
+                NSLog(@"%@",error.localizedDescription);
+            }
         }
         NSString *path = [dirPath stringByAppendingPathComponent:fileName];
         BOOL result = [iWS.responseData writeToFile:path atomically:YES];
         if (!result) {
             NSLog(@"写入失败,%@",path);
+            [self.view makeToast:@"文件保存失败"];
         }
     }
     else if ([iWS.method isEqualToString:GetLastVersions]) {
