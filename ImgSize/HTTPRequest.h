@@ -3,7 +3,7 @@
 //  iFace
 //
 //  Created by Yin on 15-3-24.
-//  Copyright (c) 2015年 caidan. All rights reserved.
+//  Copyright © 2015年 weicontrol. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -37,9 +37,9 @@ FOUNDATION_EXPORT NSString *const FileDownload;//文件下载
 
 @property (nonatomic, weak) id delegate;//代理
 @property (nonatomic, assign) SessionTaskType taskType;
-@property (nonatomic, strong) NSData *resumData; // 续传数据
-@property (nonatomic, strong) NSURLSession *session; // 会话
-@property (nonatomic, strong) NSURLSessionTask *myDataTask; // 请求任务
+@property (nonatomic, retain) NSData *resumData; // 续传数据
+@property (nonatomic, retain) NSURLSession *session; // 会话
+@property (nonatomic, retain) NSURLSessionTask *myDataTask; // 请求任务
 @property (nonatomic, retain) NSMutableURLRequest *request;
 @property (nonatomic) NSTimeInterval timeOut;//超时时间
 @property (nonatomic, retain) NSString *HTTPMethod;//请求类型(GET,POST)
@@ -51,8 +51,9 @@ FOUNDATION_EXPORT NSString *const FileDownload;//文件下载
 @property (nonatomic, retain) NSString *tag;
 @property (nonatomic, retain) NSString *tagString;
 @property (nonatomic, assign) NSInteger totalLength;
-@property (nonatomic, assign) BOOL isShowErrmsg;//默认为YES,显示错误信息
+@property (nonatomic, assign) BOOL isShowErrmsg;//显示错误信息(默认为YES)
 @property (nonatomic, assign) BOOL isSaveXml;//是否保存返回数据为xml文件(默认为NO)
+@property (nonatomic, assign) BOOL isShowLog;//是否显示LOG(默认为NO)
 
 @property (nonatomic, retain) NSDictionary *dicTag;//标签
 @property (nonatomic, retain,readonly) NSString *method;//接口名
@@ -64,12 +65,12 @@ FOUNDATION_EXPORT NSString *const FileDownload;//文件下载
 @property (nonatomic, assign,readonly) NSInteger errType;//错误信息(服务器)
 
 @property (nonatomic, retain,readonly) NSHTTPURLResponse *response;
-@property (nonatomic, assign,readonly) int responseStatusCode;//请求响应码
+@property (nonatomic, assign,readonly) int responseStatusCode;//请求响应码(200为正常)
 @property (nonatomic, retain,readonly) NSString *responseStatusMessage;//请求响应信息
 
 + (NSString *)initUrl:(NSString *)method;
 + (HTTPRequest *)run:(NSString *)method body:(NSDictionary *)body delegate:(id)thedelegate;
-+ (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler NS_AVAILABLE(10_7, 5_0);
++ (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSData * data, NSURLResponse * response, NSError * error))completionHandler;
 + (id)requestWithDelegate:(id)delegate;
 - (id)initWithDelegate:(id)delegate;
 - (void)run:(NSString *)method body:(NSDictionary *)body delegate:(id)thedelegate;
@@ -84,7 +85,7 @@ FOUNDATION_EXPORT NSString *const FileDownload;//文件下载
 - (void)suspend;//暂停
 - (void)cancel;//取消
 - (NSDictionary *)dicWithHTTPBody;
-- (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler NS_AVAILABLE(10_7, 5_0);
+- (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSData * data, NSURLResponse * response, NSError * error))completionHandler;
 
 @end
 

@@ -3,7 +3,7 @@
 //  iFace
 //
 //  Created by Yin on 15-3-24.
-//  Copyright (c) 2015年 caidan. All rights reserved.
+//  Copyright © 2015年 weicontrol. All rights reserved.
 //
 
 #import "HTTPRequest.h"
@@ -26,6 +26,20 @@ NSString *const FileDownload = @"fileDownload";
 @implementation HTTPRequest
 
 @synthesize request;
+
+#pragma mark 获取系统语言
++ (NSString *)getLocaleLang
+{
+    NSLocale *usLocale = [NSLocale currentLocale];
+    NSArray *languages = [usLocale.localeIdentifier componentsSeparatedByString:@"_"];
+    if (languages.count > 1) {
+        float iPhoneVer = [[[UIDevice currentDevice] systemVersion] floatValue];
+        NSString *lang = iPhoneVer>=10 ? usLocale.languageCode : languages.firstObject;
+        return lang;
+    }
+    
+    return nil;
+}
 
 + (NSString *)initUrl:(NSString *)method
 {
@@ -149,16 +163,16 @@ NSString *const FileDownload = @"fileDownload";
     request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:_timeOut];//超时时间
     //request.userAgentString = [self makeUserAgentForRequest:nil];
     
-    NSURLCache *urlCache = [NSURLCache sharedURLCache];
+    //NSURLCache *urlCache = [NSURLCache sharedURLCache];
     /* 设置缓存的大小为0M*/
-    [urlCache setMemoryCapacity:0];//1M = 1*1024*1024
+    //[urlCache setMemoryCapacity:0];//1M = 1*1024*1024
     //从请求中获取缓存输出
-    NSCachedURLResponse *response = [urlCache cachedResponseForRequest:request];
+    //NSCachedURLResponse *response = [urlCache cachedResponseForRequest:request];
     //判断是否有缓存
-    if (response != nil) {
-        NSLog(@"如果有缓存输出，从缓存中获取数据");
+    //if (response != nil) {
+        //NSLog(@"如果有缓存输出，从缓存中获取数据");
         //[request setCachePolicy:NSURLRequestReturnCacheDataDontLoad];
-    }
+    //}
     
     if (_taskType == SessionTaskType_Upload) {
         request.timeoutInterval = 180.0f;
@@ -172,6 +186,7 @@ NSString *const FileDownload = @"fileDownload";
         NSString *boundary = @"---------------------------14737809831466499882746641449";
         NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",boundary];
         [self addValue:contentType forHeader: @"Content-Type"];
+        [self setValue:@"application/json" forHeader:@"Accept"];
         NSMutableData *bodyData = [NSMutableData data];
         [bodyData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
         [bodyData appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"userfile\"; filename=\"%@\"\r\n",fileName] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -181,6 +196,12 @@ NSString *const FileDownload = @"fileDownload";
         [request setHTTPBody:bodyData];
         body = nil;
     }
+    else if (_taskType == SessionTaskType_Download) {
+        //下载时不接受数据为JSON类型的
+        request.HTTPMethod = @"GET";//设置为 GET
+        NSString *languageCode = [self.class getLocaleLang];//en_CN,zh_CN(语言_地区)
+        [request setValue:languageCode forHTTPHeaderField:@"lang"];
+    }
     
     if ([NSJSONSerialization isValidJSONObject:body]) {
         //利用系统自带 JSON 工具封装 JSON 数据
@@ -188,6 +209,7 @@ NSString *const FileDownload = @"fileDownload";
         request.HTTPMethod = @"POST";//设置为 POST
         request.HTTPBody = jsonData;//把刚才封装的 JSON 数据塞进去
         [self setValue:@"application/json" forHeader:@"Content-Type"];
+        [self setValue:@"application/json" forHeader:@"Accept"];
         _body = [self dicWithHTTPBody];
         
         // 设置请求头文件
@@ -195,8 +217,6 @@ NSString *const FileDownload = @"fileDownload";
         //[self addValue:rangeValue forHeader:@"Range"];
     }
     
-    [self setValue:@"application/json" forHeader:@"Accept"];
-    [self setValue:@(request.HTTPBody.length).stringValue forHeader:@"Content-length"];
     if ([k_action isEqualToString:@"api_V2"]) {
         NSString *token = [body objectForKey:@"token"];
         token = token ?: [_dicTag objectForKey:@"token"];
@@ -361,7 +381,7 @@ NSString *const FileDownload = @"fileDownload";
         }
             break;
         case SessionTaskType_Download:
-            _myDataTask = [_session downloadTaskWithRequest:request];
+            _myDataTask = [_session dataTaskWithRequest:request];
             break;
             
         default:
@@ -402,13 +422,6 @@ NSString *const FileDownload = @"fileDownload";
     return body;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if ([keyPath isEqualToString:@"request"] ) {
-        NSLog(@"%@",request.allHTTPHeaderFields);
-    }
-}
-
 #pragma mark - --------请求回调------------------------
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 {
@@ -430,7 +443,9 @@ NSString *const FileDownload = @"fileDownload";
         [_delegate sendProgress:rate];
     }
     
-    //NSLog(@"发送进度:%.2f%%,%lld",rate/0.01,task.countOfBytesSent);
+    if (_isShowLog) {
+        NSLog(@"发送进度:%.2f%%,%lld",rate/0.01,task.countOfBytesSent);
+    }
 }
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler
@@ -449,17 +464,23 @@ NSString *const FileDownload = @"fileDownload";
     if (!_body) {
     }
     
-    NSLog(@"收到服务器响应,内容长度：%lld",contentLength);
+    if (_isShowLog) {
+        NSLog(@"收到服务器响应,内容长度：%lld",contentLength);
+    }
     
     completionHandler(NSURLSessionResponseAllow);
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
-{
-    //缓存处理
-    //NSLog(@"method : %@",_method);
-    return nil;
-}
+/* Sent when a download has been resumed. If a download failed with an
+ * error, the -userInfo dictionary of the error will contain an
+ * NSURLSessionDownloadTaskResumeData key, whose value is the resume
+ * data.
+ */
+//- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didResumeAtOffset:(int64_t)fileOffset expectedTotalBytes:(int64_t)expectedTotalBytes
+//{
+//    //告诉代理人下载任务已经恢复
+//    NSLog(@"NSURLSessionDownloadDelegate 下载任务已经恢复");
+//}
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
@@ -492,8 +513,15 @@ NSString *const FileDownload = @"fileDownload";
         [_delegate receiveProgress:rate];
     }
     
-    //NSLog(@"接收进度:%.2f%%",rate/0.01);
+    if (_isShowLog) {
+        NSLog(@"接收进度:%.2f%%",rate/0.01);
+    }
 }
+
+//- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location;
+//{
+//    
+//}
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
@@ -514,7 +542,7 @@ NSString *const FileDownload = @"fileDownload";
         _urlString = userInfo[@"NSErrorFailingURLStringKey"];
         [self wsFailedWithDelegate:_delegate];
     } else {
-        NSLog(@"NSURLSessionTaskStateCompleted 操作成功!");
+        //NSLog(@"NSURLSessionTaskStateCompleted 操作成功!");
         //请求完成
         _responseData = activeDownload;
         if (_responseStatusCode != 200) {
@@ -641,9 +669,17 @@ NSString *const FileDownload = @"fileDownload";
     }
 }
 
+- (void)dealloc
+{
+    sendDate = nil;
+    receiveDate = nil;
+    _resumData = nil;
+    _responseData = nil;
+}
+
 #pragma mark - -------HTTPRequest--------------------
 #pragma mark 创建请求体
-- (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler
+- (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error))completionHandler
 {
     if ([NSJSONSerialization isValidJSONObject:body])//判断是否有效
     {
@@ -666,7 +702,11 @@ NSString *const FileDownload = @"fileDownload";
         /*
          *发起异步访问网络操作 并用 block 操作回调函数
          */
-        [NSURLConnection sendAsynchronousRequest:request queue:[[NSOperationQueue alloc] init] completionHandler:handler];
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        
+        _session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:[[NSOperationQueue alloc] init]];
+        _myDataTask = [_session dataTaskWithRequest:request completionHandler:completionHandler];
+        [_myDataTask resume];
     }else{
         NSString *urlString = [HTTPRequest initUrl:method];;
         _urlString = _urlString ?: urlString;
@@ -682,7 +722,11 @@ NSString *const FileDownload = @"fileDownload";
         /*
          *发起异步访问网络操作 并用 block 操作回调函数
          */
-        [NSURLConnection sendAsynchronousRequest:request queue:[[NSOperationQueue alloc] init] completionHandler:handler];
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        
+        _session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:[[NSOperationQueue alloc] init]];
+        _myDataTask = [_session dataTaskWithRequest:request completionHandler:completionHandler];
+        [_myDataTask resume];
     }
 }
 
@@ -695,10 +739,10 @@ NSString *const FileDownload = @"fileDownload";
     return result;
 }
 
-+ (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSURLResponse* response, NSData* data, NSError* error)) handler
++ (void)run:(NSString *)method body:(NSDictionary *)body completionHandler:(void (^)(NSData * data, NSURLResponse * response, NSError * error))completionHandler
 {
     HTTPRequest *result = [[HTTPRequest alloc] init];
-    [result run:method body:body completionHandler:handler];
+    [result run:method body:body completionHandler:completionHandler];
 }
 
 #pragma mark 打印调试信息
