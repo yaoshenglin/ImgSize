@@ -104,7 +104,7 @@
     NSString *dirPath = [@"~/Library" stringByExpandingTildeInPath];
     dirPath = [dirPath stringByAppendingPathComponent:@"Downloads"];
     NSString *path = [dirPath stringByAppendingPathComponent:imgName];
-    NSData *data = [NSData dataWithContentsOfFile:path];
+    NSData *data = [NSData dataWithContentsOfFile:path]?:[NSData data];
 //    UIImage *image = [UIImage imageNamed:imgName];
     
     NSDictionary *body = @{@"file":data,@"fileName":imgName,@"path":path};

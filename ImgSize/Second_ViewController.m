@@ -335,12 +335,25 @@ typedef NS_ENUM(NSInteger, SearchType) {
     }
     else if (Type == 3) {
         NSString *head = @"prefs:root=";
+        if (iPhone >= 10) {
+            head = @"App-Prefs:root=";
+        }
         NSString *content = listData[indexPath.row];
         NSString *urlStr = [head AppendString:content];
         NSURL *url = [NSURL URLWithString:urlStr];
         UIApplication *application = [UIApplication sharedApplication];
         if ([application canOpenURL:url]) {
             [application openURL:url];
+            if (iPhone >= 8 && iPhone < 10) {
+                [application openURL:url];
+            }
+            else if (iPhone >= 10) {
+                [application openURL:url
+                             options:@{}
+                   completionHandler:^(BOOL success) {
+                    
+                }];
+            }
         }else{
             NSLog(@"%@",UIApplicationOpenSettingsURLString);
             NSLog(@"%@",UIApplicationOpenURLOptionsOpenInPlaceKey);

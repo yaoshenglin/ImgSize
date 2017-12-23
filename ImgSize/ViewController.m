@@ -224,7 +224,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
         
         //[self.view bringSubviewToFront:ViewBlue];
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择设备" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"门禁", @"主机",@"网络请求",@"相册", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择设备" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"门禁", @"主机",@"系统设置",@"相册",@"网络请求", nil];
         alert.tag = 2;
         [alert show];
         
@@ -243,7 +243,7 @@ static NSString *const SBStyle2 = @"SBStyle2";
 //        UITextField *txtName = [alert textFieldAtIndex:0];
 //        txtName.text = textLabel.text.length > 0 ? textLabel.text : @"远在天边";
 //        [alert show];
-        //[self scanWifis];
+        [self scanWifis];
         
 //        DrawView *drawView = [[DrawView alloc] initWithFrame:CGRectMake(0, 0, Screen_Width, viewH)];
 //        [self.view addSubview:drawView];
