@@ -767,7 +767,7 @@ void forbiddenNavPan(UIViewController *VC,BOOL isForbid)
     label.text = text;
     label.layer.masksToBounds = YES;//约束边界
     label.numberOfLines = 0;
-    label.lineBreakMode = NSLineBreakByCharWrapping;
+    label.lineBreakMode = NSLineBreakByTruncatingTail;
     label.textAlignment = NSTextAlignmentCenter;    //默认为居中显示
     label.backgroundColor = [UIColor clearColor];   //默认为透明背景
     if (size > -1) {
@@ -1898,7 +1898,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
         dateSize = [content boundingRectWithSize:CGSizeMake(width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:tDic context:nil].size;
     }else{
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        dateSize = [content sizeWithFont:contentFont constrainedToSize:CGSizeMake(width, 2000) lineBreakMode:NSLineBreakByTruncatingTail];
+        dateSize = [content sizeWithFont:contentFont constrainedToSize:CGSizeMake(width, 2000) lineBreakMode:NSLineBreakByCharWrapping];
 #endif
     }
     float heightOfContent = MAX(25, dateSize.height);
@@ -1913,7 +1913,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
         labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
     }else{
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByCharWrapping];
 #endif
     }
     return labelsize;
@@ -1921,14 +1921,18 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
 
 + (CGSize)getSizeWith:(NSString *)content font:(UIFont *)font size:(CGSize)size
 {
-    return [self getSizeWith:content font:font size:size lineBreakMode:NSLineBreakByTruncatingTail];
+    NSLineBreakMode lineBreakMode = NSLineBreakByCharWrapping;
+    return [self getSizeWith:content font:font size:size lineBreakMode:lineBreakMode];
 }
 
 + (CGSize)getSizeWith:(NSString *)content font:(UIFont *)font size:(CGSize)size lineBreakMode:(NSLineBreakMode)lineBreakMode
 {
     CGSize labelsize = CGSizeZero;
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineBreakMode = lineBreakMode;
+    NSDictionary *tDic = @{NSFontAttributeName:font, NSParagraphStyleAttributeName:paragraphStyle};
     if (iPhone >= 7) {
-        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+        labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:tDic context:nil].size;
     }else{
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
         labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:lineBreakMode];
@@ -1945,7 +1949,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
         labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
     }else{
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByCharWrapping];
 #endif
     }
     label.text = content;
@@ -1961,7 +1965,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
         labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
     }else{
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByCharWrapping];
 #endif
     }
     return labelsize.height;
@@ -1976,7 +1980,7 @@ id getSuperViewBy(Class aClass,UIView *View,NSInteger tag)
         labelsize = [content boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
     }else{
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail];
+        labelsize = [content sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByCharWrapping];
 #endif
     }
     return labelsize.width;
@@ -5141,7 +5145,7 @@ long parseStrtol(NSString *str)
 
 + (CGFloat)sizeWithString:(NSString *)aString forWidth:(CGFloat)width
 {
-    return [self sizeWithString:aString forWidth:width lineBreakMode:NSLineBreakByTruncatingTail];
+    return [self sizeWithString:aString forWidth:width lineBreakMode:NSLineBreakByCharWrapping];
 }
 
 + (void)sizeWithString:(NSString *)aString forRect:(CGRect)rect
