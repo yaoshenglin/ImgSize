@@ -1144,16 +1144,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		14A0E5E81DA8885400CC08B5 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				14A0E5E61DA8885400CC08B5 /* zh-Hans */,
-				14A0E5E71DA8885400CC08B5 /* en */,
-			);
-			name = Localizable.strings;
-			path = "../../../OC工程/test/test";
-			sourceTree = "<group>";
-		};
 		E21EE5F019270DBF0051408C /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
