@@ -113,16 +113,6 @@ static NSString *const SBStyle2 = @"SBStyle2";
     
     self.title = @"哈哈";
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"IRCode.db" ofType:@""];
-    ocSqlite = [[OCSqlite alloc] init];
-    [ocSqlite ConnectToDB:path];
-    [ocSqlite query:@"SELECT * FROM device"];
-    OCField *ocField = [ocSqlite.dataset fieldbyname:@"device_name"];
-    NSLog(@"%@",ocField.toString);
-    [ocSqlite.dataset next];
-    ocField = [ocSqlite.dataset fieldbyname:@"device_name"];
-    NSLog(@"%@",ocField.toString);
-    
     [self createUI];
     
     CGFloat x = 120.0f;
